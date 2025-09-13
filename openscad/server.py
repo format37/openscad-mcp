@@ -1,11 +1,8 @@
 import os
 import re
-# import json
-# import glob
 import contextlib
 import logging
 import uvicorn
-# import requests
 from starlette.applications import Starlette
 from starlette.routing import Mount
 from starlette.middleware.base import BaseHTTPMiddleware

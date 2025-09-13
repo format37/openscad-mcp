@@ -41,3 +41,26 @@ Need to define domain name in the first line. Subtomain is also acceptable.
 ```bash
 ./production.sh
 ```
+
+### 5. Claude desktop config
+The token is defined temporary for demo and may be unavailable later. Make ur own server)
+```
+{
+  "mcpServers": {
+      "openscad": {
+        "command": "npx",
+        "args": [
+          "mcp-remote",
+          "https://rtlm.info/openscad/8TikTAffQT3Db65Q7xbofbUjapGjKepTI3sikOeLWClfXW5GXO/"
+        ]
+    }
+  }
+}
+```
+
+### 6. Claude web & Claude mobile
+Can be defined only in claude web.
+```
+https://rtlm.info/openscad/8TikTAffQT3Db65Q7xbofbUjapGjKepTI3sikOeLWClfXW5GXO/
+```
+Chat GPT requiring the search and fetch tools, which is non-sense for this server purpose.
