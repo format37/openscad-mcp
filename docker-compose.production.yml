@@ -7,8 +7,8 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - /etc/letsencrypt/live/service.dnk-technologies.com/fullchain.pem:/server/fullchain.pem:ro
-      - /etc/letsencrypt/live/service.dnk-technologies.com/privkey.pem:/server/privkey.pem:ro
+      - /etc/letsencrypt/live/rtlm.info/fullchain.pem:/server/fullchain.pem:ro
+      - /etc/letsencrypt/live/rtlm.info/privkey.pem:/server/privkey.pem:ro
       - caddy_data:/data
       - caddy_config:/config
     restart: unless-stopped
