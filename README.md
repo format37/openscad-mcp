@@ -34,6 +34,9 @@ MCP_REQUIRE_AUTH=true
 MCP_ALLOW_URL_TOKENS=true
 ```
 
+# Define the Caddyfile
+Need to define domain name in the first line. Subtomain is also acceptable.
+
 ### 4. Compose
 ```bash
 ./production.sh
