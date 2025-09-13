@@ -1,5 +1,6 @@
 import os
 import re
+import uuid
 import contextlib
 import logging
 import uvicorn
@@ -12,6 +13,7 @@ from mcp.server.fastmcp import Image as MCPImage
 from mcp_image_utils import to_mcp_image
 import subprocess
 import tempfile
+import threading
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,8 +30,19 @@ logger.info(f"Stream path: {STREAM_PATH}")
 
 mcp = FastMCP(_safe_name, streamable_http_path=STREAM_PATH, json_response=True)
 
+# Concurrency guard to prevent CPU/memory overload on weak hosts
+_max_concurrency = int(os.getenv("RENDER_MAX_CONCURRENCY", os.getenv("OPENSCAD_MAX_CONCURRENCY", "2")) or 2)
+_render_semaphore = threading.Semaphore(_max_concurrency)
+
 @mcp.tool()
-def render_scad_script(scad_code: str, filename: str = "current", view: str = "3d", image_size: str = "800,600") -> MCPImage:
+def render_scad_script(
+    scad_code: str,
+    filename: str = "script",
+    view: str = "3d",
+    image_size: str = "800,600",
+    uid: str | None = None,
+    persist: bool = True,
+) -> MCPImage:
     """
     Render an OpenSCAD script to an image and return it as an MCP image.
     
@@ -42,6 +55,8 @@ def render_scad_script(scad_code: str, filename: str = "current", view: str = "3
     Returns:
         MCPImage: The rendered image in MCP format.
     """
+    # Limit simultaneous renders to avoid overwhelming weak servers
+    _render_semaphore.acquire()
     try:
         from PIL import Image as PILImage
         import shutil
@@ -49,19 +64,28 @@ def render_scad_script(scad_code: str, filename: str = "current", view: str = "3
         # Create data directories if they don't exist
         os.makedirs("./data/scad", exist_ok=True)
         os.makedirs("./data/render", exist_ok=True)
-        
-        # Create temporary files with specified filename
-        temp_dir = tempfile.gettempdir()
-        temp_scad_path = os.path.join(temp_dir, f"{filename}.scad")
-        temp_png_path = os.path.join(temp_dir, f"{filename}.png")
-        
-        # Permanent file paths in organized directories (same filename each time for real-time monitoring)
-        permanent_scad_path = f"./data/scad/{filename}.scad"
-        permanent_png_path = f"./data/render/{filename}_{view}.png"
-        
-        # Write the SCAD code to file
-        with open(temp_scad_path, 'w') as scad_file:
+
+        # Generate a unique id for this render (directory namespace for permanence)
+        if not uid:
+            uid = str(uuid.uuid4())
+
+        # Per-request subdirectories to avoid collisions and aid future retrieval
+        uid_scad_dir = os.path.join("./data/scad", uid)
+        uid_render_dir = os.path.join("./data/render", uid)
+        os.makedirs(uid_scad_dir, exist_ok=True)
+        os.makedirs(uid_render_dir, exist_ok=True)
+
+        # Create unique temporary files to avoid collisions even within same uid
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.scad', delete=False) as scad_file:
+            temp_scad_path = scad_file.name
             scad_file.write(scad_code)
+        temp_png_fd, temp_png_path = tempfile.mkstemp(suffix='.png')
+        os.close(temp_png_fd)
+
+        # Permanent file paths in organized directories
+        safe_base = re.sub(r"[^a-zA-Z0-9_.-]", "-", filename) or "script"
+        permanent_scad_path = os.path.join(uid_scad_dir, f"{safe_base}.scad")
+        permanent_png_path = os.path.join(uid_render_dir, f"{safe_base}_{view}.png")
         
         try:
             # Define camera settings for different views
@@ -101,10 +125,11 @@ def render_scad_script(scad_code: str, filename: str = "current", view: str = "3
                 raise RuntimeError("OpenSCAD rendering succeeded but no output file was created")
             
             # Copy files to organized directories for permanent storage
-            shutil.copy2(temp_scad_path, permanent_scad_path)
-            shutil.copy2(temp_png_path, permanent_png_path)
+            if persist:
+                shutil.copy2(temp_scad_path, permanent_scad_path)
+                shutil.copy2(temp_png_path, permanent_png_path)
             
-            logger.info(f"Files saved: {permanent_scad_path}, {permanent_png_path}")
+            logger.info(f"Render UID={uid} files saved: {permanent_scad_path}, {permanent_png_path}")
             
             # Load and return the image
             img = PILImage.open(temp_png_path)
@@ -123,6 +148,8 @@ def render_scad_script(scad_code: str, filename: str = "current", view: str = "3
     except Exception as e:
         logger.error(f"Exception occurred while rendering OpenSCAD script: {str(e)}")
         raise RuntimeError(f"Exception occurred while rendering OpenSCAD script: {str(e)}")
+    finally:
+        _render_semaphore.release()
 
 # Build the main ASGI app with Streamable HTTP mounted
 mcp_asgi = mcp.streamable_http_app()

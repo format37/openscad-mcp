@@ -5,5 +5,5 @@ pydantic>=2.0
 pydantic-settings>=2.5.2
 requests>=2.32.5
 starlette>=0.28.0
-uvicorn>=0.31.1
+uvicorn[standard]>=0.31.1
 pillow==11.3.0

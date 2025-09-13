@@ -42,6 +42,10 @@ Need to define domain name in the first line. Subtomain is also acceptable.
 ./production.sh
 ```
 
+### Concurrency & Persistence
+- The server limits simultaneous OpenSCAD renders with `RENDER_MAX_CONCURRENCY` (default: 2). Increase carefully on small hosts.
+- Each render is saved under `./data/scad/<uid>/` and `./data/render/<uid>/` with filenames derived from the provided `filename` plus the view (e.g., `script_3d.png`). You can pass a custom `uid` if you need predictable locations.
+
 ### 5. Claude desktop config
 The token is defined temporary for demo and may be unavailable later. Make ur own server)
 ```
