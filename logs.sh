@@ -1,0 +1,1 @@
+sudo docker logs -f mcp-openscad-resource-server

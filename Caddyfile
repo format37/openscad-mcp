@@ -1,0 +1,21 @@
+service.dnk-technologies.com {
+    tls /server/fullchain.pem /server/privkey.pem
+
+    # OPENSCAD → /openscad/* (preserve prefix for cookie path scoping)
+    handle /openscad* {
+        reverse_proxy mcp-openscad:8004
+    }
+
+    # Root response (optional)
+    handle_path / {
+        respond "MCP Gateway." 200
+    }
+
+    # Basic hardening headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+    }
+}

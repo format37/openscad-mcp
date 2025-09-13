@@ -1,13 +1,38 @@
-# openscad-mcp
-The openscad MCP server to compose openscad scripts and render them by LLM
-# Claude desktop config
+# OpenSCAD MCP
+
+## Installation
+
+### 1. SSL certificate generation
+Update your subdomain name if required
+```bash
+sudo apt install certbot
+sudo certbot certonly --standalone -d service.dnk-technologies.com
 ```
-"openscad": {
-        "command": "npx",
-        "args": [
-          "mcp-remote",
-          "http://localhost:8000/sse"
-        ],
-        "disabled": false
-      }
+Auto-renewal setup:
+```bash
+sudo crontab -e
+# Add: 0 12 * * * /usr/bin/certbot renew --quiet
+```
+
+### 2. Git clone
+```bash
+git clone https://github.com/format37/openscad-mcp.git
+cd openscad-mcp
+```
+
+### 3. Environment variables
+Localhost
+```bash
+cd mcp
+nano .env
+```
+Generate any token.
+Define: tokens divided by comma:
+```
+TOKENS=YOUR_TOKEN
+```
+
+### 4. Compose
+```bash
+./compose.sh
 ```

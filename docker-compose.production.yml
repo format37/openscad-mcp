@@ -1,0 +1,40 @@
+services:
+  # Reverse proxy + TLS terminator
+  caddy:
+    image: caddy:2.8
+    container_name: mcp-gateway
+    ports:
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /etc/letsencrypt/live/service.dnk-technologies.com/fullchain.pem:/server/fullchain.pem:ro
+      - /etc/letsencrypt/live/service.dnk-technologies.com/privkey.pem:/server/privkey.pem:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+  # Openscad MCP app (HTTP internal)
+  mcp-openscad:
+    container_name: mcp-openscad-resource-server
+    runtime: runc
+    build: openscad
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - PORT=8004
+      - TZ=UTC
+      - OPENSCAD_TOKENS=${OPENSCAD_TOKENS}
+      - OPENSCAD_REQUIRE_AUTH=${OPENSCAD_REQUIRE_AUTH}
+      - OPENSCAD_ALLOW_URL_TOKENS=${OPENSCAD_ALLOW_URL_TOKENS}
+    expose:
+      - "8004"
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:
