@@ -5,6 +5,7 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
        openscad \
        xvfb \
+       xauth \
        libgl1 \
        libglu1-mesa \
        libgl1-mesa-dri \
@@ -13,7 +14,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a lightweight wrapper so any 'openscad' call runs under Xvfb
-RUN printf '#!/bin/sh\nexec xvfb-run -a /usr/bin/openscad "$@"\n' > /usr/local/bin/openscad \
+RUN printf '#!/bin/sh\nexec xvfb-run -a --server-args="-screen 0 1600x1200x24 -nolisten tcp" /usr/bin/openscad "$@"\n' > /usr/local/bin/openscad \
     && chmod +x /usr/local/bin/openscad
 
 WORKDIR /app
