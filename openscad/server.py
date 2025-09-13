@@ -246,13 +246,6 @@ def main():
     Run the uvicorn server without SSL (TLS handled by Caddy).
     """
     PORT = int(os.getenv("PORT", "8003"))
-    # Raise error if required credentials are not set (prefer MCP_NAME-derived envs, fall back to legacy CBONDS_*)
-    login = os.getenv(f"{ENV_PREFIX}_LOGIN", os.getenv("CBONDS_LOGIN"))
-    password = os.getenv(f"{ENV_PREFIX}_PASSWORD", os.getenv("CBONDS_PASSWORD"))
-    if not password or not login:
-        raise EnvironmentError(
-            f"{ENV_PREFIX}_PASSWORD and {ENV_PREFIX}_LOGIN (or legacy CBONDS_PASSWORD/CBONDS_LOGIN) environment variables must be set"
-        )
 
     logger.info(f"Starting {MCP_NAME} MCP server (HTTP) on port {PORT} at {STREAM_PATH}")
 
