@@ -20,8 +20,6 @@ RUN printf '#!/bin/sh\nexec xvfb-run -a --server-args="-screen 0 1600x1200x24 -n
 WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
-COPY solid_renderer.py /app/
-COPY program.py /app/
 COPY mcp_image_utils.py /app/
 COPY server.py /app/
 
