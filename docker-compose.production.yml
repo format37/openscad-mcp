@@ -28,9 +28,9 @@ services:
     environment:
       - PORT=8004
       - TZ=UTC
-      - TOKENS=${TOKENS}
-      - REQUIRE_AUTH=${REQUIRE_AUTH}
-      - ALLOW_URL_TOKENS=${ALLOW_URL_TOKENS}
+      - MCP_TOKENS=${MCP_TOKENS}
+      - MCP_REQUIRE_AUTH=${MCP_REQUIRE_AUTH}
+      - MCP_ALLOW_URL_TOKENS=${MCP_ALLOW_URL_TOKENS}
     expose:
       - "8004"
     restart: unless-stopped

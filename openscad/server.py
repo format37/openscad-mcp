@@ -161,28 +161,28 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
         # Prefer envs derived from MCP_NAME; fall back to legacy CBONDS_* names for backward compatibility
-        raw = os.getenv(f"{ENV_PREFIX}_TOKENS", os.getenv("CBONDS_TOKENS", ""))
+        raw = os.getenv(f"MCP_TOKENS", "")
         self.allowed_tokens = {t.strip() for t in raw.split(",") if t.strip()}
         self.allow_url_tokens = (
-            os.getenv(f"{ENV_PREFIX}_ALLOW_URL_TOKENS", os.getenv("CBONDS_ALLOW_URL_TOKENS", "")).lower()
+            os.getenv(f"MCP_ALLOW_URL_TOKENS", "").lower()
             in ("1", "true", "yes")
         )
         self.require_auth = (
-            os.getenv(f"{ENV_PREFIX}_REQUIRE_AUTH", os.getenv("CBONDS_REQUIRE_AUTH", "")).lower()
+            os.getenv(f"MCP_REQUIRE_AUTH", "").lower()
             in ("1", "true", "yes")
         )
         if not self.allowed_tokens:
             if self.require_auth:
                 logger.warning(
                     "%s is not set; %s=true -> all %s requests will be rejected (401)",
-                    f"{ENV_PREFIX}_TOKENS",
-                    f"{ENV_PREFIX}_REQUIRE_AUTH",
+                    f"MCP_TOKENS",
+                    f"MCP_REQUIRE_AUTH",
                     BASE_PATH,
                 )
             else:
                 logger.warning(
                     "%s is not set; token auth is DISABLED for %s endpoints",
-                    f"{ENV_PREFIX}_TOKENS",
+                    f"MCP_TOKENS",
                     BASE_PATH,
                 )
 
