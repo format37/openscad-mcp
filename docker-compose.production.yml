@@ -28,9 +28,9 @@ services:
     environment:
       - PORT=8004
       - TZ=UTC
-      - OPENSCAD_TOKENS=${OPENSCAD_TOKENS}
-      - OPENSCAD_REQUIRE_AUTH=${OPENSCAD_REQUIRE_AUTH}
-      - OPENSCAD_ALLOW_URL_TOKENS=${OPENSCAD_ALLOW_URL_TOKENS}
+      - TOKENS=${OPENSCAD_TOKENS}
+      - REQUIRE_AUTH=${OPENSCAD_REQUIRE_AUTH}
+      - ALLOW_URL_TOKENS=${OPENSCAD_ALLOW_URL_TOKENS}
     expose:
       - "8004"
     restart: unless-stopped

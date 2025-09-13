@@ -24,15 +24,17 @@ cd openscad-mcp
 Localhost
 ```bash
 cd mcp
-nano .env
+nano .env.production
 ```
 Generate any token.
 Define: tokens divided by comma:
 ```
 TOKENS=YOUR_TOKEN
+REQUIRE_AUTH=true
+ALLOW_URL_TOKENS=true
 ```
 
 ### 4. Compose
 ```bash
-./compose.sh
+./production.sh
 ```
