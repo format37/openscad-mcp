@@ -1,21 +1,6 @@
 services:
-  # # Reverse proxy + TLS terminator
-  # caddy:
-  #   image: caddy:2.8
-  #   container_name: mcp-gateway
-  #   ports:
-  #     - "443:443"
-  #   volumes:
-  #     - ./Caddyfile:/etc/caddy/Caddyfile:ro
-  #     - /etc/letsencrypt/live/rtlm.info/fullchain.pem:/server/fullchain.pem:ro
-  #     - /etc/letsencrypt/live/rtlm.info/privkey.pem:/server/privkey.pem:ro
-  #     - caddy_data:/data
-  #     - caddy_config:/config
-  #   restart: unless-stopped
-
-  # Openscad MCP app (HTTP internal)
   mcp-openscad:
-    container_name: mcp-openscad-resource-server
+    container_name: mcp-openscad
     runtime: runc
     build: openscad
     logging:
@@ -35,9 +20,9 @@ services:
       - "8004"
     restart: unless-stopped
     networks:
-       mcp-shared:
-         external: true
+      - default
+      - mcp-shared
 
-# volumes:
-#   caddy_data:
-#   caddy_config:
+networks:
+  mcp-shared:
+    external: true
