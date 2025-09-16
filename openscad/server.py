@@ -360,6 +360,17 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
         if not path.startswith(BASE_PATH):
             return await call_next(request)
 
+        def accept(token_value: str, source: str):
+            request.state.mcp_token = token_value  # stash for downstream use
+            logger.info(
+                "Authenticated %s %s via %s token %s",
+                request.method,
+                path,
+                source,
+                token_value,
+            )
+            return True
+
         # If no tokens configured
         if not self.allowed_tokens:
             if self.require_auth:
@@ -374,6 +385,7 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
 
         # Header token valid -> allow
         if token and token in self.allowed_tokens:
+            accept(token, "header")
             return await call_next(request)
 
         # If URL tokens are allowed, check query and path variants
@@ -381,6 +393,7 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
             # 1) Query parameter ?token=...
             url_token = request.query_params.get("token")
             if url_token and url_token in self.allowed_tokens:
+                accept(url_token, "query")
                 return await call_next(request)
 
             # 2) Path segment /<service>/<token>/...
@@ -396,6 +409,7 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
                     request.scope["path"] = new_path
                     if "raw_path" in request.scope:
                         request.scope["raw_path"] = new_path.encode("utf-8")
+                    accept(candidate, "path")
                     return await call_next(request)
 
         # If we reached here, reject unauthorized
