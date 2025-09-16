@@ -1,4 +1,5 @@
 import contextlib
+import contextvars
 import logging
 import os
 import re
@@ -17,13 +18,15 @@ from starlette.responses import JSONResponse
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.fastmcp import Image as MCPImage
 
 from mcp_image_utils import to_mcp_image
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+MCP_TOKEN_CTX = contextvars.ContextVar("mcp_token", default=None)
 
 # Initialize FastMCP using MCP_NAME (env) for tool name and base path
 # Ensure the streamable path ends with '/'
@@ -105,6 +108,7 @@ def render_scad_script(
     image_size: str = "800,600",
     uid: str | None = None,
     persist: bool = True,
+    ctx: Context | None = None,
 ) -> list[Any]:
     """Render an OpenSCAD script, return a preview image plus links.
 
@@ -117,6 +121,16 @@ def render_scad_script(
         with _render_semaphore:
             from PIL import Image as PILImage
             import shutil
+
+            user_token = MCP_TOKEN_CTX.get(None)
+            request_id = ctx.request_id if ctx else "?"
+            client_id = ctx.client_id if ctx else None
+            logger.info(
+                "render_scad_script invoked (token=%s, client_id=%s, request=%s)",
+                user_token or "<none>",
+                client_id or "<unknown>",
+                request_id,
+            )
 
             render_uid = uid or str(uuid.uuid4())
             uid_scad_dir = SCAD_DIR / render_uid
@@ -369,7 +383,14 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
                 source,
                 token_value,
             )
-            return True
+            return MCP_TOKEN_CTX.set(token_value)
+
+        async def proceed(token_value: str, source: str):
+            token_scope = accept(token_value, source)
+            try:
+                return await call_next(request)
+            finally:
+                MCP_TOKEN_CTX.reset(token_scope)
 
         # If no tokens configured
         if not self.allowed_tokens:
@@ -385,16 +406,14 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
 
         # Header token valid -> allow
         if token and token in self.allowed_tokens:
-            accept(token, "header")
-            return await call_next(request)
+            return await proceed(token, "header")
 
         # If URL tokens are allowed, check query and path variants
         if self.allow_url_tokens:
             # 1) Query parameter ?token=...
             url_token = request.query_params.get("token")
             if url_token and url_token in self.allowed_tokens:
-                accept(url_token, "query")
-                return await call_next(request)
+                return await proceed(url_token, "query")
 
             # 2) Path segment /<service>/<token>/...
             segs = [s for s in path.split("/") if s != ""]
@@ -409,8 +428,7 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
                     request.scope["path"] = new_path
                     if "raw_path" in request.scope:
                         request.scope["raw_path"] = new_path.encode("utf-8")
-                    accept(candidate, "path")
-                    return await call_next(request)
+                    return await proceed(candidate, "path")
 
         # If we reached here, reject unauthorized
         if self.allow_url_tokens:
