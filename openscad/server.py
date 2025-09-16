@@ -214,6 +214,7 @@ def render_scad_script(
                     format=PREVIEW_FORMAT,
                     **preview_kwargs,
                 )
+                preview_content = preview_block.to_image_content()
 
                 asset_relative_path = f"{render_uid}/{png_name}"
                 asset_http_path = f"{ASSETS_ROUTE}/{asset_relative_path}"
@@ -248,7 +249,7 @@ def render_scad_script(
                         "Render was not persisted; asset URLs and resources are unavailable."
                     )
 
-                return [preview_block, "\n".join(info_lines)]
+                return [preview_content, "\n".join(info_lines)]
 
             finally:
                 if temp_scad_path.exists():
