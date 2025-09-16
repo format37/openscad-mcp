@@ -10,6 +10,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+      - ./data.csv:/app/data.csv:ro
     environment:
       - PORT=8004
       - TZ=UTC

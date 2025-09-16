@@ -1,6 +1,8 @@
+import base64
 import contextlib
 import contextvars
 import logging
+import mimetypes
 import os
 import re
 import subprocess
@@ -20,6 +22,7 @@ from starlette.staticfiles import StaticFiles
 
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.fastmcp import Image as MCPImage
+from mcp.types import BlobResourceContents, EmbeddedResource
 
 from mcp_image_utils import to_mcp_image
 
@@ -99,6 +102,44 @@ mcp = FastMCP(_safe_name, streamable_http_path=STREAM_PATH, json_response=True)
 # Concurrency guard to prevent CPU/memory overload on weak hosts
 _max_concurrency = _env_int("RENDER_MAX_CONCURRENCY", _env_int("OPENSCAD_MAX_CONCURRENCY", 2))
 _render_semaphore = threading.Semaphore(_max_concurrency)
+
+
+@mcp.tool()
+def get_file(
+    file: bytes,
+    filename: str | None = None,
+    mime_type: str | None = None,
+) -> list[Any]:
+    """Return the provided file contents as an embedded MCP resource."""
+
+    safe_name = _sanitize_filename(filename or "uploaded")
+    resource_uri = f"file:///{safe_name}"
+    detected_mime = mime_type or mimetypes.guess_type(safe_name)[0] or "application/octet-stream"
+
+    logger.info(
+        "get_file invoked for %s (bytes=%s)",
+        safe_name,
+        len(file),
+    )
+
+    encoded_blob = base64.b64encode(file).decode("ascii")
+    resource = EmbeddedResource(
+        type="resource",
+        resource=BlobResourceContents(
+            uri=resource_uri,
+            blob=encoded_blob,
+            mimeType=detected_mime,
+        ),
+    )
+
+    info_lines = [
+        f"Filename: {safe_name}",
+        f"URI: {resource_uri}",
+        f"MIME type: {detected_mime}",
+    ]
+
+    return [resource, "\n".join(info_lines)]
+
 
 @mcp.tool()
 def render_scad_script(
