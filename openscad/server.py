@@ -63,8 +63,9 @@ def _sanitize_filename(name: str) -> str:
 DATA_DIR = Path(os.getenv("MCP_DATA_DIR", "./data")).resolve()
 SCAD_DIR = DATA_DIR / "scad"
 RENDER_DIR = DATA_DIR / "render"
+UPLOAD_DIR = DATA_DIR / "uploads"
 
-for directory in (SCAD_DIR, RENDER_DIR):
+for directory in (SCAD_DIR, RENDER_DIR, UPLOAD_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 ASSETS_ROUTE = f"{STREAM_PATH.rstrip('/')}/assets"
@@ -240,7 +241,13 @@ async def get_file(
 
     resolved_name = filename or inferred_name or "uploaded"
     safe_name = _sanitize_filename(resolved_name)
-    resource_uri = f"file:///{safe_name}"
+    file_uid = str(uuid.uuid4())
+    upload_dir = UPLOAD_DIR / file_uid
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    file_path = upload_dir / safe_name
+    file_path.write_bytes(data_bytes)
+
+    resource_uri = f"{_safe_name}://file/{file_uid}/{safe_name}"
 
     detected_mime = (
         mime_type
@@ -249,7 +256,12 @@ async def get_file(
         or "application/octet-stream"
     )
 
-    logger.info("get_file invoked for %s (bytes=%s)", safe_name, len(data_bytes))
+    logger.info(
+        "get_file invoked for %s (bytes=%s, uri=%s)",
+        safe_name,
+        len(data_bytes),
+        resource_uri,
+    )
 
     encoded_blob = base64.b64encode(data_bytes).decode("ascii")
     resource = EmbeddedResource(
@@ -265,6 +277,7 @@ async def get_file(
         f"Filename: {safe_name}",
         f"URI: {resource_uri}",
         f"MIME type: {detected_mime}",
+        f"Stored path: {file_path}",
     ]
 
     return [resource, "\n".join(info_lines)]
@@ -460,6 +473,18 @@ def get_render_resource(uid: str, name: str, view: str) -> bytes:
         raise FileNotFoundError(
             f"Render {uid}/{safe_name}_{view}.png not found on server"
         )
+    return path.read_bytes()
+
+
+@mcp.resource(f"{_safe_name}://file/{{uid}}/{{name}}", mime_type="application/octet-stream")
+def get_uploaded_file(uid: str, name: str) -> bytes:
+    """Expose uploaded files as MCP resources."""
+
+    safe_name = _sanitize_filename(name)
+    base_dir = (UPLOAD_DIR / uid).resolve()
+    path = (base_dir / safe_name).resolve()
+    if not path.is_relative_to(base_dir) or not path.exists():
+        raise FileNotFoundError(f"Uploaded file {uid}/{safe_name} not found on server")
     return path.read_bytes()
 
 
