@@ -1,4 +1,5 @@
 import base64
+import binascii
 import contextlib
 import contextvars
 import logging
@@ -11,7 +12,7 @@ import threading
 import uuid
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import uvicorn
 from starlette.applications import Starlette
@@ -104,25 +105,153 @@ _max_concurrency = _env_int("RENDER_MAX_CONCURRENCY", _env_int("OPENSCAD_MAX_CON
 _render_semaphore = threading.Semaphore(_max_concurrency)
 
 
+def _try_decode_base64(data: str) -> bytes | None:
+    data = data.strip()
+    if not data:
+        return b""
+    try:
+        return base64.b64decode(data, validate=True)
+    except binascii.Error:
+        return None
+
+
+async def _load_uri_contents(uri: str, ctx: Context | None) -> tuple[bytes, str | None, str | None]:
+    if ctx is None:
+        raise ValueError("Context is required to read resources by URI")
+
+    contents = await ctx.read_resource(uri)
+    chunks: list[bytes] = []
+    detected_mime: str | None = None
+    for item in contents:
+        if isinstance(item.content, str):
+            chunks.append(item.content.encode("utf-8"))
+            detected_mime = detected_mime or item.mime_type or "text/plain"
+        else:
+            chunks.append(item.content)
+            detected_mime = detected_mime or item.mime_type
+
+    parsed = urlparse(uri)
+    name = Path(parsed.path).name if parsed.path else None
+    return b"".join(chunks), name, detected_mime
+
+
+async def _extract_file_bytes(
+    file_arg: Any,
+    ctx: Context | None,
+) -> tuple[bytes, str | None, str | None]:
+    if isinstance(file_arg, (bytes, bytearray)):
+        return bytes(file_arg), None, None
+
+    if isinstance(file_arg, str):
+        candidate_uri = file_arg.strip()
+        if "://" in candidate_uri:
+            return await _load_uri_contents(candidate_uri, ctx)
+
+        maybe_base64 = _try_decode_base64(candidate_uri)
+        if maybe_base64 is not None:
+            return maybe_base64, None, None
+
+        path_candidate = Path(candidate_uri)
+        if not path_candidate.is_absolute():
+            scoped_candidate = (DATA_DIR / candidate_uri).resolve()
+            if scoped_candidate.exists() and scoped_candidate.is_file():
+                path_candidate = scoped_candidate
+        if path_candidate.exists() and path_candidate.is_file():
+            data = path_candidate.read_bytes()
+            return data, path_candidate.name, mimetypes.guess_type(path_candidate.name)[0]
+
+        # Treat as plain text payload
+        looks_like_filename = Path(candidate_uri).suffix and not any(
+            ch in candidate_uri for ch in ("\n", ",", "\t")
+        )
+        if looks_like_filename:
+            raise FileNotFoundError(
+                f"File {candidate_uri!r} not found; provide file data or a resolvable reference"
+            )
+        return candidate_uri.encode("utf-8"), None, "text/plain"
+
+    if isinstance(file_arg, dict):
+        if "resource" in file_arg and file_arg.get("type") == "resource":
+            return await _extract_file_bytes(file_arg["resource"], ctx)
+
+        blob = file_arg.get("blob") or file_arg.get("data")
+        if blob is not None:
+            if isinstance(blob, bytes):
+                data_bytes = blob
+            elif isinstance(blob, str):
+                decoded = _try_decode_base64(blob)
+                data_bytes = decoded if decoded is not None else blob.encode("utf-8")
+            else:
+                raise ValueError("Unsupported blob/data payload type")
+            name = file_arg.get("name") or file_arg.get("filename")
+            mime = file_arg.get("mimeType") or file_arg.get("mime_type")
+            return data_bytes, name, mime
+
+        if "uri" in file_arg:
+            data, name, mime = await _load_uri_contents(str(file_arg["uri"]), ctx)
+            name = file_arg.get("name") or file_arg.get("filename") or name
+            mime = file_arg.get("mimeType") or file_arg.get("mime_type") or mime
+            return data, name, mime
+
+        if "path" in file_arg:
+            return await _extract_file_bytes(str(file_arg["path"]), ctx)
+
+    if isinstance(file_arg, (list, tuple)):
+        for item in file_arg:
+            data, name, mime = await _extract_file_bytes(item, ctx)
+            if data is not None:
+                return data, name, mime
+
+    raise ValueError("Unsupported file argument type; provide bytes, base64 data, or a resource reference")
+
+
 @mcp.tool()
-def get_file(
-    file: bytes,
+async def get_file(
+    file: Any | None = None,
     filename: str | None = None,
     mime_type: str | None = None,
+    ctx: Context | None = None,
 ) -> list[Any]:
     """Return the provided file contents as an embedded MCP resource."""
 
-    safe_name = _sanitize_filename(filename or "uploaded")
-    resource_uri = f"file:///{safe_name}"
-    detected_mime = mime_type or mimetypes.guess_type(safe_name)[0] or "application/octet-stream"
+    attachments: list[Any] = []
+    if ctx and ctx.request_context.meta:
+        try:
+            meta_dump = ctx.request_context.meta.model_dump()
+            logger.debug("get_file meta keys: %s", list(meta_dump.keys()))
+            for key in ("attachments", "files", "file", "resources"):
+                value = meta_dump.get(key)
+                if isinstance(value, list):
+                    attachments.extend(value)
+                elif value is not None:
+                    attachments.append(value)
+        except Exception:  # pragma: no cover - defensive logging
+            logger.debug("get_file meta logging failed")
 
-    logger.info(
-        "get_file invoked for %s (bytes=%s)",
-        safe_name,
-        len(file),
+    file_source: Any | None = file
+    if file_source is None and attachments:
+        file_source = attachments
+    if file_source is None and filename:
+        file_source = filename
+    if file_source is None:
+        raise ValueError("Missing file payload. Provide file data, a resource attachment, or a filename that resolves on the server.")
+
+    data_bytes, inferred_name, inferred_mime = await _extract_file_bytes(file_source, ctx)
+
+    resolved_name = filename or inferred_name or "uploaded"
+    safe_name = _sanitize_filename(resolved_name)
+    resource_uri = f"file:///{safe_name}"
+
+    detected_mime = (
+        mime_type
+        or inferred_mime
+        or mimetypes.guess_type(safe_name)[0]
+        or "application/octet-stream"
     )
 
-    encoded_blob = base64.b64encode(file).decode("ascii")
+    logger.info("get_file invoked for %s (bytes=%s)", safe_name, len(data_bytes))
+
+    encoded_blob = base64.b64encode(data_bytes).decode("ascii")
     resource = EmbeddedResource(
         type="resource",
         resource=BlobResourceContents(
