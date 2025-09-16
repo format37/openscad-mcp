@@ -105,7 +105,7 @@ def render_scad_script(
     image_size: str = "800,600",
     uid: str | None = None,
     persist: bool = True,
-) -> list[MCPImage | str]:
+) -> list[Any]:
     """Render an OpenSCAD script, return a preview image plus links.
 
     Generates a full-resolution PNG via OpenSCAD, persists it to disk when
@@ -209,7 +209,7 @@ def render_scad_script(
                 elif PREVIEW_FORMAT in {"png", "webp"}:
                     preview_kwargs["optimize"] = True
 
-                preview_block = to_mcp_image(
+                preview_block: MCPImage = to_mcp_image(
                     preview_image,
                     format=PREVIEW_FORMAT,
                     **preview_kwargs,
