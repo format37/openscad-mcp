@@ -1,7 +1,9 @@
 import base64
 import io
-import requests
+import os
+from typing import Any
 
+import requests
 from PIL import Image as PILImage
 from mcp.server.fastmcp import Image as MCPImage
 
@@ -51,7 +53,11 @@ def load_image(image: str | bytes | io.BufferedReader) -> PILImage.Image:
         raise ValueError(f"Invalid image path or URL: {image}")
 
 
-def to_mcp_image(image: PILImage.Image | bytes, format: str = "jpeg") -> MCPImage:
+def to_mcp_image(
+    image: PILImage.Image | bytes | io.BufferedReader,
+    format: str = "jpeg",
+    **save_kwargs: Any,
+) -> MCPImage:
     """
     Convert a PIL Image object or bytes to an MCP Image.
 
@@ -68,7 +74,10 @@ def to_mcp_image(image: PILImage.Image | bytes, format: str = "jpeg") -> MCPImag
         image_bytes = image
     elif isinstance(image, PILImage.Image):
         img_byte_arr = io.BytesIO()
-        image.save(img_byte_arr, format=format)
+        # Pillow expects "RGB" for JPEG; convert if needed before saving.
+        if format.lower() in {"jpeg", "jpg"} and image.mode not in ("RGB", "L"):
+            image = image.convert("RGB")
+        image.save(img_byte_arr, format=format, **save_kwargs)
         image_bytes = img_byte_arr.getvalue()
     else:
         raise ValueError("Invalid image type. Expected PIL Image or bytes.")

@@ -7,3 +7,4 @@ requests>=2.32.5
 starlette>=0.28.0
 uvicorn[standard]>=0.31.1
 pillow==11.3.0
+aiofiles>=23.2.1
