@@ -98,6 +98,19 @@ PREVIEW_JPEG_QUALITY = _env_int("MCP_PREVIEW_JPEG_QUALITY", 85)
 
 mcp = FastMCP(_safe_name, streamable_http_path=STREAM_PATH, json_response=True)
 
+# Add custom error handling for stream disconnections
+import anyio
+original_logger = logging.getLogger("mcp.server.streamable_http")
+
+class StreamErrorFilter(logging.Filter):
+    def filter(self, record):
+        # Suppress ClosedResourceError logs as they're expected when clients disconnect
+        if "ClosedResourceError" in str(record.getMessage()):
+            return False
+        return True
+
+original_logger.addFilter(StreamErrorFilter())
+
 # Concurrency guard to prevent CPU/memory overload on weak hosts
 _max_concurrency = _env_int("RENDER_MAX_CONCURRENCY", _env_int("OPENSCAD_MAX_CONCURRENCY", 2))
 _render_semaphore = threading.Semaphore(_max_concurrency)
@@ -646,7 +659,7 @@ def main():
         # Behind Caddy: respect X-Forwarded-* and use https in redirects
         proxy_headers=True,
         forwarded_allow_ips="*",
-        timeout_keep_alive=75,
+        timeout_keep_alive=120,
     )
 
 if __name__ == "__main__":
