@@ -73,14 +73,21 @@ The server exposes tools via Server-Sent Events (SSE) endpoint at `/{service-nam
 
 ## Tool Usage
 
-### render_scad_script
-- Generates preview images from OpenSCAD code
-- Returns thumbnail image + resource links for full-resolution PNG
-- Supports multiple camera views (3d, top, front, etc.)
+### render_scad_script(scad_code, view="3d")
+- **Input**: OpenSCAD code string, optional view angle
+- **Output**: Preview image + resource links for full-resolution PNG
+- **Views**: 3d (default), top, front, left, right
+- **Always persists** files with auto-generated UIDs and filenames
 
-### generate_stl
-- Creates STL files from OpenSCAD code or existing SCAD files
-- Input: `scad_code` (string) OR `filename` (from existing SCAD files)
-- Returns: Resource URI + public HTTPS URL for downloading the generated STL file
-- Public URLs served at: `{PUBLIC_BASE_URL}/openscad/stl/{uid}/{filename}.stl`
-- Use cases: 3D printing, CAD import, mesh processing
+### generate_stl(scad_code)
+- **Input**: OpenSCAD code string
+- **Output**: Resource URI + public HTTPS URL for STL download
+- **Public URLs**: `{PUBLIC_BASE_URL}/openscad/stl/{uid}/{filename}.stl`
+- **Always persists** files with auto-generated UIDs and filenames
+- **Use cases**: 3D printing, CAD import, mesh processing
+
+## Simplified Architecture
+- **No complex parameters**: Only essential inputs (scad_code, optional view)
+- **Auto-generated filenames**: No manual naming required
+- **Always persistent**: All files are stored and accessible via URLs
+- **No authentication noise**: Clean logging focused on operations

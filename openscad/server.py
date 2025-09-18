@@ -124,18 +124,13 @@ _render_semaphore = threading.Semaphore(_max_concurrency)
 @mcp.tool()
 def render_scad_script(
     scad_code: str,
-    filename: str = "script",
     view: str = "3d",
-    image_size: str = "800,600",
-    uid: str | None = None,
-    persist: bool = True,
     ctx: Context | None = None,
 ) -> list[Any]:
     """Render an OpenSCAD script, return a preview image plus links.
 
-    Generates a full-resolution PNG via OpenSCAD, persists it to disk when
-    requested, and returns a JPEG/PNG preview alongside HTTPS + resource URLs
-    so clients can fetch the full artifact out-of-band.
+    Generates a full-resolution PNG via OpenSCAD, persists it to disk, and returns
+    a JPEG/PNG preview alongside HTTPS + resource URLs for downloading.
     """
 
     try:
@@ -143,17 +138,11 @@ def render_scad_script(
             from PIL import Image as PILImage
             import shutil
 
-            user_token = MCP_TOKEN_CTX.get(None)
-            request_id = ctx.request_id if ctx else "?"
-            client_id = ctx.client_id if ctx else None
-            logger.info(
-                "render_scad_script invoked (token=%s, client_id=%s, request=%s)",
-                user_token or "<none>",
-                client_id or "<unknown>",
-                request_id,
-            )
+            logger.info("render_scad_script invoked")
 
-            render_uid = uid or str(uuid.uuid4())
+            # Auto-generate UID and filename
+            render_uid = str(uuid.uuid4())
+            filename = f"render_{render_uid[:8]}"
             uid_scad_dir = SCAD_DIR / render_uid
             uid_render_dir = RENDER_DIR / render_uid
 
@@ -192,7 +181,7 @@ def render_scad_script(
                     str(temp_png_path),
                     "--autocenter",
                     "--viewall",
-                    f"--imgsize={image_size}",
+                    "--imgsize=800,600",
                     "--camera",
                     camera,
                     "--projection",
@@ -215,17 +204,17 @@ def render_scad_script(
                         "OpenSCAD rendering succeeded but no output file was created"
                     )
 
-                if persist:
-                    uid_scad_dir.mkdir(parents=True, exist_ok=True)
-                    uid_render_dir.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(temp_scad_path, permanent_scad_path)
-                    shutil.copy2(temp_png_path, permanent_png_path)
-                    logger.info(
-                        "Persisted render UID=%s files at %s and %s",
-                        render_uid,
-                        permanent_scad_path,
-                        permanent_png_path,
-                    )
+                # Always persist files
+                uid_scad_dir.mkdir(parents=True, exist_ok=True)
+                uid_render_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(temp_scad_path, permanent_scad_path)
+                shutil.copy2(temp_png_path, permanent_png_path)
+                logger.info(
+                    "Persisted render UID=%s files at %s and %s",
+                    render_uid,
+                    permanent_scad_path,
+                    permanent_png_path,
+                )
 
                 with PILImage.open(temp_png_path) as full_image:
                     preview_image = full_image.copy()
@@ -254,35 +243,29 @@ def render_scad_script(
                 asset_relative_path = f"{render_uid}/{png_name}"
                 asset_http_path = f"{ASSETS_ROUTE}/{asset_relative_path}"
                 public_url = None
-                if persist and PUBLIC_ASSET_BASE_URL:
+                if PUBLIC_ASSET_BASE_URL:
                     public_url = f"{PUBLIC_ASSET_BASE_URL}/{asset_relative_path}"
                     if PUBLIC_LINK_TOKEN:
                         sep = "&" if "?" in public_url else "?"
                         public_url = f"{public_url}{sep}token={quote(PUBLIC_LINK_TOKEN)}"
 
-                info_lines = [f"UID: {render_uid}"]
+                info_lines = [
+                    f"UID: {render_uid}",
+                    f"Filename: {safe_base}",
+                    f"Preview path: {asset_http_path}",
+                ]
 
-                if persist:
-                    info_lines.append(f"Filename: {safe_base}")
-                    info_lines.append(f"Preview path: {asset_http_path}")
-                    if public_url:
-                        info_lines.append(f"Full-res URL: {public_url}")
-                    else:
-                        info_lines.append(
-                            "Configure MCP_PUBLIC_BASE_URL or MCP_PUBLIC_ASSET_BASE_URL to expose HTTPS asset links."
-                        )
-                    render_resource = (
-                        f"{_safe_name}://render/{render_uid}/{safe_base}_{view}.png"
-                    )
-                    scad_resource = (
-                        f"{_safe_name}://source/{render_uid}/{safe_base}.scad"
-                    )
-                    info_lines.append(f"Render resource: {render_resource}")
-                    info_lines.append(f"SCAD resource: {scad_resource}")
+                if public_url:
+                    info_lines.append(f"Full-res URL: {public_url}")
                 else:
                     info_lines.append(
-                        "Render was not persisted; asset URLs and resources are unavailable."
+                        "Configure MCP_PUBLIC_BASE_URL or MCP_PUBLIC_ASSET_BASE_URL to expose HTTPS asset links."
                     )
+
+                render_resource = f"{_safe_name}://render/{render_uid}/{safe_base}_{view}.png"
+                scad_resource = f"{_safe_name}://source/{render_uid}/{safe_base}.scad"
+                info_lines.append(f"Render resource: {render_resource}")
+                info_lines.append(f"SCAD resource: {scad_resource}")
 
                 return [preview_content, "\n".join(info_lines)]
 
@@ -303,64 +286,29 @@ def render_scad_script(
 
 @mcp.tool()
 def generate_stl(
-    scad_code: str | None = None,
-    filename: str | None = None,
-    output_filename: str = "model",
-    uid: str | None = None,
-    persist: bool = True,
+    scad_code: str,
     ctx: Context | None = None,
 ) -> list[Any]:
-    """Generate an STL file from OpenSCAD code or an existing SCAD file.
+    """Generate an STL file from OpenSCAD code.
 
-    Either provide scad_code directly or specify a filename to read from existing SCAD files.
+    Takes OpenSCAD code and generates a downloadable STL file for 3D printing or CAD import.
     Returns a resource link to the generated STL file.
     """
-
-    if scad_code is None and filename is None:
-        raise ValueError("Either scad_code or filename must be provided")
-
-    if scad_code is not None and filename is not None:
-        raise ValueError("Provide either scad_code or filename, not both")
 
     try:
         with _render_semaphore:
             import shutil
 
-            user_token = MCP_TOKEN_CTX.get(None)
-            request_id = ctx.request_id if ctx else "?"
-            client_id = ctx.client_id if ctx else None
-            logger.info(
-                "generate_stl invoked (token=%s, client_id=%s, request=%s)",
-                user_token or "<none>",
-                client_id or "<unknown>",
-                request_id,
-            )
+            logger.info("generate_stl invoked")
 
-            stl_uid = uid or str(uuid.uuid4())
+            # Auto-generate UID and filename
+            stl_uid = str(uuid.uuid4())
+            output_filename = f"model_{stl_uid[:8]}"
             uid_stl_dir = STL_DIR / stl_uid
 
-            # Handle input source
-            if filename is not None:
-                # Read from existing SCAD file
-                safe_filename = _sanitize_filename(filename)
-                # Look for the file in any UID directory
-                found_scad_path = None
-                for uid_dir in SCAD_DIR.iterdir():
-                    if uid_dir.is_dir():
-                        candidate_path = uid_dir / f"{safe_filename}.scad"
-                        if candidate_path.exists():
-                            found_scad_path = candidate_path
-                            break
-
-                if found_scad_path is None:
-                    raise FileNotFoundError(f"SCAD file '{safe_filename}.scad' not found in any UID directory")
-
-                scad_content = found_scad_path.read_text()
-                source_name = safe_filename
-            else:
-                # Use provided scad_code
-                scad_content = scad_code
-                source_name = _sanitize_filename(output_filename)
+            # Use provided scad_code directly
+            scad_content = scad_code
+            source_name = _sanitize_filename(output_filename)
 
             # Create temporary files
             with tempfile.NamedTemporaryFile(
@@ -401,14 +349,14 @@ def generate_stl(
                         "OpenSCAD STL generation succeeded but no output file was created"
                     )
 
-                if persist:
-                    uid_stl_dir.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(temp_stl_path, permanent_stl_path)
-                    logger.info(
-                        "Persisted STL UID=%s file at %s",
-                        stl_uid,
-                        permanent_stl_path,
-                    )
+                # Always persist STL files
+                uid_stl_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(temp_stl_path, permanent_stl_path)
+                logger.info(
+                    "Persisted STL UID=%s file at %s",
+                    stl_uid,
+                    permanent_stl_path,
+                )
 
                 # Generate resource URI
                 stl_resource_uri = f"{_safe_name}://stl/{stl_uid}/{safe_output_name}.stl"
@@ -420,7 +368,7 @@ def generate_stl(
                 stl_asset_relative_path = f"{stl_uid}/{stl_filename}"
                 stl_asset_http_path = f"{STL_ASSETS_ROUTE}/{stl_asset_relative_path}"
                 stl_public_url = None
-                if persist and PUBLIC_BASE_URL:
+                if PUBLIC_BASE_URL:
                     stl_public_url = f"{PUBLIC_BASE_URL}{STL_ASSETS_ROUTE}/{stl_asset_relative_path}"
                     if PUBLIC_LINK_TOKEN:
                         sep = "&" if "?" in stl_public_url else "?"
@@ -430,21 +378,18 @@ def generate_stl(
                     f"STL UID: {stl_uid}",
                     f"Output filename: {stl_filename}",
                     f"STL size: {stl_size:,} bytes",
+                    f"STL resource: {stl_resource_uri}",
                 ]
 
-                if persist:
-                    info_lines.append(f"STL resource: {stl_resource_uri}")
-                    if stl_public_url:
-                        info_lines.append(f"STL URL: {stl_public_url}")
-                    else:
-                        info_lines.append(
-                            "Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL links."
-                        )
-                    info_lines.append(f"Stored path: {permanent_stl_path}")
+                if stl_public_url:
+                    info_lines.append(f"STL URL: {stl_public_url}")
                 else:
-                    info_lines.append("STL was not persisted; resource URL unavailable.")
+                    info_lines.append(
+                        "Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL links."
+                    )
+                info_lines.append(f"Stored path: {permanent_stl_path}")
 
-                return [stl_resource_uri if persist else "STL not persisted", "\n".join(info_lines)]
+                return [stl_resource_uri, "\n".join(info_lines)]
 
             finally:
                 if temp_scad_path.exists():
