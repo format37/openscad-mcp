@@ -1,9 +1,6 @@
-import base64
-import binascii
 import contextlib
 import contextvars
 import logging
-import mimetypes
 import os
 import re
 import subprocess
@@ -12,7 +9,7 @@ import threading
 import uuid
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote, urlparse
+from urllib.parse import quote
 
 import uvicorn
 from starlette.applications import Starlette
@@ -23,7 +20,6 @@ from starlette.staticfiles import StaticFiles
 
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.fastmcp import Image as MCPImage
-from mcp.types import BlobResourceContents, EmbeddedResource
 
 from mcp_image_utils import to_mcp_image
 
@@ -63,9 +59,9 @@ def _sanitize_filename(name: str) -> str:
 DATA_DIR = Path(os.getenv("MCP_DATA_DIR", "./data")).resolve()
 SCAD_DIR = DATA_DIR / "scad"
 RENDER_DIR = DATA_DIR / "render"
-UPLOAD_DIR = DATA_DIR / "uploads"
+STL_DIR = DATA_DIR / "stl"
 
-for directory in (SCAD_DIR, RENDER_DIR, UPLOAD_DIR):
+for directory in (SCAD_DIR, RENDER_DIR, STL_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 ASSETS_ROUTE = f"{STREAM_PATH.rstrip('/')}/assets"
@@ -106,181 +102,9 @@ _max_concurrency = _env_int("RENDER_MAX_CONCURRENCY", _env_int("OPENSCAD_MAX_CON
 _render_semaphore = threading.Semaphore(_max_concurrency)
 
 
-def _try_decode_base64(data: str) -> bytes | None:
-    data = data.strip()
-    if not data:
-        return b""
-    try:
-        return base64.b64decode(data, validate=True)
-    except binascii.Error:
-        return None
 
 
-async def _load_uri_contents(uri: str, ctx: Context | None) -> tuple[bytes, str | None, str | None]:
-    if ctx is None:
-        raise ValueError("Context is required to read resources by URI")
 
-    contents = await ctx.read_resource(uri)
-    chunks: list[bytes] = []
-    detected_mime: str | None = None
-    for item in contents:
-        if isinstance(item.content, str):
-            chunks.append(item.content.encode("utf-8"))
-            detected_mime = detected_mime or item.mime_type or "text/plain"
-        else:
-            chunks.append(item.content)
-            detected_mime = detected_mime or item.mime_type
-
-    parsed = urlparse(uri)
-    name = Path(parsed.path).name if parsed.path else None
-    return b"".join(chunks), name, detected_mime
-
-
-async def _extract_file_bytes(
-    file_arg: Any,
-    ctx: Context | None,
-) -> tuple[bytes, str | None, str | None]:
-    if isinstance(file_arg, (bytes, bytearray)):
-        return bytes(file_arg), None, None
-
-    if isinstance(file_arg, str):
-        candidate_uri = file_arg.strip()
-        if "://" in candidate_uri:
-            return await _load_uri_contents(candidate_uri, ctx)
-
-        maybe_base64 = _try_decode_base64(candidate_uri)
-        if maybe_base64 is not None:
-            return maybe_base64, None, None
-
-        path_candidate = Path(candidate_uri)
-        if not path_candidate.is_absolute():
-            scoped_candidate = (DATA_DIR / candidate_uri).resolve()
-            if scoped_candidate.exists() and scoped_candidate.is_file():
-                path_candidate = scoped_candidate
-        if path_candidate.exists() and path_candidate.is_file():
-            data = path_candidate.read_bytes()
-            return data, path_candidate.name, mimetypes.guess_type(path_candidate.name)[0]
-
-        # Treat as plain text payload
-        looks_like_filename = Path(candidate_uri).suffix and not any(
-            ch in candidate_uri for ch in ("\n", ",", "\t")
-        )
-        if looks_like_filename:
-            raise FileNotFoundError(
-                f"File {candidate_uri!r} not found; provide file data or a resolvable reference"
-            )
-        return candidate_uri.encode("utf-8"), None, "text/plain"
-
-    if isinstance(file_arg, dict):
-        if "resource" in file_arg and file_arg.get("type") == "resource":
-            return await _extract_file_bytes(file_arg["resource"], ctx)
-
-        blob = file_arg.get("blob") or file_arg.get("data")
-        if blob is not None:
-            if isinstance(blob, bytes):
-                data_bytes = blob
-            elif isinstance(blob, str):
-                decoded = _try_decode_base64(blob)
-                data_bytes = decoded if decoded is not None else blob.encode("utf-8")
-            else:
-                raise ValueError("Unsupported blob/data payload type")
-            name = file_arg.get("name") or file_arg.get("filename")
-            mime = file_arg.get("mimeType") or file_arg.get("mime_type")
-            return data_bytes, name, mime
-
-        if "uri" in file_arg:
-            data, name, mime = await _load_uri_contents(str(file_arg["uri"]), ctx)
-            name = file_arg.get("name") or file_arg.get("filename") or name
-            mime = file_arg.get("mimeType") or file_arg.get("mime_type") or mime
-            return data, name, mime
-
-        if "path" in file_arg:
-            return await _extract_file_bytes(str(file_arg["path"]), ctx)
-
-    if isinstance(file_arg, (list, tuple)):
-        for item in file_arg:
-            data, name, mime = await _extract_file_bytes(item, ctx)
-            if data is not None:
-                return data, name, mime
-
-    raise ValueError("Unsupported file argument type; provide bytes, base64 data, or a resource reference")
-
-
-@mcp.tool()
-async def get_file(
-    file: Any | None = None,
-    filename: str | None = None,
-    mime_type: str | None = None,
-    ctx: Context | None = None,
-) -> list[Any]:
-    """Return the provided file contents as an embedded MCP resource."""
-
-    attachments: list[Any] = []
-    if ctx and ctx.request_context.meta:
-        try:
-            meta_dump = ctx.request_context.meta.model_dump()
-            logger.debug("get_file meta keys: %s", list(meta_dump.keys()))
-            for key in ("attachments", "files", "file", "resources"):
-                value = meta_dump.get(key)
-                if isinstance(value, list):
-                    attachments.extend(value)
-                elif value is not None:
-                    attachments.append(value)
-        except Exception:  # pragma: no cover - defensive logging
-            logger.debug("get_file meta logging failed")
-
-    file_source: Any | None = file
-    if file_source is None and attachments:
-        file_source = attachments
-    if file_source is None and filename:
-        file_source = filename
-    if file_source is None:
-        raise ValueError("Missing file payload. Provide file data, a resource attachment, or a filename that resolves on the server.")
-
-    data_bytes, inferred_name, inferred_mime = await _extract_file_bytes(file_source, ctx)
-
-    resolved_name = filename or inferred_name or "uploaded"
-    safe_name = _sanitize_filename(resolved_name)
-    file_uid = str(uuid.uuid4())
-    upload_dir = UPLOAD_DIR / file_uid
-    upload_dir.mkdir(parents=True, exist_ok=True)
-    file_path = upload_dir / safe_name
-    file_path.write_bytes(data_bytes)
-
-    resource_uri = f"{_safe_name}://file/{file_uid}/{safe_name}"
-
-    detected_mime = (
-        mime_type
-        or inferred_mime
-        or mimetypes.guess_type(safe_name)[0]
-        or "application/octet-stream"
-    )
-
-    logger.info(
-        "get_file invoked for %s (bytes=%s, uri=%s)",
-        safe_name,
-        len(data_bytes),
-        resource_uri,
-    )
-
-    encoded_blob = base64.b64encode(data_bytes).decode("ascii")
-    resource = EmbeddedResource(
-        type="resource",
-        resource=BlobResourceContents(
-            uri=resource_uri,
-            blob=encoded_blob,
-            mimeType=detected_mime,
-        ),
-    )
-
-    info_lines = [
-        f"Filename: {safe_name}",
-        f"URI: {resource_uri}",
-        f"MIME type: {detected_mime}",
-        f"Stored path: {file_path}",
-    ]
-
-    return [resource, "\n".join(info_lines)]
 
 
 @mcp.tool()
@@ -463,6 +287,150 @@ def render_scad_script(
         ) from exc
 
 
+@mcp.tool()
+def generate_stl(
+    scad_code: str | None = None,
+    filename: str | None = None,
+    output_filename: str = "model",
+    uid: str | None = None,
+    persist: bool = True,
+    ctx: Context | None = None,
+) -> list[Any]:
+    """Generate an STL file from OpenSCAD code or an existing SCAD file.
+
+    Either provide scad_code directly or specify a filename to read from existing SCAD files.
+    Returns a resource link to the generated STL file.
+    """
+
+    if scad_code is None and filename is None:
+        raise ValueError("Either scad_code or filename must be provided")
+
+    if scad_code is not None and filename is not None:
+        raise ValueError("Provide either scad_code or filename, not both")
+
+    try:
+        with _render_semaphore:
+            import shutil
+
+            user_token = MCP_TOKEN_CTX.get(None)
+            request_id = ctx.request_id if ctx else "?"
+            client_id = ctx.client_id if ctx else None
+            logger.info(
+                "generate_stl invoked (token=%s, client_id=%s, request=%s)",
+                user_token or "<none>",
+                client_id or "<unknown>",
+                request_id,
+            )
+
+            stl_uid = uid or str(uuid.uuid4())
+            uid_stl_dir = STL_DIR / stl_uid
+
+            # Handle input source
+            if filename is not None:
+                # Read from existing SCAD file
+                safe_filename = _sanitize_filename(filename)
+                # Look for the file in any UID directory
+                found_scad_path = None
+                for uid_dir in SCAD_DIR.iterdir():
+                    if uid_dir.is_dir():
+                        candidate_path = uid_dir / f"{safe_filename}.scad"
+                        if candidate_path.exists():
+                            found_scad_path = candidate_path
+                            break
+
+                if found_scad_path is None:
+                    raise FileNotFoundError(f"SCAD file '{safe_filename}.scad' not found in any UID directory")
+
+                scad_content = found_scad_path.read_text()
+                source_name = safe_filename
+            else:
+                # Use provided scad_code
+                scad_content = scad_code
+                source_name = _sanitize_filename(output_filename)
+
+            # Create temporary files
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".scad", delete=False
+            ) as scad_file:
+                temp_scad_path = Path(scad_file.name)
+                scad_file.write(scad_content)
+
+            temp_stl_fd, temp_stl_path_str = tempfile.mkstemp(suffix=".stl")
+            os.close(temp_stl_fd)
+            temp_stl_path = Path(temp_stl_path_str)
+
+            safe_output_name = _sanitize_filename(output_filename)
+            stl_filename = f"{safe_output_name}.stl"
+            permanent_stl_path = uid_stl_dir / stl_filename
+
+            try:
+                # Generate STL using OpenSCAD
+                cmd = [
+                    "openscad",
+                    "-o",
+                    str(temp_stl_path),
+                    str(temp_scad_path),
+                ]
+
+                logger.info("Running OpenSCAD STL command: %s", " ".join(cmd))
+                result = subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=60
+                )
+
+                if result.returncode != 0:
+                    raise RuntimeError(
+                        f"OpenSCAD STL generation failed: {result.stderr.strip()}"
+                    )
+
+                if not temp_stl_path.exists():
+                    raise RuntimeError(
+                        "OpenSCAD STL generation succeeded but no output file was created"
+                    )
+
+                if persist:
+                    uid_stl_dir.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(temp_stl_path, permanent_stl_path)
+                    logger.info(
+                        "Persisted STL UID=%s file at %s",
+                        stl_uid,
+                        permanent_stl_path,
+                    )
+
+                # Generate resource URI
+                stl_resource_uri = f"{_safe_name}://stl/{stl_uid}/{safe_output_name}.stl"
+
+                # Get file size for info
+                stl_size = temp_stl_path.stat().st_size
+
+                info_lines = [
+                    f"STL UID: {stl_uid}",
+                    f"Output filename: {stl_filename}",
+                    f"STL size: {stl_size:,} bytes",
+                ]
+
+                if persist:
+                    info_lines.append(f"STL resource: {stl_resource_uri}")
+                    info_lines.append(f"Stored path: {permanent_stl_path}")
+                else:
+                    info_lines.append("STL was not persisted; resource URL unavailable.")
+
+                return [stl_resource_uri if persist else "STL not persisted", "\n".join(info_lines)]
+
+            finally:
+                if temp_scad_path.exists():
+                    temp_scad_path.unlink()
+                if temp_stl_path.exists():
+                    temp_stl_path.unlink()
+
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError("OpenSCAD STL generation timed out (60 seconds)") from exc
+    except Exception as exc:
+        logger.error("Exception occurred while generating STL: %s", exc)
+        raise RuntimeError(
+            f"Exception occurred while generating STL: {exc}"
+        ) from exc
+
+
 @mcp.resource(f"{_safe_name}://render/{{uid}}/{{name}}_{{view}}.png", mime_type="image/png")
 def get_render_resource(uid: str, name: str, view: str) -> bytes:
     """Expose persisted render PNGs as MCP resources."""
@@ -476,16 +444,6 @@ def get_render_resource(uid: str, name: str, view: str) -> bytes:
     return path.read_bytes()
 
 
-@mcp.resource(f"{_safe_name}://file/{{uid}}/{{name}}", mime_type="application/octet-stream")
-def get_uploaded_file(uid: str, name: str) -> bytes:
-    """Expose uploaded files as MCP resources."""
-
-    safe_name = _sanitize_filename(name)
-    base_dir = (UPLOAD_DIR / uid).resolve()
-    path = (base_dir / safe_name).resolve()
-    if not path.is_relative_to(base_dir) or not path.exists():
-        raise FileNotFoundError(f"Uploaded file {uid}/{safe_name} not found on server")
-    return path.read_bytes()
 
 
 @mcp.resource(f"{_safe_name}://source/{{uid}}/{{name}}.scad", mime_type="text/plain")
@@ -499,6 +457,19 @@ def get_scad_resource(uid: str, name: str) -> str:
             f"Source {uid}/{safe_name}.scad not found on server"
         )
     return path.read_text()
+
+
+@mcp.resource(f"{_safe_name}://stl/{{uid}}/{{name}}.stl", mime_type="model/stl")
+def get_stl_resource(uid: str, name: str) -> bytes:
+    """Expose persisted STL files as MCP resources."""
+
+    safe_name = _sanitize_filename(name)
+    path = STL_DIR / uid / f"{safe_name}.stl"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"STL {uid}/{safe_name}.stl not found on server"
+        )
+    return path.read_bytes()
 
 # Build the main ASGI app with Streamable HTTP mounted
 mcp_asgi = mcp.streamable_http_app()
