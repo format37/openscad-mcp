@@ -66,6 +66,7 @@ for directory in (SCAD_DIR, RENDER_DIR, STL_DIR):
 
 ASSETS_ROUTE = f"{STREAM_PATH.rstrip('/')}/assets"
 ASSETS_DIR = RENDER_DIR
+STL_ASSETS_ROUTE = f"{STREAM_PATH.rstrip('/')}/stl"
 
 PUBLIC_BASE_URL = os.getenv("MCP_PUBLIC_BASE_URL")
 if PUBLIC_BASE_URL:
@@ -402,6 +403,16 @@ def generate_stl(
                 # Get file size for info
                 stl_size = temp_stl_path.stat().st_size
 
+                # Generate public URL for STL file
+                stl_asset_relative_path = f"{stl_uid}/{stl_filename}"
+                stl_asset_http_path = f"{STL_ASSETS_ROUTE}/{stl_asset_relative_path}"
+                stl_public_url = None
+                if persist and PUBLIC_BASE_URL:
+                    stl_public_url = f"{PUBLIC_BASE_URL}{STL_ASSETS_ROUTE}/{stl_asset_relative_path}"
+                    if PUBLIC_LINK_TOKEN:
+                        sep = "&" if "?" in stl_public_url else "?"
+                        stl_public_url = f"{stl_public_url}{sep}token={quote(PUBLIC_LINK_TOKEN)}"
+
                 info_lines = [
                     f"STL UID: {stl_uid}",
                     f"Output filename: {stl_filename}",
@@ -410,6 +421,12 @@ def generate_stl(
 
                 if persist:
                     info_lines.append(f"STL resource: {stl_resource_uri}")
+                    if stl_public_url:
+                        info_lines.append(f"STL URL: {stl_public_url}")
+                    else:
+                        info_lines.append(
+                            "Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL links."
+                        )
                     info_lines.append(f"Stored path: {permanent_stl_path}")
                 else:
                     info_lines.append("STL was not persisted; resource URL unavailable.")
@@ -486,6 +503,11 @@ app = Starlette(
             ASSETS_ROUTE,
             app=StaticFiles(directory=ASSETS_DIR, check_dir=False),
             name="assets",
+        ),
+        Mount(
+            STL_ASSETS_ROUTE,
+            app=StaticFiles(directory=STL_DIR, check_dir=False),
+            name="stl_assets",
         ),
         # Mount at root; internal app handles service path routing
         Mount("/", app=mcp_asgi),

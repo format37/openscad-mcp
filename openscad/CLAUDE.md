@@ -81,5 +81,6 @@ The server exposes tools via Server-Sent Events (SSE) endpoint at `/{service-nam
 ### generate_stl
 - Creates STL files from OpenSCAD code or existing SCAD files
 - Input: `scad_code` (string) OR `filename` (from existing SCAD files)
-- Returns: Resource URI for downloading the generated STL file
+- Returns: Resource URI + public HTTPS URL for downloading the generated STL file
+- Public URLs served at: `{PUBLIC_BASE_URL}/openscad/stl/{uid}/{filename}.stl`
 - Use cases: 3D printing, CAD import, mesh processing
