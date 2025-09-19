@@ -75,16 +75,16 @@ The server exposes tools via Server-Sent Events (SSE) endpoint at `/{service-nam
 
 ### render_scad_script(scad_code, view="3d")
 - **Input**: OpenSCAD code string, optional view angle
-- **Output**: Preview image + resource links for full-resolution PNG
+- **Output**: Preview image + simple "Preview URL:" for full-resolution download
 - **Views**: 3d (default), top, front, left, right
-- **Always persists** files with auto-generated UIDs and filenames
+- **Caption**: Only shows the download URL
 
 ### generate_stl(scad_code)
 - **Input**: OpenSCAD code string
-- **Output**: Resource URI + public HTTPS URL for STL download
-- **Public URLs**: `{PUBLIC_BASE_URL}/openscad/stl/{uid}/{filename}.stl`
-- **Always persists** files with auto-generated UIDs and filenames
+- **Output**: Simple "STL URL:" for direct download
+- **Caption**: Only shows the download URL
 - **Use cases**: 3D printing, CAD import, mesh processing
+- **Client behavior**: Tool description instructs MCP clients to provide download links to users
 
 ## Simplified Architecture
 - **No complex parameters**: Only essential inputs (scad_code, optional view)

@@ -127,10 +127,11 @@ def render_scad_script(
     view: str = "3d",
     ctx: Context | None = None,
 ) -> list[Any]:
-    """Render an OpenSCAD script, return a preview image plus links.
+    """Render an OpenSCAD script and return a preview image with download link.
 
-    Generates a full-resolution PNG via OpenSCAD, persists it to disk, and returns
-    a JPEG/PNG preview alongside HTTPS + resource URLs for downloading.
+    Generates a full-resolution PNG via OpenSCAD and returns a JPEG/PNG preview
+    with an HTTPS URL for downloading the full-resolution image. Always provide
+    the Preview URL to users for downloading the rendered image.
     """
 
     try:
@@ -249,23 +250,10 @@ def render_scad_script(
                         sep = "&" if "?" in public_url else "?"
                         public_url = f"{public_url}{sep}token={quote(PUBLIC_LINK_TOKEN)}"
 
-                info_lines = [
-                    f"UID: {render_uid}",
-                    f"Filename: {safe_base}",
-                    f"Preview path: {asset_http_path}",
-                ]
-
                 if public_url:
-                    info_lines.append(f"Full-res URL: {public_url}")
+                    info_lines = [f"Preview URL: {public_url}"]
                 else:
-                    info_lines.append(
-                        "Configure MCP_PUBLIC_BASE_URL or MCP_PUBLIC_ASSET_BASE_URL to expose HTTPS asset links."
-                    )
-
-                render_resource = f"{_safe_name}://render/{render_uid}/{safe_base}_{view}.png"
-                scad_resource = f"{_safe_name}://source/{render_uid}/{safe_base}.scad"
-                info_lines.append(f"Render resource: {render_resource}")
-                info_lines.append(f"SCAD resource: {scad_resource}")
+                    info_lines = ["Configure MCP_PUBLIC_BASE_URL or MCP_PUBLIC_ASSET_BASE_URL to expose HTTPS asset links."]
 
                 return [preview_content, "\n".join(info_lines)]
 
@@ -289,10 +277,11 @@ def generate_stl(
     scad_code: str,
     ctx: Context | None = None,
 ) -> list[Any]:
-    """Generate an STL file from OpenSCAD code.
+    """Generate an STL file from OpenSCAD code and provide download link.
 
     Takes OpenSCAD code and generates a downloadable STL file for 3D printing or CAD import.
-    Returns a resource link to the generated STL file.
+    Returns an HTTPS download URL. IMPORTANT: Always provide the STL URL to users so they
+    can download the generated 3D model file for 3D printing or CAD software.
     """
 
     try:
@@ -374,20 +363,10 @@ def generate_stl(
                         sep = "&" if "?" in stl_public_url else "?"
                         stl_public_url = f"{stl_public_url}{sep}token={quote(PUBLIC_LINK_TOKEN)}"
 
-                info_lines = [
-                    f"STL UID: {stl_uid}",
-                    f"Output filename: {stl_filename}",
-                    f"STL size: {stl_size:,} bytes",
-                    f"STL resource: {stl_resource_uri}",
-                ]
-
                 if stl_public_url:
-                    info_lines.append(f"STL URL: {stl_public_url}")
+                    info_lines = [f"STL URL: {stl_public_url}"]
                 else:
-                    info_lines.append(
-                        "Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL links."
-                    )
-                info_lines.append(f"Stored path: {permanent_stl_path}")
+                    info_lines = ["Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL links."]
 
                 return [stl_resource_uri, "\n".join(info_lines)]
 
