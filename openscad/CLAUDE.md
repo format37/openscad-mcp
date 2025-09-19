@@ -99,4 +99,3 @@ The server exposes tools via Server-Sent Events (SSE) endpoint at `/{service-nam
 - **Standard logging**: Uses standard Python logging - Sentry captures automatically
 - **Tool call logging**: Each render/STL generation logged with structured details
 - **Auto error capture**: All logger.error() and logger.warning() sent to Sentry
-- **Test tool**: `test_sentry_logging` tool for verifying integration

@@ -419,29 +419,6 @@ def generate_stl(
         ) from exc
 
 
-@mcp.tool()
-def test_sentry_logging(
-    ctx: Context | None = None,
-) -> list[Any]:
-    """Test Sentry integration by sending a test message.
-
-    This tool sends a test message to Sentry to verify logging integration is working.
-    """
-    try:
-        test_uid = str(uuid.uuid4())
-
-        # Test info message (will be sent to Sentry automatically)
-        logger.info(f"Sentry test message from OpenSCAD MCP server: test_uid={test_uid}, service=openscad-mcp")
-
-        # Test warning message (will create an issue in Sentry)
-        logger.warning(f"Sentry integration test warning: test_uid={test_uid}")
-
-        return [f"Sentry test messages sent successfully. Test UID: {test_uid}"]
-
-    except Exception as exc:
-        logger.error(f"Error in Sentry test: tool=test_sentry_logging, error={exc}")
-        raise RuntimeError(f"Sentry test failed: {exc}") from exc
-
 
 @mcp.resource(f"{_safe_name}://render/{{uid}}/{{name}}_{{view}}.png", mime_type="image/png")
 def get_render_resource(uid: str, name: str, view: str) -> bytes:
