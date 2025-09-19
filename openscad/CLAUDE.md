@@ -95,7 +95,8 @@ The server exposes tools via Server-Sent Events (SSE) endpoint at `/{service-nam
 - **Error tracking**: Comprehensive exception handling with Sentry capture
 
 ## Monitoring & Logging
-- **Sentry Integration**: Optional error tracking and performance monitoring
-- **Tool call logging**: Each render/STL generation logged with details
-- **Exception capture**: All errors automatically sent to Sentry if configured
-- **Test tool**: `test_sentry_logging` tool for verifying Sentry integration
+- **Sentry Integration**: Simple, automatic error tracking with `enable_logs=True`
+- **Standard logging**: Uses standard Python logging - Sentry captures automatically
+- **Tool call logging**: Each render/STL generation logged with structured details
+- **Auto error capture**: All logger.error() and logger.warning() sent to Sentry
+- **Test tool**: `test_sentry_logging` tool for verifying integration

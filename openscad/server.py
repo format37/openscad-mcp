@@ -12,7 +12,6 @@ from typing import Any
 from urllib.parse import quote
 
 import sentry_sdk
-from sentry_sdk.integrations.logging import LoggingIntegration
 import uvicorn
 from starlette.applications import Starlette
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -25,13 +24,7 @@ from mcp.server.fastmcp import Image as MCPImage
 
 from mcp_image_utils import to_mcp_image
 
-# Configure Sentry logging integration
-logging_integration = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.WARNING  # Only send warnings and errors as events (issues)
-)
-
-# Configure local logging with more detail
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -46,16 +39,9 @@ sentry_dsn = os.getenv("SENTRY_DSN")
 if sentry_dsn:
     sentry_sdk.init(
         dsn=sentry_dsn,
-        environment="openscad-mcp",
-        send_default_pii=True,
-        traces_sample_rate=1.0,
-        profile_session_sample_rate=1.0,
-        integrations=[logging_integration],
-        _experiments={
-            "enable_logs": True
-        },
+        # Enable logs to be sent to Sentry
+        enable_logs=True,
     )
-    sentry_sdk.set_tag("service", "openscad-mcp")
     logger.info("Sentry initialized successfully")
 else:
     logger.info("Sentry DSN not provided, running without Sentry")
@@ -179,14 +165,8 @@ def render_scad_script(
             render_uid = str(uuid.uuid4())
             filename = f"render_{render_uid[:8]}"
 
-            # Log tool call details to Sentry
-            sentry_sdk.set_context("tool_call", {
-                "tool": "render_scad_script",
-                "view": view,
-                "render_uid": render_uid,
-                "scad_code_length": len(scad_code),
-                "scad_code_preview": scad_code[:200] + "..." if len(scad_code) > 200 else scad_code
-            })
+            # Log tool call details
+            logger.info(f"render_scad_script: view={view}, render_uid={render_uid}, scad_length={len(scad_code)}")
             uid_scad_dir = SCAD_DIR / render_uid
             uid_render_dir = RENDER_DIR / render_uid
 
@@ -298,16 +278,8 @@ def render_scad_script(
                 else:
                     info_lines = ["Configure MCP_PUBLIC_BASE_URL or MCP_PUBLIC_ASSET_BASE_URL to expose HTTPS asset links."]
 
-                # Log successful render to Sentry
-                with sentry_sdk.configure_scope() as scope:
-                    scope.set_extra("render_uid", render_uid)
-                    scope.set_extra("view", view)
-                    scope.set_extra("preview_url", public_url or "not_configured")
-                    scope.set_extra("scad_code_length", len(scad_code))
-                    sentry_sdk.capture_message(
-                        f"render_scad_script successful: {view} view rendered",
-                        level="info"
-                    )
+                # Log successful render
+                logger.info(f"render_scad_script successful: {view} view rendered, render_uid={render_uid}, url={public_url or 'not_configured'}")
 
                 return [preview_content, "\n".join(info_lines)]
 
@@ -318,18 +290,10 @@ def render_scad_script(
                     temp_png_path.unlink()
 
     except subprocess.TimeoutExpired as exc:
-        logger.error("OpenSCAD rendering timed out")
-        with sentry_sdk.configure_scope() as scope:
-            scope.set_extra("tool", "render_scad_script")
-            scope.set_extra("view", view)
-            sentry_sdk.capture_exception(exc)
+        logger.error(f"OpenSCAD rendering timed out: tool=render_scad_script, view={view}")
         raise RuntimeError("OpenSCAD rendering timed out (30 seconds)") from exc
     except Exception as exc:
-        logger.error("Exception occurred while rendering OpenSCAD script: %s", exc)
-        with sentry_sdk.configure_scope() as scope:
-            scope.set_extra("tool", "render_scad_script")
-            scope.set_extra("view", view)
-            sentry_sdk.capture_exception(exc)
+        logger.error(f"Exception in render_scad_script: tool=render_scad_script, view={view}, error={exc}")
         raise RuntimeError(
             f"Exception occurred while rendering OpenSCAD script: {exc}"
         ) from exc
@@ -358,14 +322,8 @@ def generate_stl(
             output_filename = f"model_{stl_uid[:8]}"
             uid_stl_dir = STL_DIR / stl_uid
 
-            # Log tool call details to Sentry
-            sentry_sdk.set_context("tool_call", {
-                "tool": "generate_stl",
-                "stl_uid": stl_uid,
-                "output_filename": output_filename,
-                "scad_code_length": len(scad_code),
-                "scad_code_preview": scad_code[:200] + "..." if len(scad_code) > 200 else scad_code
-            })
+            # Log tool call details
+            logger.info(f"generate_stl: stl_uid={stl_uid}, output_filename={output_filename}, scad_length={len(scad_code)}")
 
             # Use provided scad_code directly
             scad_content = scad_code
@@ -440,17 +398,8 @@ def generate_stl(
                 else:
                     info_lines = ["Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL links."]
 
-                # Log successful STL generation to Sentry
-                with sentry_sdk.configure_scope() as scope:
-                    scope.set_extra("stl_uid", stl_uid)
-                    scope.set_extra("output_filename", stl_filename)
-                    scope.set_extra("stl_url", stl_public_url or "not_configured")
-                    scope.set_extra("stl_size_bytes", stl_size)
-                    scope.set_extra("scad_code_length", len(scad_code))
-                    sentry_sdk.capture_message(
-                        f"generate_stl successful: {stl_filename} generated",
-                        level="info"
-                    )
+                # Log successful STL generation
+                logger.info(f"generate_stl successful: {stl_filename} generated, stl_uid={stl_uid}, size={stl_size} bytes, url={stl_public_url or 'not_configured'}")
 
                 return [stl_resource_uri, "\n".join(info_lines)]
 
@@ -461,18 +410,10 @@ def generate_stl(
                     temp_stl_path.unlink()
 
     except subprocess.TimeoutExpired as exc:
-        logger.error("OpenSCAD STL generation timed out")
-        with sentry_sdk.configure_scope() as scope:
-            scope.set_extra("tool", "generate_stl")
-            scope.set_extra("stl_uid", stl_uid)
-            sentry_sdk.capture_exception(exc)
+        logger.error(f"OpenSCAD STL generation timed out: tool=generate_stl, stl_uid={stl_uid}")
         raise RuntimeError("OpenSCAD STL generation timed out (60 seconds)") from exc
     except Exception as exc:
-        logger.error("Exception occurred while generating STL: %s", exc)
-        with sentry_sdk.configure_scope() as scope:
-            scope.set_extra("tool", "generate_stl")
-            scope.set_extra("stl_uid", stl_uid)
-            sentry_sdk.capture_exception(exc)
+        logger.error(f"Exception in generate_stl: tool=generate_stl, stl_uid={stl_uid}, error={exc}")
         raise RuntimeError(
             f"Exception occurred while generating STL: {exc}"
         ) from exc
@@ -488,29 +429,17 @@ def test_sentry_logging(
     """
     try:
         test_uid = str(uuid.uuid4())
-        sentry_sdk.set_context("test_call", {
-            "tool": "test_sentry_logging",
-            "test_uid": test_uid,
-            "timestamp": str(uuid.uuid4())
-        })
 
-        with sentry_sdk.configure_scope() as scope:
-            scope.set_extra("test_uid", test_uid)
-            scope.set_extra("service", "openscad-mcp")
-            scope.set_extra("integration_test", True)
-            sentry_sdk.capture_message(
-                "Sentry test message from OpenSCAD MCP server",
-                level="info"
-            )
+        # Test info message (will be sent to Sentry automatically)
+        logger.info(f"Sentry test message from OpenSCAD MCP server: test_uid={test_uid}, service=openscad-mcp")
 
-        logger.info(f"Sentry test message sent with UID: {test_uid}")
-        return [f"Sentry test message sent successfully. Test UID: {test_uid}"]
+        # Test warning message (will create an issue in Sentry)
+        logger.warning(f"Sentry integration test warning: test_uid={test_uid}")
+
+        return [f"Sentry test messages sent successfully. Test UID: {test_uid}"]
 
     except Exception as exc:
-        logger.error(f"Error in Sentry test: {exc}")
-        with sentry_sdk.configure_scope() as scope:
-            scope.set_extra("tool", "test_sentry_logging")
-            sentry_sdk.capture_exception(exc)
+        logger.error(f"Error in Sentry test: tool=test_sentry_logging, error={exc}")
         raise RuntimeError(f"Sentry test failed: {exc}") from exc
 
 
