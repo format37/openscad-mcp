@@ -20,6 +20,7 @@ services:
       - MCP_PUBLIC_BASE_URL=${MCP_PUBLIC_BASE_URL}
       - MCP_PUBLIC_LINK_TOKEN=${MCP_PUBLIC_LINK_TOKEN}
       - MCP_PUBLIC_ASSET_BASE_URL=${MCP_PUBLIC_ASSET_BASE_URL}
+      - SENTRY_DSN=${SENTRY_DSN}
     expose:
       - "8004"
     restart: unless-stopped

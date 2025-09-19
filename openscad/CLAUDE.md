@@ -51,6 +51,7 @@ docker run -p 8004:8004 openscad-mcp
 - `PORT`: Server port (default: 8004 in Docker, 8000 otherwise)
 - `OPENSCAD_THREADS`: Concurrent rendering limit (default: 1)
 - `MAX_FILE_SIZE`: Upload size limit (default: 100MB)
+- `SENTRY_DSN`: Sentry DSN for error tracking and logging (optional)
 
 ## OpenSCAD Integration
 - Requires OpenSCAD binary in PATH
@@ -90,4 +91,11 @@ The server exposes tools via Server-Sent Events (SSE) endpoint at `/{service-nam
 - **No complex parameters**: Only essential inputs (scad_code, optional view)
 - **Auto-generated filenames**: No manual naming required
 - **Always persistent**: All files are stored and accessible via URLs
-- **No authentication noise**: Clean logging focused on operations
+- **Clean logging**: Focused on operations with optional Sentry integration
+- **Error tracking**: Comprehensive exception handling with Sentry capture
+
+## Monitoring & Logging
+- **Sentry Integration**: Optional error tracking and performance monitoring
+- **Tool call logging**: Each render/STL generation logged with details
+- **Exception capture**: All errors automatically sent to Sentry if configured
+- **Test tool**: `test_sentry_logging` tool for verifying Sentry integration
