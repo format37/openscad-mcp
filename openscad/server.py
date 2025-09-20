@@ -511,9 +511,13 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
                 )
 
     async def dispatch(self, request, call_next):
-        # Only protect BASE_PATH path space
+        # Only protect BASE_PATH path space, but allow public access to asset routes
         path = request.url.path or "/"
         if not path.startswith(BASE_PATH):
+            return await call_next(request)
+
+        # Allow public access to asset routes (they use UUID-based security)
+        if path.startswith(ASSETS_ROUTE) or path.startswith(STL_ASSETS_ROUTE):
             return await call_next(request)
 
         def accept(token_value: str, source: str):
