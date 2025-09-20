@@ -21,6 +21,7 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 COPY mcp_image_utils.py /app/
+COPY openscad_documentation.md /app/
 COPY server.py /app/
 
 ENV PORT=8004

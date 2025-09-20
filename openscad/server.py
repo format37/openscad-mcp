@@ -442,6 +442,21 @@ def get_stl_resource(uid: str, name: str) -> bytes:
         )
     return path.read_bytes()
 
+
+@mcp.resource(
+    f"{_safe_name}://documentation",
+    name="OpenSCAD Documentation",
+    description="Documentation and guidance for using OpenSCAD scripting language",
+    mime_type="text/markdown"
+)
+def get_documentation_resource() -> str:
+    """Expose OpenSCAD documentation as an MCP resource."""
+
+    doc_path = Path("/app/openscad_documentation.md")
+    if not doc_path.exists():
+        raise FileNotFoundError("OpenSCAD documentation not found on server")
+    return doc_path.read_text()
+
 # Build the main ASGI app with Streamable HTTP mounted
 mcp_asgi = mcp.streamable_http_app()
 
