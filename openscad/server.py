@@ -261,7 +261,7 @@ def render_scad_script(
                     public_url = f"{PUBLIC_ASSET_BASE_URL}/{asset_relative_path}"
 
                 if public_url:
-                    info_lines = [f"Preview URL: {public_url}"]
+                    info_lines = [f"{public_url}"]
                 else:
                     info_lines = ["Configure MCP_PUBLIC_BASE_URL or MCP_PUBLIC_ASSET_BASE_URL to expose HTTPS asset links."]
 
@@ -363,7 +363,7 @@ def generate_stl(
                 )
 
                 # Generate resource URI
-                stl_resource_uri = f"{_safe_name}://stl/{stl_uid}/{safe_output_name}.stl"
+                # stl_resource_uri = f"{_safe_name}://stl/{stl_uid}/{safe_output_name}.stl"
 
                 # Get file size for info
                 stl_size = temp_stl_path.stat().st_size
@@ -375,14 +375,15 @@ def generate_stl(
                     stl_public_url = f"{PUBLIC_BASE_URL}{STL_ASSETS_ROUTE}/{stl_asset_relative_path}"
 
                 if stl_public_url:
-                    info_lines = [f"STL URL: {stl_public_url}"]
+                    info_lines = [f"{stl_public_url}"]
                 else:
                     info_lines = ["Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL links."]
 
                 # Log successful STL generation
                 logger.info(f"generate_stl successful: {stl_filename} generated, stl_uid={stl_uid}, size={stl_size} bytes, url={stl_public_url or 'not_configured'}")
 
-                return [stl_resource_uri, "\n".join(info_lines)]
+                # return [stl_resource_uri, "\n".join(info_lines)]
+                return ["\n".join(info_lines)]
 
             finally:
                 if temp_scad_path.exists():
