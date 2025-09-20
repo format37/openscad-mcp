@@ -1,18 +1,13 @@
 # OpenSCAD MCP
+Openscad MCP server, that has the following features:
+* openscad code rendering to png
+* stl generation from openscad code
+* openscad documentation resource
 
 ## Installation
 
-### 1. SSL certificate generation
-Update your subdomain name if required
-```bash
-sudo apt install certbot
-sudo certbot certonly --standalone -d service.dnk-technologies.com
-```
-Auto-renewal setup:
-```bash
-sudo crontab -e
-# Add: 0 12 * * * /usr/bin/certbot renew --quiet
-```
+### 1. Reverse-proxy
+Install [this](https://github.com/format37/reverse-proxy) or use your own.
 
 ### 2. Git clone
 ```bash
@@ -62,9 +57,10 @@ The token is defined temporary for demo and may be unavailable later. Make ur ow
 }
 ```
 
-### 6. Claude web & Claude mobile
-Can be defined only in claude web.
+### 6. Claude web, Claude mobile, Chat GPT Web
 ```
 https://rtlm.info/openscad/8TikTAffQT3Db65Q7xbofbUjapGjKepTI3sikOeLWClfXW5GXO/
 ```
-Chat GPT requiring the search and fetch tools, which is non-sense for this server purpose.
+
+### 7. Notes
+The provided url is defined for demonstration and would be removed eventually.
