@@ -21,6 +21,7 @@ services:
       - MCP_PUBLIC_LINK_TOKEN=${MCP_PUBLIC_LINK_TOKEN}
       - MCP_PUBLIC_ASSET_BASE_URL=${MCP_PUBLIC_ASSET_BASE_URL}
       - SENTRY_DSN=${SENTRY_DSN}
+      - RENDER_MAX_CONCURRENCY=4
     expose:
       - "8004"
     restart: unless-stopped
