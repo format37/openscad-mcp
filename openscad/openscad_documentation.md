@@ -1,10125 +1,6284 @@
-[Jump to content](#bodyContent)
+# OpenSCAD Documentation
 
-<div class="vector-header-container">
+This document contains converted documentation from HTML files.
 
-<div class="vector-header-start">
+---
 
-<div id="vector-main-menu-dropdown" class="vector-dropdown vector-main-menu-dropdown vector-button-flush-left vector-button-flush-right" title="Main menu">
+# En.Wikibooks.Org Wiki Openscad User Manual Text
 
-<span class="vector-icon mw-ui-icon-menu mw-ui-icon-wikimedia-menu"></span>
-<span class="vector-dropdown-label-text">Main menu</span>
+# OpenSCAD User Manual — Text
 
-<div class="vector-dropdown-content">
+The `text()` module creates text as a 2D geometric object, using fonts installed on the local system or provided as separate font files.
 
-<div id="vector-main-menu-unpinned-container" class="vector-unpinned-container">
+Note: Requires version 2015.03
 
-<div id="vector-main-menu" class="vector-main-menu vector-pinnable-element">
+## Parameters
 
-<div class="vector-pinnable-header vector-main-menu-pinnable-header vector-pinnable-header-unpinned" data-feature-name="main-menu-pinned" data-pinnable-element-id="vector-main-menu" data-pinned-container-id="vector-main-menu-pinned-container" data-unpinned-container-id="vector-main-menu-unpinned-container">
+- text: String. The text to generate.
+- size: Decimal. The generated text has an ascent (height above the baseline) of approximately this value. Default is 10. Fonts vary and may be a different height, typically slightly smaller. Conversion to points: pt = size / 3.937 (e.g., size=3.05 ≈ 12 pt). Note that point measurements for text generally refer to ascent-to-descent, not ascent-to-baseline.
+- font: String. Logical font name (not the font file name). May include a style parameter, e.g., `font="Liberation Sans:style=Bold Italic"`.
+- halign: String. Horizontal alignment: "left", "center", "right". Default "left".
+- valign: String. Vertical alignment: "top", "center", "baseline", "bottom". Default "baseline".
+- spacing: Decimal. Factor to increase/decrease character spacing. Default 1.
+- direction: String. Text flow: "ltr" (left-to-right), "rtl" (right-to-left), "ttb" (top-to-bottom), "btt" (bottom-to-top). Default "ltr".
+- language: String. Language of the text (e.g., "en", "ar", "ch"). Default "en".
+- script: String. Script of the text (e.g., "latin", "arabic", "hani"). Default "latin".
+- $fn: Used for subdividing curved path segments provided by FreeType.
 
-<div class="vector-pinnable-header-label">
+## Example
 
-Main menu
+### Example 1
 
-</div>
+```openscad
+text("OpenSCAD");
+```
 
-move to sidebar
+## Unicode and escape sequences
 
-hide
+To allow specification of particular Unicode characters, use escape codes within strings:
 
-</div>
+- \xNN — Hex char value (01–7f)
+- \uNNNN — Unicode char with 4 hex digits (lowercase u)
+- \UNNNNNN — Unicode char with 6 hex digits (uppercase U)
 
-<div id="p-navigation" class="vector-menu mw-portlet mw-portlet-navigation">
+The null character (NUL) is mapped to the space character (SP).
 
-<div class="vector-menu-heading">
+```openscad
+assert(version() == [2019, 5, 0]);
+assert(ord(" ") == 32);
+assert(ord("\x00") == 32);
+assert(ord("\u0000") == 32);
+assert(ord("\U000000") == 32);
 
-Navigation
+// Example: 10 euro and a smiley
+t = "\u20AC10 \u263A";
+```
 
-</div>
+## Using Fonts & Styles
 
-<div class="vector-menu-content">
+Fonts are specified by logical name; a style parameter can be added to select a specific style (e.g., Bold, Italic):
 
-  - <span id="n-mainpage">[<span>Main
-    Page</span>](/wiki/Main_Page "Visit the main page [z]")</span>
-  - <span id="n-help">[<span>Help</span>](/wiki/Help:Contents "Find help on how to use and edit Wikibooks")</span>
-  - <span id="n-Browse">[<span>Browse</span>](/wiki/Wikibooks:Card_Catalog_Office "Check out what Wikibooks has to offer")</span>
-  - <span id="n-Cookbook">[<span>Cookbook</span>](/wiki/Cookbook:Table_of_Contents "Learn recipes from around the world")</span>
-  - <span id="n-Wikijunior">[<span>Wikijunior</span>](/wiki/Wikijunior "Books for children")</span>
-  - <span id="n-Featured-books">[<span>Featured
-    books</span>](/wiki/Wikibooks:Featured_books "The best of Wikibooks")</span>
-  - <span id="n-recentchanges">[<span>Recent
-    changes</span>](/wiki/Special:RecentChanges "A list of recent changes in the wiki [r]")</span>
-  - <span id="n-specialpages">[<span>Special
-    pages</span>](/wiki/Special:SpecialPages)</span>
-  - <span id="n-randomrootpage">[<span>Random
-    book</span>](/wiki/Special:RandomInCategory/Book:Wikibooks_Stacks/Books)</span>
-  - <span id="n-Using-Wikibooks">[<span>Using
-    Wikibooks</span>](/wiki/Using_Wikibooks)</span>
+```openscad
+text("Sample", font="Liberation Sans:style=Bold Italic");
+```
 
-</div>
+OpenSCAD includes the fonts Liberation Mono, Liberation Sans, and Liberation Serif. Using these is recommended for portability across platforms. Liberation Sans is the default.
 
-</div>
+In addition to installed fonts (on Windows, only fonts installed for all users are available), it is possible to add project-specific font files. Supported formats: TrueType (*.ttf) and OpenType (*.otf). Register font files with `use <>`:
 
-<div id="p-community" class="vector-menu mw-portlet mw-portlet-community">
+```openscad
+use <ttf/paratype-serif/PTF55F.ttf>
+```
 
-<div class="vector-menu-heading">
+After registration, the font appears in the font list dialog and can be referenced by its logical name.
 
-Community
+List system-configured fonts via fontconfig tools:
 
-</div>
+```
+fc-list -f "%-60{{%{family[0]}%{:style[0]=}}}%{file}\n" | sort
+```
 
-<div class="vector-menu-content">
+On Windows, list font file names from the registry:
 
-  - <span id="n-Reading-room-forum">[<span>Reading room
-    forum</span>](/wiki/Wikibooks:Reading_room)</span>
-  - <span id="n-portal">[<span>Community
-    portal</span>](/wiki/Wikibooks:Community_Portal "Find your way around the Wikibooks community")</span>
-  - <span id="n-currentevents">[<span>Bulletin
-    Board</span>](/wiki/Wikibooks:Reading_room/Bulletin_Board "Important community news")</span>
-  - <span id="n-maintenance">[<span>Help
-    out\!</span>](/wiki/Wikibooks:Maintenance "Frequent tasks that you can help with")</span>
-  - <span id="n-Policies-and-guidelines">[<span>Policies and
-    guidelines</span>](/wiki/Wikibooks:Policies_and_guidelines "Pages detailing important rules and procedures")</span>
-  - <span id="n-contact">[<span>Contact
-    us</span>](/wiki/Wikibooks:Contact_us "Alternative methods of communication")</span>
+```
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" /s > List_Fonts_Windows.txt
+```
 
-</div>
+### Example 2
 
-</div>
+```openscad
+square(10);
 
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-[![](openscad_user_manual_media/2f06b519faa2e53fb20043e883f2a3b8953e0e62.svg)
-<span class="mw-logo-container skin-invert">
-![Wikibooks](openscad_user_manual_media/403486f9d17ac5ab7632ce647bc98bb7ac0d9901.svg)
-![The Free Textbook
-Project](openscad_user_manual_media/361b3a223b746036b26bfda05106f4acf4aa7ee3.svg)
-</span>](/wiki/Main_Page)
-
-</div>
-
-<div class="vector-header-end">
-
-<div id="p-search" class="vector-search-box-vue vector-search-box-collapses vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box" role="search">
-
-[<span class="vector-icon mw-ui-icon-search mw-ui-icon-wikimedia-search"></span>
-<span>Search</span>](/wiki/Special:Search "Search Wikibooks [f]")
-
-<div class="vector-typeahead-search-container">
-
-<div class="cdx-typeahead-search cdx-typeahead-search--show-thumbnail cdx-typeahead-search--auto-expand-width">
-
-<div id="simpleSearch" class="cdx-search-input__input-wrapper" data-search-loc="header-moved">
-
-<div class="cdx-text-input cdx-text-input--has-start-icon">
-
-<span class="cdx-text-input__icon cdx-text-input__start-icon"></span>
-
-</div>
-
-</div>
-
-Search
-
-</div>
-
-</div>
-
-</div>
-
-<div class="vector-user-links-main">
-
-<div id="p-vector-user-menu-preferences" class="vector-menu mw-portlet emptyPortlet">
-
-<div class="vector-menu-content">
-
-</div>
-
-</div>
-
-<div id="p-vector-user-menu-userpage" class="vector-menu mw-portlet emptyPortlet">
-
-<div class="vector-menu-content">
-
-</div>
-
-</div>
-
-<div id="vector-appearance-dropdown" class="vector-dropdown" title="Change the appearance of the page&#39;s font size, width, and color">
-
-<span class="vector-icon mw-ui-icon-appearance mw-ui-icon-wikimedia-appearance"></span>
-<span class="vector-dropdown-label-text">Appearance</span>
-
-<div class="vector-dropdown-content">
-
-<div id="vector-appearance-unpinned-container" class="vector-unpinned-container">
-
-</div>
-
-</div>
-
-</div>
-
-<div id="p-vector-user-menu-notifications" class="vector-menu mw-portlet emptyPortlet">
-
-<div class="vector-menu-content">
-
-</div>
-
-</div>
-
-<div id="p-vector-user-menu-overflow" class="vector-menu mw-portlet">
-
-<div class="vector-menu-content">
-
-  - <span id="pt-sitesupport-2">[<span>Donations</span>](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikibooks.org&uselang=en)</span>
-  - <span id="pt-createaccount-2">[<span>Create
-    account</span>](/w/index.php?title=Special:CreateAccount&returnto=OpenSCAD+User+Manual%2FPrint+version "You are encouraged to create an account and log in; however, it is not mandatory")</span>
-  - <span id="pt-login-2">[<span>Log
-    in</span>](/w/index.php?title=Special:UserLogin&returnto=OpenSCAD+User+Manual%2FPrint+version "You are encouraged to log in; however, it is not mandatory [o]")</span>
-
-</div>
-
-</div>
-
-</div>
-
-<div id="vector-user-links-dropdown" class="vector-dropdown vector-user-menu vector-button-flush-right vector-user-menu-logged-out user-links-collapsible-item" title="More options">
-
-<span class="vector-icon mw-ui-icon-ellipsis mw-ui-icon-wikimedia-ellipsis"></span>
-<span class="vector-dropdown-label-text">Personal tools</span>
-
-<div class="vector-dropdown-content">
-
-<div id="p-personal" class="vector-menu mw-portlet mw-portlet-personal user-links-collapsible-item" title="User menu">
-
-<div class="vector-menu-content">
-
-  - <span id="pt-sitesupport">[<span>Donations</span>](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikibooks.org&uselang=en)</span>
-  - <span id="pt-createaccount">[<span class="vector-icon mw-ui-icon-userAdd mw-ui-icon-wikimedia-userAdd"></span>
-    <span>Create
-    account</span>](/w/index.php?title=Special:CreateAccount&returnto=OpenSCAD+User+Manual%2FPrint+version "You are encouraged to create an account and log in; however, it is not mandatory")</span>
-  - <span id="pt-login">[<span class="vector-icon mw-ui-icon-logIn mw-ui-icon-wikimedia-logIn"></span>
-    <span>Log
-    in</span>](/w/index.php?title=Special:UserLogin&returnto=OpenSCAD+User+Manual%2FPrint+version "You are encouraged to log in; however, it is not mandatory [o]")</span>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="mw-page-container">
-
-<div class="mw-page-container-inner">
-
-<div class="vector-sitenotice-container">
-
-<div id="siteNotice">
-
-<div id="mw-dismissablenotice-anonplace">
-
-</div>
-
-</div>
-
-</div>
-
-<div class="vector-column-start">
-
-<div class="vector-main-menu-container">
-
-<div id="mw-navigation">
-
-<div id="vector-main-menu-pinned-container" class="vector-pinned-container">
-
-</div>
-
-</div>
-
-</div>
-
-<div class="vector-sticky-pinned-container">
-
-<div id="vector-toc-pinned-container" class="vector-pinned-container">
-
-<div id="vector-toc" class="vector-toc vector-pinnable-element">
-
-<div class="vector-pinnable-header vector-toc-pinnable-header vector-pinnable-header-pinned" data-feature-name="toc-pinned" data-pinnable-element-id="vector-toc">
-
-## Contents
-
-move to sidebar
-
-hide
-
-</div>
-
-  - <span id="toc-mw-content-text">[](#)</span>
-    <div class="vector-toc-text">
-    Beginning
-    </div>
-  - <span id="toc-Introduction">[](#Introduction)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">1</span> <span>Introduction</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Introduction subsection</span>
-      - <span id="toc-Additional_Resources">[](#Additional_Resources)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">1.1</span> <span>Additional
-        Resources</span>
-        </div>
-      - <span id="toc-History">[](#History)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">1.2</span> <span>History</span>
-        </div>
-  - <span id="toc-The_OpenSCAD_User_Manual">[](#The_OpenSCAD_User_Manual)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">2</span> <span>The OpenSCAD User
-    Manual</span>
-    </div>
-  - <span id="toc-The_OpenSCAD_Language_Reference">[](#The_OpenSCAD_Language_Reference)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">3</span> <span>The OpenSCAD Language
-    Reference</span>
-    </div>
-  - <span id="toc-Work_in_progress">[](#Work_in_progress)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">4</span> <span>Work in progress</span>
-    </div>
-  - <span id="toc-Contents">[](#Contents)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">5</span> <span>Contents</span>
-    </div>
-  - <span id="toc-Chapter_1_--_First_Steps">[](#Chapter_1_--_First_Steps)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">6</span> <span>Chapter 1 -- First
-    Steps</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 1 -- First Steps subsection</span>
-      - <span id="toc-Compiling_and_rendering_our_first_model">[](#Compiling_and_rendering_our_first_model)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">6.1</span> <span>Compiling and
-        rendering our first model</span>
-        </div>
-      - <span id="toc-Translate_Operator_May_Not_End_A_Statement">[](#Translate_Operator_May_Not_End_A_Statement)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">6.2</span> <span>Translate
-        Operator May Not End A Statement</span>
-        </div>
-      - <span id="toc-Surfaces">[](#Surfaces)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">6.3</span> <span>Surfaces</span>
-        </div>
-      - <span id="toc-Wireframe">[](#Wireframe)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">6.4</span> <span>Wireframe</span>
-        </div>
-      - <span id="toc-The_OpenCSG_view">[](#The_OpenCSG_view)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">6.5</span> <span>The OpenCSG
-        view</span>
-        </div>
-      - <span id="toc-The_Thrown_Together_View">[](#The_Thrown_Together_View)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">6.6</span> <span>The Thrown
-        Together View</span>
-        </div>
-      - <span id="toc-References">[](#References)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">6.7</span> <span>References</span>
-        </div>
-  - <span id="toc-Chapter_2_--_The_OpenSCAD_User_Interface">[](#Chapter_2_--_The_OpenSCAD_User_Interface)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">7</span> <span>Chapter 2 -- The
-    OpenSCAD User Interface</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 2 -- The OpenSCAD User Interface
-    subsection</span>
-      - <span id="toc-User_Interface">[](#User_Interface)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.1</span> <span>User
-        Interface</span>
-        </div>
-          - <span id="toc-Viewing_area">[](#Viewing_area)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.1.1</span> <span>Viewing
-            area</span>
-            </div>
-          - <span id="toc-Console_window">[](#Console_window)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.1.2</span> <span>Console
-            window</span>
-            </div>
-          - <span id="toc-Text_editor">[](#Text_editor)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.1.3</span> <span>Text
-            editor</span>
-            </div>
-      - <span id="toc-Interactive_modification_of_the_numerical_value">[](#Interactive_modification_of_the_numerical_value)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.2</span> <span>Interactive
-        modification of the numerical value</span>
-        </div>
-      - <span id="toc-View_navigation">[](#View_navigation)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.3</span> <span>View
-        navigation</span>
-        </div>
-      - <span id="toc-View_setup">[](#View_setup)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.4</span> <span>View setup</span>
-        </div>
-          - <span id="toc-Render_modes">[](#Render_modes)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.4.1</span> <span>Render
-            modes</span>
-            </div>
-              - <span id="toc-OpenCSG_(F9)">[](#OpenCSG_\(F9\))</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">7.4.1.1</span>
-                <span>OpenCSG (F9)</span>
-                </div>
-                  - <span id="toc-Implementation_Details">[](#Implementation_Details)</span>
-                    <div class="vector-toc-text">
-                    <span class="vector-toc-numb">7.4.1.1.1</span>
-                    <span>Implementation Details</span>
-                    </div>
-              - <span id="toc-CGAL_(Surfaces_and_Grid,_F10_and_F11)">[](#CGAL_\(Surfaces_and_Grid,_F10_and_F11\))</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">7.4.1.2</span> <span>CGAL
-                (Surfaces and Grid, F10 and F11)</span>
-                </div>
-                  - <span id="toc-Implementation_Details_2">[](#Implementation_Details_2)</span>
-                    <div class="vector-toc-text">
-                    <span class="vector-toc-numb">7.4.1.2.1</span>
-                    <span>Implementation Details</span>
-                    </div>
-          - <span id="toc-View_options">[](#View_options)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.4.2</span> <span>View
-            options</span>
-            </div>
-              - <span id="toc-Show_Edges_(Ctrl+1)">[](#Show_Edges_\(Ctrl+1\))</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">7.4.2.1</span> <span>*Show
-                Edges* (Ctrl+1)</span>
-                </div>
-              - <span id="toc-Show_Axes_(Ctrl+2)">[](#Show_Axes_\(Ctrl+2\))</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">7.4.2.2</span> <span>*Show
-                Axes* (Ctrl+2)</span>
-                </div>
-              - <span id="toc-Show_Crosshairs_(Ctrl+3)">[](#Show_Crosshairs_\(Ctrl+3\))</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">7.4.2.3</span> <span>*Show
-                Crosshairs* (Ctrl+3)</span>
-                </div>
-          - <span id="toc-Animation">[](#Animation)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.4.3</span>
-            <span>Animation</span>
-            </div>
-          - <span id="toc-View_alignment">[](#View_alignment)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.4.4</span> <span>View
-            alignment</span>
-            </div>
-      - <span id="toc-Dodecahedron">[](#Dodecahedron)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.5</span>
-        <span>Dodecahedron</span>
-        </div>
-      - <span id="toc-Icosahedron">[](#Icosahedron)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.6</span>
-        <span>Icosahedron</span>
-        </div>
-      - <span id="toc-Icosphere">[](#Icosphere)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.7</span> <span>Icosphere</span>
-        </div>
-      - <span id="toc-Half-pyramid">[](#Half-pyramid)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.8</span>
-        <span>Half-pyramid</span>
-        </div>
-      - <span id="toc-Bounding_Box">[](#Bounding_Box)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.9</span> <span>Bounding
-        Box</span>
-        </div>
-      - <span id="toc-Linear_Extrude_extended_use_examples">[](#Linear_Extrude_extended_use_examples)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.10</span> <span>Linear Extrude
-        extended use examples</span>
-        </div>
-          - <span id="toc-Linear_Extrude_with_Scale_as_an_interpolated_function">[](#Linear_Extrude_with_Scale_as_an_interpolated_function)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.10.1</span> <span>Linear
-            Extrude with Scale as an interpolated function</span>
-            </div>
-          - <span id="toc-Linear_Extrude_with_Twist_as_an_interpolated_function">[](#Linear_Extrude_with_Twist_as_an_interpolated_function)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.10.2</span> <span>Linear
-            Extrude with Twist as an interpolated function</span>
-            </div>
-          - <span id="toc-Linear_Extrude_with_Twist_and_Scale_as_interpolated_functions">[](#Linear_Extrude_with_Twist_and_Scale_as_interpolated_functions)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.10.3</span> <span>Linear
-            Extrude with Twist and Scale as interpolated
-            functions</span>
-            </div>
-      - <span id="toc-Rocket">[](#Rocket)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.11</span> <span>Rocket</span>
-        </div>
-      - <span id="toc-Horns">[](#Horns)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.12</span> <span>Horns</span>
-        </div>
-      - <span id="toc-Strandbeest">[](#Strandbeest)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.13</span>
-        <span>Strandbeest</span>
-        </div>
-      - <span id="toc-Previous">[](#Previous)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.14</span> <span>Previous</span>
-        </div>
-      - <span id="toc-Next">[](#Next)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">7.15</span> <span>Next</span>
-        </div>
-          - <span id="toc-Command_line_usage">[](#Command_line_usage)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.15.1</span> <span>Command
-            line usage</span>
-            </div>
-          - <span id="toc-Export_options">[](#Export_options)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.15.2</span> <span>Export
-            options</span>
-            </div>
-              - <span id="toc-Camera_and_image_output">[](#Camera_and_image_output)</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">7.15.2.1</span>
-                <span>Camera and image output</span>
-                </div>
-          - <span id="toc-Constants">[](#Constants)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.15.3</span>
-            <span>Constants</span>
-            </div>
-          - <span id="toc-Command_to_build_required_files">[](#Command_to_build_required_files)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.15.4</span> <span>Command to
-            build required files</span>
-            </div>
-          - <span id="toc-Processing_all_.scad_files_in_a_folder">[](#Processing_all_.scad_files_in_a_folder)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.15.5</span> <span>Processing
-            all .scad files in a folder</span>
-            </div>
-          - <span id="toc-Makefile_example">[](#Makefile_example)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.15.6</span> <span>Makefile
-            example</span>
-            </div>
-              - <span id="toc-Automatic_targets">[](#Automatic_targets)</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">7.15.6.1</span>
-                <span>Automatic targets</span>
-                </div>
-          - <span id="toc-Windows_notes">[](#Windows_notes)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.15.7</span> <span>Windows
-            notes</span>
-            </div>
-          - <span id="toc-MacOS_notes">[](#MacOS_notes)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">7.15.8</span> <span>MacOS
-            notes</span>
-            </div>
-  - <span id="toc-Chapter_3_--_Commented_Example_Projects">[](#Chapter_3_--_Commented_Example_Projects)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">8</span> <span>Chapter 3 -- Commented
-    Example Projects</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 3 -- Commented Example Projects
-    subsection</span>
-      - <span id="toc-Dodecahedron_2">[](#Dodecahedron_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.1</span>
-        <span>Dodecahedron</span>
-        </div>
-      - <span id="toc-Icosahedron_2">[](#Icosahedron_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.2</span>
-        <span>Icosahedron</span>
-        </div>
-      - <span id="toc-Icosphere_2">[](#Icosphere_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.3</span> <span>Icosphere</span>
-        </div>
-      - <span id="toc-Half-pyramid_2">[](#Half-pyramid_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.4</span>
-        <span>Half-pyramid</span>
-        </div>
-      - <span id="toc-Bounding_Box_2">[](#Bounding_Box_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.5</span> <span>Bounding
-        Box</span>
-        </div>
-      - <span id="toc-Linear_Extrude_extended_use_examples_2">[](#Linear_Extrude_extended_use_examples_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.6</span> <span>Linear Extrude
-        extended use examples</span>
-        </div>
-          - <span id="toc-Linear_Extrude_with_Scale_as_an_interpolated_function_2">[](#Linear_Extrude_with_Scale_as_an_interpolated_function_2)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">8.6.1</span> <span>Linear
-            Extrude with Scale as an interpolated function</span>
-            </div>
-          - <span id="toc-Linear_Extrude_with_Twist_as_an_interpolated_function_2">[](#Linear_Extrude_with_Twist_as_an_interpolated_function_2)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">8.6.2</span> <span>Linear
-            Extrude with Twist as an interpolated function</span>
-            </div>
-          - <span id="toc-Linear_Extrude_with_Twist_and_Scale_as_interpolated_functions_2">[](#Linear_Extrude_with_Twist_and_Scale_as_interpolated_functions_2)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">8.6.3</span> <span>Linear
-            Extrude with Twist and Scale as interpolated
-            functions</span>
-            </div>
-      - <span id="toc-Rocket_2">[](#Rocket_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.7</span> <span>Rocket</span>
-        </div>
-      - <span id="toc-Horns_2">[](#Horns_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.8</span> <span>Horns</span>
-        </div>
-      - <span id="toc-Strandbeest_2">[](#Strandbeest_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.9</span>
-        <span>Strandbeest</span>
-        </div>
-      - <span id="toc-Previous_2">[](#Previous_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.10</span> <span>Previous</span>
-        </div>
-      - <span id="toc-Next_2">[](#Next_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">8.11</span> <span>Next</span>
-        </div>
-  - <span id="toc-Chapter_4_--_Export">[](#Chapter_4_--_Export)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">9</span> <span>Chapter 4 --
-    Export</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 4 -- Export subsection</span>
-      - <span id="toc-Export">[](#Export)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.1</span> <span>Export</span>
-        </div>
-      - <span id="toc-STL_Export">[](#STL_Export)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.2</span> <span>STL Export</span>
-        </div>
-      - <span id="toc-Linear_Extrude">[](#Linear_Extrude)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.3</span> <span>Linear
-        Extrude</span>
-        </div>
-      - <span id="toc-Rotate_Extrude">[](#Rotate_Extrude)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.4</span> <span>Rotate
-        Extrude</span>
-        </div>
-      - <span id="toc-Getting_Inkscape_to_work">[](#Getting_Inkscape_to_work)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.5</span> <span>Getting Inkscape
-        to work</span>
-        </div>
-      - <span id="toc-Previous_3">[](#Previous_3)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.6</span> <span>Previous</span>
-        </div>
-      - <span id="toc-Next_3">[](#Next_3)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.7</span> <span>Next</span>
-        </div>
-          - <span id="toc-PS/EPS">[](#PS/EPS)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">9.7.1</span>
-            <span>PS/EPS</span>
-            </div>
-          - <span id="toc-SVG">[](#SVG)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">9.7.2</span> <span>SVG</span>
-            </div>
-          - <span id="toc-Makefile_automation">[](#Makefile_automation)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">9.7.3</span> <span>Makefile
-            automation</span>
-            </div>
-          - <span id="toc-AI_(Adobe_Illustrator)">[](#AI_\(Adobe_Illustrator\))</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">9.7.4</span> <span>AI (Adobe
-            Illustrator)</span>
-            </div>
-      - <span id="toc-Previous_4">[](#Previous_4)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.8</span> <span>Previous</span>
-        </div>
-      - <span id="toc-Next_4">[](#Next_4)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">9.9</span> <span>Next</span>
-        </div>
-  - <span id="toc-Chapter_5_--_Using_an_external_Editor_with_OpenSCAD">[](#Chapter_5_--_Using_an_external_Editor_with_OpenSCAD)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">10</span> <span>Chapter 5 -- Using an
-    external Editor with OpenSCAD</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 5 -- Using an external Editor with OpenSCAD
-    subsection</span>
-      - <span id="toc-How_to_use_an_external_editor">[](#How_to_use_an_external_editor)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">10.1</span> <span>How to use an
-        external editor</span>
-        </div>
-      - <span id="toc-Support_of_external_editors">[](#Support_of_external_editors)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">10.2</span> <span>Support of
-        external editors</span>
-        </div>
-  - <span id="toc-Chapter_6_--_Using_OpenSCAD_in_a_command_line_environment">[](#Chapter_6_--_Using_OpenSCAD_in_a_command_line_environment)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">11</span> <span>Chapter 6 -- Using
-    OpenSCAD in a command line environment</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 6 -- Using OpenSCAD in a command line
-    environment subsection</span>
-      - <span id="toc-Command_line_usage_2">[](#Command_line_usage_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">11.1</span> <span>Command line
-        usage</span>
-        </div>
-      - <span id="toc-Export_options_2">[](#Export_options_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">11.2</span> <span>Export
-        options</span>
-        </div>
-          - <span id="toc-Camera_and_image_output_2">[](#Camera_and_image_output_2)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">11.2.1</span> <span>Camera and
-            image output</span>
-            </div>
-      - <span id="toc-Constants_2">[](#Constants_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">11.3</span> <span>Constants</span>
-        </div>
-      - <span id="toc-Command_to_build_required_files_2">[](#Command_to_build_required_files_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">11.4</span> <span>Command to build
-        required files</span>
-        </div>
-      - <span id="toc-Processing_all_.scad_files_in_a_folder_2">[](#Processing_all_.scad_files_in_a_folder_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">11.5</span> <span>Processing all
-        .scad files in a folder</span>
-        </div>
-      - <span id="toc-Makefile_example_2">[](#Makefile_example_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">11.6</span> <span>Makefile
-        example</span>
-        </div>
-          - <span id="toc-Automatic_targets_2">[](#Automatic_targets_2)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">11.6.1</span> <span>Automatic
-            targets</span>
-            </div>
-      - <span id="toc-Windows_notes_2">[](#Windows_notes_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">11.7</span> <span>Windows
-        notes</span>
-        </div>
-      - <span id="toc-MacOS_notes_2">[](#MacOS_notes_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">11.8</span> <span>MacOS
-        notes</span>
-        </div>
-  - <span id="toc-Chapter_7_--_Path_locations">[](#Chapter_7_--_Path_locations)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">12</span> <span>Chapter 7 -- Path
-    locations</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 7 -- Path locations subsection</span>
-      - <span id="toc-Env_variables">[](#Env_variables)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">12.1</span> <span>Env
-        variables</span>
-        </div>
-      - <span id="toc-Per_platform_roots">[](#Per_platform_roots)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">12.2</span> <span>Per platform
-        roots</span>
-        </div>
-      - <span id="toc-Read-only_Resources">[](#Read-only_Resources)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">12.3</span> <span>Read-only
-        Resources</span>
-        </div>
-      - <span id="toc-User_Resources">[](#User_Resources)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">12.4</span> <span>User
-        Resources</span>
-        </div>
-      - <span id="toc-Misc_Resources">[](#Misc_Resources)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">12.5</span> <span>Misc
-        Resources</span>
-        </div>
-  - <span id="toc-Chapter_8_--_Building_OpenSCAD_from_Sources">[](#Chapter_8_--_Building_OpenSCAD_from_Sources)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">13</span> <span>Chapter 8 -- Building
-    OpenSCAD from Sources</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 8 -- Building OpenSCAD from Sources
-    subsection</span>
-      - <span id="toc-Prebuilt_binary_packages">[](#Prebuilt_binary_packages)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.1</span> <span>Prebuilt binary
-        packages</span>
-        </div>
-          - <span id="toc-generic_linux_binary_package">[](#generic_linux_binary_package)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.1.1</span> <span>generic
-            linux binary package</span>
-            </div>
-          - <span id="toc-nightly_builds">[](#nightly_builds)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.1.2</span> <span>nightly
-            builds</span>
-            </div>
-          - <span id="toc-chrysn&#39;s_Ubuntu_packages">[](#chrysn's_Ubuntu_packages)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.1.3</span> <span>chrysn's
-            Ubuntu packages</span>
-            </div>
-      - <span id="toc-Building_OpenSCAD_yourself">[](#Building_OpenSCAD_yourself)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.2</span> <span>Building
-        OpenSCAD yourself</span>
-        </div>
-          - <span id="toc-Installing_dependencies">[](#Installing_dependencies)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.2.1</span> <span>Installing
-            dependencies</span>
-            </div>
-              - <span id="toc-Prepackaged_dependencies">[](#Prepackaged_dependencies)</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">13.2.1.1</span>
-                <span>Prepackaged dependencies</span>
-                </div>
-              - <span id="toc-Verifying_dependencies">[](#Verifying_dependencies)</span>
-                <div class="vector-toc-text">
-                <span class="vector-toc-numb">13.2.1.2</span>
-                <span>Verifying dependencies</span>
-                </div>
-          - <span id="toc-Building_the_dependencies_yourself">[](#Building_the_dependencies_yourself)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.2.2</span> <span>Building
-            the dependencies yourself</span>
-            </div>
-          - <span id="toc-Build_the_OpenSCAD_binary">[](#Build_the_OpenSCAD_binary)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.2.3</span> <span>Build the
-            OpenSCAD binary</span>
-            </div>
-          - <span id="toc-Experimental">[](#Experimental)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.2.4</span>
-            <span>Experimental</span>
-            </div>
-      - <span id="toc-Compiling_the_test_suite">[](#Compiling_the_test_suite)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.3</span> <span>Compiling the
-        test suite</span>
-        </div>
-      - <span id="toc-Troubleshooting">[](#Troubleshooting)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.4</span>
-        <span>Troubleshooting</span>
-        </div>
-          - <span id="toc-Errors_about_incompatible_library_versions">[](#Errors_about_incompatible_library_versions)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.1</span> <span>Errors
-            about incompatible library versions</span>
-            </div>
-          - <span id="toc-OpenCSG_didn&#39;t_automatically_build">[](#OpenCSG_didn't_automatically_build)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.2</span> <span>OpenCSG
-            didn't automatically build</span>
-            </div>
-          - <span id="toc-CGAL_didn&#39;t_automatically_build">[](#CGAL_didn't_automatically_build)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.3</span> <span>CGAL
-            didn't automatically build</span>
-            </div>
-          - <span id="toc-Compiling_fails_with_an_Internal_compiler_error_from_GCC_or_GAS">[](#Compiling_fails_with_an_Internal_compiler_error_from_GCC_or_GAS)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.4</span> <span>Compiling
-            fails with an Internal compiler error from GCC or GAS</span>
-            </div>
-          - <span id="toc-Compiling_is_horribly_slow_and/or_grinds_the_disk">[](#Compiling_is_horribly_slow_and/or_grinds_the_disk)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.5</span> <span>Compiling
-            is horribly slow and/or grinds the disk</span>
-            </div>
-          - <span id="toc-BSD_issues">[](#BSD_issues)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.6</span> <span>BSD
-            issues</span>
-            </div>
-          - <span id="toc-Sun_/_Solaris_/_IllumOS_/_AIX_/_IRIX_/_Minix_/_etc">[](#Sun_/_Solaris_/_IllumOS_/_AIX_/_IRIX_/_Minix_/_etc)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.7</span> <span>Sun /
-            Solaris / IllumOS / AIX / IRIX / Minix / etc</span>
-            </div>
-          - <span id="toc-Test_suite_problems">[](#Test_suite_problems)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.8</span> <span>Test suite
-            problems</span>
-            </div>
-          - <span id="toc-I_moved_the_dependencies_I_built_and_now_openscad_won&#39;t_run">[](#I_moved_the_dependencies_I_built_and_now_openscad_won't_run)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.4.9</span> <span>I moved
-            the dependencies I built and now openscad won't run</span>
-            </div>
-      - <span id="toc-Tricks_and_tips">[](#Tricks_and_tips)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.5</span> <span>Tricks and
-        tips</span>
-        </div>
-          - <span id="toc-Reduce_space_of_dependency_build">[](#Reduce_space_of_dependency_build)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.5.1</span> <span>Reduce
-            space of dependency build</span>
-            </div>
-          - <span id="toc-Preferences">[](#Preferences)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.5.2</span>
-            <span>Preferences</span>
-            </div>
-          - <span id="toc-Setup_environment_to_start_developing_OpenSCAD_in_Ubuntu_11.04">[](#Setup_environment_to_start_developing_OpenSCAD_in_Ubuntu_11.04)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.5.3</span> <span>Setup
-            environment to start developing OpenSCAD in Ubuntu
-            11.04</span>
-            </div>
-          - <span id="toc-The_Clang_Compiler">[](#The_Clang_Compiler)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.5.4</span> <span>The Clang
-            Compiler</span>
-            </div>
-      - <span id="toc-Setup">[](#Setup)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.6</span> <span>Setup</span>
-        </div>
-      - <span id="toc-Requirements">[](#Requirements)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.7</span>
-        <span>Requirements</span>
-        </div>
-      - <span id="toc-Build_OpenSCAD">[](#Build_OpenSCAD)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.8</span> <span>Build
-        OpenSCAD</span>
-        </div>
-      - <span id="toc-Downloads">[](#Downloads)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.9</span> <span>Downloads</span>
-        </div>
-      - <span id="toc-Installing">[](#Installing)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.10</span>
-        <span>Installing</span>
-        </div>
-      - <span id="toc-Compiling_Dependencies">[](#Compiling_Dependencies)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.11</span> <span>Compiling
-        Dependencies</span>
-        </div>
-          - <span id="toc-Qt">[](#Qt)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.11.1</span> <span>Qt</span>
-            </div>
-          - <span id="toc-CGAL">[](#CGAL)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.11.2</span>
-            <span>CGAL</span>
-            </div>
-          - <span id="toc-OpenCSG">[](#OpenCSG)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.11.3</span>
-            <span>OpenCSG</span>
-            </div>
-          - <span id="toc-OpenSCAD">[](#OpenSCAD)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.11.4</span>
-            <span>OpenSCAD</span>
-            </div>
-      - <span id="toc-Building_an_installer">[](#Building_an_installer)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.12</span> <span>Building an
-        installer</span>
-        </div>
-      - <span id="toc-Compiling_the_regression_tests">[](#Compiling_the_regression_tests)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.13</span> <span>Compiling the
-        regression tests</span>
-        </div>
-      - <span id="toc-Troubleshooting_2">[](#Troubleshooting_2)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">13.14</span>
-        <span>Troubleshooting</span>
-        </div>
-          - <span id="toc-CGAL_2">[](#CGAL_2)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.14.1</span>
-            <span>CGAL</span>
-            </div>
-          - <span id="toc-References_2">[](#References_2)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">13.14.2</span>
-            <span>References</span>
-            </div>
-  - <span id="toc-Chapter_9_--_Frequently_Asked_Questions">[](#Chapter_9_--_Frequently_Asked_Questions)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">14</span> <span>Chapter 9 --
-    Frequently Asked Questions</span>
-    </div>
-  - <span id="toc-General">[](#General)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">15</span> <span>General</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle General subsection</span>
-      - <span id="toc-How_is_OpenSCAD_pronounced?">[](#How_is_OpenSCAD_pronounced?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">15.1</span> <span>How is OpenSCAD
-        pronounced?</span>
-        </div>
-      - <span id="toc-What_is_the_meaning_of_the_S_in_OpenSCAD?">[](#What_is_the_meaning_of_the_S_in_OpenSCAD?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">15.2</span> <span>What is the
-        meaning of the S in OpenSCAD?</span>
-        </div>
-      - <span id="toc-Why_Is_There_No_Preview_on_Windows_in_a_Virtual_Machine?">[](#Why_Is_There_No_Preview_on_Windows_in_a_Virtual_Machine?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">15.3</span> <span>Why Is There No
-        Preview on Windows in a Virtual Machine?</span>
-        </div>
-  - <span id="toc-Display">[](#Display)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">16</span> <span>Display</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Display subsection</span>
-      - <span id="toc-What_is_the_Convexity_Parameter_?">[](#What_is_the_Convexity_Parameter_?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">16.1</span> <span>What is the
-        Convexity Parameter ?</span>
-        </div>
-      - <span id="toc-Why_Isn&#39;t_Preview_Working?">[](#Why_Isn't_Preview_Working?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">16.2</span> <span>Why Isn't
-        Preview Working?</span>
-        </div>
-      - <span id="toc-What_are_those_strange_flickering_artifacts_in_the_preview?">[](#What_are_those_strange_flickering_artifacts_in_the_preview?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">16.3</span> <span>What are those
-        strange flickering artifacts in the preview?</span>
-        </div>
-      - <span id="toc-Why_are_some_parts_(e.g._holes)_of_the_model_not_rendered_correctly?">[](#Why_are_some_parts_\(e.g._holes\)_of_the_model_not_rendered_correctly?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">16.4</span> <span>Why are some
-        parts (e.g. holes) of the model not rendered correctly?</span>
-        </div>
-      - <span id="toc-Why_does_difference_(or_intersection)_sometimes_not_work_in_preview?">[](#Why_does_difference_\(or_intersection\)_sometimes_not_work_in_preview?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">16.5</span> <span>Why does
-        difference (or intersection) sometimes not work in
-        preview?</span>
-        </div>
-      - <span id="toc-Why_is_my_model_appearing_with_F5_but_not_F6?">[](#Why_is_my_model_appearing_with_F5_but_not_F6?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">16.6</span> <span>Why is my model
-        appearing with F5 but not F6?</span>
-        </div>
-      - <span id="toc-Why_is_the_preview_so_slow?">[](#Why_is_the_preview_so_slow?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">16.7</span> <span>Why is the
-        preview so slow?</span>
-        </div>
-  - <span id="toc-Import">[](#Import)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">17</span> <span>Import</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Import subsection</span>
-      - <span id="toc-How_can_I_Clean_Up_STL_Issues_?">[](#How_can_I_Clean_Up_STL_Issues_?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">17.1</span> <span>How can I Clean
-        Up STL Issues ?</span>
-        </div>
-      - <span id="toc-Why_is_my_imported_STL_file_appearing_with_F5_but_not_F6?">[](#Why_is_my_imported_STL_file_appearing_with_F5_but_not_F6?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">17.2</span> <span>Why is my
-        imported STL file appearing with F5 but not F6?</span>
-        </div>
-      - <span id="toc-What_are_&quot;Unsupported_DXF_Entity&quot;_warnings?">[](#What_are_%22Unsupported_DXF_Entity%22_warnings?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">17.3</span> <span>What are
-        "Unsupported DXF Entity" warnings?</span>
-        </div>
-      - <span id="toc-Can_I_Use_Inkscape_to_Make_2D_Drawings_?">[](#Can_I_Use_Inkscape_to_Make_2D_Drawings_?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">17.4</span> <span>Can I Use
-        Inkscape to Make 2D Drawings ?</span>
-        </div>
-      - <span id="toc-Can_I_Import_Inkscape_2D_Models_to_OpenSCAD_?">[](#Can_I_Import_Inkscape_2D_Models_to_OpenSCAD_?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">17.5</span> <span>Can I Import
-        Inkscape 2D Models to OpenSCAD ?</span>
-        </div>
-  - <span id="toc-Export_2">[](#Export_2)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">18</span> <span>Export</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Export subsection</span>
-      - <span id="toc-How_can_I_export_multiple_parts_from_one_script?">[](#How_can_I_export_multiple_parts_from_one_script?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">18.1</span> <span>How can I export
-        multiple parts from one script?</span>
-        </div>
-      - <span id="toc-How_can_I_export_screenshots_with_higher_resolution_than_the_current_window">[](#How_can_I_export_screenshots_with_higher_resolution_than_the_current_window)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">18.2</span> <span>How can I export
-        screenshots with higher resolution than the current
-        window</span>
-        </div>
-  - <span id="toc-Language">[](#Language)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">19</span> <span>Language</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Language subsection</span>
-      - <span id="toc-Why_am_I_getting_an_error_when_writing_a_=_a_+_1?">[](#Why_am_I_getting_an_error_when_writing_a_=_a_+_1?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">19.1</span> <span>Why am I getting
-        an error when writing a = a + 1?</span>
-        </div>
-      - <span id="toc-How_can_i_fake_iteration_without_a_=_a_+_1_?">[](#How_can_i_fake_iteration_without_a_=_a_+_1_?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">19.2</span> <span>How can i fake
-        iteration without a = a + 1 ?</span>
-        </div>
-      - <span id="toc-Are_measures_being_considered_to_help_procedural_programmers_?">[](#Are_measures_being_considered_to_help_procedural_programmers_?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">19.3</span> <span>Are measures
-        being considered to help procedural programmers ?</span>
-        </div>
-  - <span id="toc-User_Interface_2">[](#User_Interface_2)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">20</span> <span>User Interface</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle User Interface subsection</span>
-      - <span id="toc-OpenSCAD_isn&#39;t_adhering_to_my_GTK_desktop_theme">[](#OpenSCAD_isn't_adhering_to_my_GTK_desktop_theme)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">20.1</span> <span>OpenSCAD isn't
-        adhering to my GTK desktop theme</span>
-        </div>
-      - <span id="toc-OpenSCAD_GUI_is_not_scaled_in_Gnome_on_a_4K_/_HIDPI_Monitor">[](#OpenSCAD_GUI_is_not_scaled_in_Gnome_on_a_4K_/_HIDPI_Monitor)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">20.2</span> <span>OpenSCAD GUI is
-        not scaled in Gnome on a 4K / HIDPI Monitor</span>
-        </div>
-      - <span id="toc-I&#39;m_not_getting_any_menubar_when_running_OpenSCAD_in_Ubuntu,_how_can_I_get_it_back?">[](#I'm_not_getting_any_menubar_when_running_OpenSCAD_in_Ubuntu,_how_can_I_get_it_back?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">20.3</span> <span>I'm not getting
-        any menubar when running OpenSCAD in Ubuntu, how can I get it
-        back?</span>
-        </div>
-      - <span id="toc-Why_are_the_error_line_numbers_wrong?">[](#Why_are_the_error_line_numbers_wrong?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">20.4</span> <span>Why are the
-        error line numbers wrong?</span>
-        </div>
-      - <span id="toc-I_don&#39;t_like_the_editor,_can_I_use_my_favourite_editor_instead?">[](#I_don't_like_the_editor,_can_I_use_my_favourite_editor_instead?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">20.5</span> <span>I don't like the
-        editor, can I use my favourite editor instead?</span>
-        </div>
-  - <span id="toc-Errors_/_Problems">[](#Errors_/_Problems)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">21</span> <span>Errors /
-    Problems</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Errors / Problems subsection</span>
-      - <span id="toc-Why_am_I_getting_&quot;no_top_level_geometry_to_render&quot;?">[](#Why_am_I_getting_%22no_top_level_geometry_to_render%22?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">21.1</span> <span>Why am I getting
-        "no top level geometry to render"?</span>
-        </div>
-      - <span id="toc-OpenSCAD_crashed/was_killed,_are_my_unsaved_changes_lost?">[](#OpenSCAD_crashed/was_killed,_are_my_unsaved_changes_lost?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">21.2</span> <span>OpenSCAD
-        crashed/was killed, are my unsaved changes lost?</span>
-        </div>
-      - <span id="toc-OpenSCAD_crashes_when_clicking_&quot;New&quot;_or_loading_a_file_on_Windows">[](#OpenSCAD_crashes_when_clicking_%22New%22_or_loading_a_file_on_Windows)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">21.3</span> <span>OpenSCAD crashes
-        when clicking "New" or loading a file on Windows</span>
-        </div>
-      - <span id="toc-OpenSCAD_fails_to_run_due_to_missing_DLLs">[](#OpenSCAD_fails_to_run_due_to_missing_DLLs)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">21.4</span> <span>OpenSCAD fails
-        to run due to missing DLLs</span>
-        </div>
-  - <span id="toc-Reporting_bugs,_Requesting_features">[](#Reporting_bugs,_Requesting_features)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">22</span> <span>Reporting bugs,
-    Requesting features</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Reporting bugs, Requesting features subsection</span>
-      - <span id="toc-How_do_I_report_bugs?">[](#How_do_I_report_bugs?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">22.1</span> <span>How do I report
-        bugs?</span>
-        </div>
-      - <span id="toc-How_do_I_request_new_features?">[](#How_do_I_request_new_features?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">22.2</span> <span>How do I request
-        new features?</span>
-        </div>
-      - <span id="toc-Best_Way_to_Report_OS_Specific_Bugs_?">[](#Best_Way_to_Report_OS_Specific_Bugs_?)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">22.3</span> <span>Best Way to
-        Report OS Specific Bugs ?</span>
-        </div>
-  - <span id="toc-Chapter_10_--_Libraries">[](#Chapter_10_--_Libraries)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">23</span> <span>Chapter 10 --
-    Libraries</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 10 -- Libraries subsection</span>
-      - <span id="toc-Library_locations">[](#Library_locations)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">23.1</span> <span>Library
-        locations</span>
-        </div>
-          - <span id="toc-Setting_OPENSCADPATH">[](#Setting_OPENSCADPATH)</span>
-            <div class="vector-toc-text">
-            <span class="vector-toc-numb">23.1.1</span> <span>Setting
-            OPENSCADPATH</span>
-            </div>
-      - <span id="toc-MCAD">[](#MCAD)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">23.2</span> <span>MCAD</span>
-        </div>
-      - <span id="toc-Other_libraries">[](#Other_libraries)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">23.3</span> <span>Other
-        libraries</span>
-        </div>
-      - <span id="toc-Other_OpenSCAD_tutorials_and_documentation">[](#Other_OpenSCAD_tutorials_and_documentation)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">23.4</span> <span>Other OpenSCAD
-        tutorials and documentation</span>
-        </div>
-  - <span id="toc-Chapter_11_--_Command_Glossary">[](#Chapter_11_--_Command_Glossary)</span>
-    <div class="vector-toc-text">
-    <span class="vector-toc-numb">24</span> <span>Chapter 11 -- Command
-    Glossary</span>
-    </div>
-    <span class="vector-icon mw-ui-icon-wikimedia-expand"></span>
-    <span>Toggle Chapter 11 -- Command Glossary subsection</span>
-      - <span id="toc-Mathematical_Operators">[](#Mathematical_Operators)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.1</span> <span>Mathematical
-        Operators</span>
-        </div>
-      - <span id="toc-Mathematical_Functions">[](#Mathematical_Functions)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.2</span> <span>Mathematical
-        Functions</span>
-        </div>
-      - <span id="toc-String_Functions">[](#String_Functions)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.3</span> <span>String
-        Functions</span>
-        </div>
-      - <span id="toc-Primitive_Solids">[](#Primitive_Solids)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.4</span> <span>Primitive
-        Solids</span>
-        </div>
-      - <span id="toc-Transformations">[](#Transformations)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.5</span>
-        <span>Transformations</span>
-        </div>
-      - <span id="toc-Conditional_and_Iterator_Functions">[](#Conditional_and_Iterator_Functions)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.6</span> <span>Conditional and
-        Iterator Functions</span>
-        </div>
-      - <span id="toc-CSG_Modelling">[](#CSG_Modelling)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.7</span> <span>CSG
-        Modelling</span>
-        </div>
-      - <span id="toc-Modifier_Characters">[](#Modifier_Characters)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.8</span> <span>Modifier
-        Characters</span>
-        </div>
-      - <span id="toc-Modules">[](#Modules)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.9</span> <span>Modules</span>
-        </div>
-      - <span id="toc-Include_Statement">[](#Include_Statement)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.10</span> <span>Include
-        Statement</span>
-        </div>
-      - <span id="toc-Other_Language_Features">[](#Other_Language_Features)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.11</span> <span>Other Language
-        Features</span>
-        </div>
-      - <span id="toc-2D_Primitives">[](#2D_Primitives)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.12</span> <span>2D
-        Primitives</span>
-        </div>
-      - <span id="toc-3D_to_2D_Projection">[](#3D_to_2D_Projection)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.13</span> <span>3D to 2D
-        Projection</span>
-        </div>
-      - <span id="toc-2D_to_3D_Extrusion">[](#2D_to_3D_Extrusion)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.14</span> <span>2D to 3D
-        Extrusion</span>
-        </div>
-      - <span id="toc-DXF_Extrusion">[](#DXF_Extrusion)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.15</span> <span>DXF
-        Extrusion</span>
-        </div>
-      - <span id="toc-STL_Import">[](#STL_Import)</span>
-        <div class="vector-toc-text">
-        <span class="vector-toc-numb">24.16</span> <span>STL
-        Import</span>
-        </div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="mw-content-container">
-
-<div id="content" class="mw-body" role="main">
-
-<div id="vector-page-titlebar-toc" class="vector-dropdown vector-page-titlebar-toc vector-button-flush-left" title="Table of Contents">
-
-<span class="vector-icon mw-ui-icon-listBullet mw-ui-icon-wikimedia-listBullet"></span>
-<span class="vector-dropdown-label-text">Toggle the table of
-contents</span>
-
-<div class="vector-dropdown-content">
-
-<div id="vector-page-titlebar-toc-unpinned-container" class="vector-unpinned-container">
-
-</div>
-
-</div>
-
-</div>
-
-# <span class="mw-page-title-main">OpenSCAD User Manual/Print version</span>
-
-<div id="p-lang-btn" class="vector-dropdown mw-portlet mw-portlet-lang">
-
-<span class="vector-icon mw-ui-icon-language-progressive mw-ui-icon-wikimedia-language-progressive"></span>
-<span class="vector-dropdown-label-text">3 languages</span>
-
-<div class="vector-dropdown-content">
-
-<div class="vector-menu-content">
-
-  - [<span>Español</span>](https://es.wikibooks.org/wiki/Tutorial_de_OpenScad "Tutorial de OpenScad – Spanish")
-  - [<span>Italiano</span>](https://it.wikibooks.org/wiki/OpenSCAD "OpenSCAD – Italian")
-  - [<span>Русский</span>](https://ru.wikibooks.org/wiki/%D0%A0%D1%83%D0%BA%D0%BE%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE_%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8F_%D0%BF%D0%BE_OpenSCAD "Руководство пользователя по OpenSCAD – Russian")
-
-<div class="after-portlet after-portlet-lang">
-
-<span class="wb-langlinks-edit wb-langlinks-link">[Edit
-links](https://www.wikidata.org/wiki/Special:EntityPage/Q82816289#sitelinks-wikibooks "Edit interlanguage links")</span>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="vector-page-toolbar vector-feature-custom-font-size-clientpref--excluded">
-
-<div class="vector-page-toolbar-container">
-
-<div id="left-navigation">
-
-<div id="p-associated-pages" class="vector-menu vector-menu-tabs mw-portlet mw-portlet-associated-pages">
-
-<div class="vector-menu-content">
-
-  - <span id="ca-nstab-main">[<span>Book</span>](/wiki/OpenSCAD_User_Manual/Print_version "View the content page [c]")</span>
-  - <span id="ca-talk">[<span>Discussion</span>](/w/index.php?title=Talk:OpenSCAD_User_Manual/Print_version&action=edit&redlink=1 "Discussion about the content page (does not exist) [t]")</span>
-
-</div>
-
-</div>
-
-<div id="vector-variants-dropdown" class="vector-dropdown emptyPortlet">
-
-<span class="vector-dropdown-label-text">English</span>
-
-<div class="vector-dropdown-content">
-
-<div id="p-variants" class="vector-menu mw-portlet mw-portlet-variants emptyPortlet">
-
-<div class="vector-menu-content">
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div id="right-navigation" class="vector-collapsible">
-
-<div id="p-views" class="vector-menu vector-menu-tabs mw-portlet mw-portlet-views">
-
-<div class="vector-menu-content">
-
-  - <span id="ca-view">[<span>Read</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&stable=1)</span>
-  - <span id="ca-current">[<span>Latest
-    draft</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&stable=0&redirect=no "View this page with the pending changes [v]")</span>
-  - <span id="ca-ve-edit">[<span>Edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit "Edit this page [v]")</span>
-  - <span id="ca-edit">[<span>Edit
-    source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit "Edit the source code of this page [e]")</span>
-  - <span id="ca-history">[<span>View
-    history</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=history "Past revisions of this page [h]")</span>
-
-</div>
-
-</div>
-
-<div id="vector-page-tools-dropdown" class="vector-dropdown vector-page-tools-dropdown">
-
-<span class="vector-dropdown-label-text">Tools</span>
-
-<div class="vector-dropdown-content">
-
-<div id="vector-page-tools-unpinned-container" class="vector-unpinned-container">
-
-<div id="vector-page-tools" class="vector-page-tools vector-pinnable-element">
-
-<div class="vector-pinnable-header vector-page-tools-pinnable-header vector-pinnable-header-unpinned" data-feature-name="page-tools-pinned" data-pinnable-element-id="vector-page-tools" data-pinned-container-id="vector-page-tools-pinned-container" data-unpinned-container-id="vector-page-tools-unpinned-container">
-
-<div class="vector-pinnable-header-label">
-
-Tools
-
-</div>
-
-move to sidebar
-
-hide
-
-</div>
-
-<div id="p-cactions" class="vector-menu mw-portlet mw-portlet-cactions emptyPortlet vector-has-collapsible-items" title="More options">
-
-<div class="vector-menu-heading">
-
-Actions
-
-</div>
-
-<div class="vector-menu-content">
-
-  - <span id="ca-more-view">[<span>Read</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&stable=1)</span>
-  - <span id="ca-more-current">[<span>Latest
-    draft</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&stable=0&redirect=no)</span>
-  - <span id="ca-more-ve-edit">[<span>Edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit "Edit this page [v]")</span>
-  - <span id="ca-more-edit">[<span>Edit
-    source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit "Edit the source code of this page [e]")</span>
-  - <span id="ca-more-history">[<span>View
-    history</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=history)</span>
-
-</div>
-
-</div>
-
-<div id="p-tb" class="vector-menu mw-portlet mw-portlet-tb">
-
-<div class="vector-menu-heading">
-
-General
-
-</div>
-
-<div class="vector-menu-content">
-
-  - <span id="t-whatlinkshere">[<span>What links
-    here</span>](/wiki/Special:WhatLinksHere/OpenSCAD_User_Manual/Print_version "A list of all wiki pages that link here [j]")</span>
-  - <span id="t-recentchangeslinked">[<span>Related
-    changes</span>](/wiki/Special:RecentChangesLinked/OpenSCAD_User_Manual/Print_version "Recent changes in pages linked from this page [k]")</span>
-  - <span id="t-upload">[<span>Upload
-    file</span>](//commons.wikimedia.org/wiki/Special:UploadWizard?uselang=en "Upload files [u]")</span>
-  - <span id="t-permalink">[<span>Permanent
-    link</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&oldid=3674395 "Permanent link to this revision of this page")</span>
-  - <span id="t-info">[<span>Page
-    information</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=info "More information about this page")</span>
-  - <span id="t-cite">[<span>Cite this
-    page</span>](/w/index.php?title=Special:CiteThisPage&page=OpenSCAD_User_Manual%2FPrint_version&id=3674395&wpFormIdentifier=titleform "Information on how to cite this page")</span>
-  - <span id="t-urlshortener">[<span>Get shortened
-    URL</span>](/w/index.php?title=Special:UrlShortener&url=https%3A%2F%2Fen.wikibooks.org%2Fwiki%2FOpenSCAD_User_Manual%2FPrint_version)</span>
-  - <span id="t-urlshortener-qrcode">[<span>Download QR
-    code</span>](/w/index.php?title=Special:QrCode&url=https%3A%2F%2Fen.wikibooks.org%2Fwiki%2FOpenSCAD_User_Manual%2FPrint_version)</span>
-
-</div>
-
-</div>
-
-<div id="p-sister_projects" class="vector-menu mw-portlet mw-portlet-sister_projects">
-
-<div class="vector-menu-heading">
-
-Sister projects
-
-</div>
-
-<div class="vector-menu-content">
-
-  - <span id="n-Wikipedia">[<span>Wikipedia</span>](https://en.wikipedia.org/wiki/Main_Page)</span>
-  - <span id="n-Wikiversity">[<span>Wikiversity</span>](https://en.wikiversity.org/wiki/Wikiversity:Main_Page)</span>
-  - <span id="n-Wiktionary">[<span>Wiktionary</span>](https://en.wiktionary.org/wiki/Wiktionary:Main_Page)</span>
-  - <span id="n-Wikiquote">[<span>Wikiquote</span>](https://en.wikiquote.org/wiki/Main_Page)</span>
-  - <span id="n-Wikisource">[<span>Wikisource</span>](https://en.wikisource.org/wiki/Main_Page)</span>
-  - <span id="n-Wikinews">[<span>Wikinews</span>](https://en.wikinews.org/wiki/Main_Page)</span>
-  - <span id="n-Wikivoyage">[<span>Wikivoyage</span>](https://en.wikivoyage.org/wiki/Main_Page)</span>
-  - <span id="n-Commons">[<span>Commons</span>](https://commons.wikimedia.org/wiki/Main_Page)</span>
-  - <span id="n-Wikidata">[<span>Wikidata</span>](https://www.wikidata.org/wiki/Wikidata:Main_Page)</span>
-  - <span id="n-MediaWiki">[<span>MediaWiki</span>](https://www.mediawiki.org/wiki/Main_Page)</span>
-  - <span id="n-Meta-Wiki">[<span>Meta-Wiki</span>](https://meta.wikimedia.org/wiki/Main_Page)</span>
-
-</div>
-
-</div>
-
-<div id="p-coll-print_export" class="vector-menu mw-portlet mw-portlet-coll-print_export">
-
-<div class="vector-menu-heading">
-
-Print/export
-
-</div>
-
-<div class="vector-menu-content">
-
-  - <span id="coll-create_a_book">[<span>Create a
-    collection</span>](/w/index.php?title=Special:Book&bookcmd=book_creator&referer=OpenSCAD+User+Manual%2FPrint+version)</span>
-  - <span id="coll-download-as-rl">[<span>Download as
-    PDF</span>](/w/index.php?title=Special:DownloadAsPdf&page=OpenSCAD_User_Manual%2FPrint_version&action=show-download-screen)</span>
-  - <span id="t-print">[<span>Printable
-    version</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&printable=yes "Printable version of this page [p]")</span>
-
-</div>
-
-</div>
-
-<div id="p-wikibase-otherprojects" class="vector-menu mw-portlet mw-portlet-wikibase-otherprojects">
-
-<div class="vector-menu-heading">
-
-In other projects
-
-</div>
-
-<div class="vector-menu-content">
-
-  - <span id="t-wikibase">[<span>Wikidata
-    item</span>](https://www.wikidata.org/wiki/Special:EntityPage/Q82816289 "Link to connected data repository item [g]")</span>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="vector-column-end no-font-mode-scale">
-
-<div class="vector-sticky-pinned-container">
-
-<div id="vector-page-tools-pinned-container" class="vector-pinned-container">
-
-</div>
-
-<div id="vector-appearance-pinned-container" class="vector-pinned-container">
-
-<div id="vector-appearance" class="vector-appearance vector-pinnable-element">
-
-<div class="vector-pinnable-header vector-appearance-pinnable-header vector-pinnable-header-pinned" data-feature-name="appearance-pinned" data-pinnable-element-id="vector-appearance" data-pinned-container-id="vector-appearance-pinned-container" data-unpinned-container-id="vector-appearance-unpinned-container">
-
-<div class="vector-pinnable-header-label">
-
-Appearance
-
-</div>
-
-move to sidebar
-
-hide
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div id="bodyContent" class="vector-body" aria-labelledby="firstHeading" data-mw-ve-target-container="">
-
-<div class="vector-body-before-content">
-
-<div class="mw-indicators">
-
-<div id="mw-indicator-status" class="mw-indicator">
-
-<div class="mw-parser-output">
-
-<span typeof="mw:File">[![75%
-developed](openscad_user_manual_media/f751bb75e5617c996724a24b1c58fa1adfe5c828.png)](/wiki/Help:Development_stages "75% developed")</span>
-
-</div>
-
-</div>
-
-</div>
-
-<div id="siteSub" class="noprint">
-
-From Wikibooks, open books for an open world
-
-</div>
-
-</div>
-
-<div id="contentSub">
-
-<div id="mw-content-subtitle">
-
-<div class="subpages">
-
-\< [OpenSCAD User
-Manual](/wiki/OpenSCAD_User_Manual "OpenSCAD User Manual")
-
-</div>
-
-<div id="mw-fr-revision-messages">
-
-<div class="cdx-message mw-fr-message-box cdx-message--block cdx-message--notice mw-fr-basic mw-fr-draft-not-synced plainlinks noprint">
-
-<span class="cdx-message__icon"></span>
-
-<div class="cdx-message__content">
-
-The [latest reviewed
-version](https://en.wikibooks.org/w/index.php?title=OpenSCAD_User_Manual/Print_version&stable=1)
-was
-[checked](https://en.wikibooks.org/w/index.php?title=Special:Log&type=review&page=OpenSCAD_User_Manual/Print_version)
-on *13 April 2020*. There are [template/file
-changes](https://en.wikibooks.org/w/index.php?title=OpenSCAD_User_Manual/Print_version&oldid=3674395&diff=cur&diffonly=0)
-awaiting review.
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div id="mw-content-text" class="mw-body-content">
-
-<div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr">
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><div class="mbox-image-div">
-<span typeof="mw:File"><a href="/wiki/File:Printer.svg" class="mw-file-description"><img src="openscad_user_manual_media/595f4058875a33214077840add3d571c760710fe.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/2/23/Printer.svg/60px-Printer.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/2/23/Printer.svg/80px-Printer.svg.png 2x" width="40" height="40" /></a></span>
-</div></td>
-<td><div class="mbox-text-span">
-<strong>This is the <a href="/wiki/Help:Print_versions" title="Help:Print versions">print version</a> of <a href="/wiki/OpenSCAD_User_Manual" title="OpenSCAD User Manual">OpenSCAD User Manual</a></strong><br />
-You won't see this message or any elements not part of the book's content when you print or <a href="https://en.wikibooks.org/w/index.php?title=OpenSCAD_User_Manual/Print_version&amp;printable=yes" class="external text">preview</a> this page.
-</div></td>
-</tr>
-</tbody>
-</table>
-
-    This User Manual contains everything except the language reference.
-    Go here for the printable version of The OpenSCAD Language  
-    For the Contents governed by [hide] or [show], what you see is what gets printed.
-    This message is not printed.
-
-<div class="mw-heading mw-heading1">
-
-# Introduction
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=1 "Edit section: Introduction")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=1 "Edit section's source code: Introduction")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-**OpenSCAD** is software for creating solid 3D CAD objects.  
-It is [free software](https://www.gnu.org/philosophy/free-sw.html) and
-available for [GNU/Linux](https://www.gnu.org/), Microsoft Windows and
-Mac OS X.
-
-Unlike most free software for creating 3D models (such as the well-known
-application [Blender](/wiki/Blender "Blender")), OpenSCAD does not focus
-on the artistic aspects of 3D modelling, but instead focuses on the
-[CAD](https://en.wikipedia.org/wiki/Computer-aided_design "w:Computer-aided design")
-aspects. So it might be the application you are looking for when you are
-planning to create 3D models of machine parts, but probably is not what
-you are looking for when you are more interested in creating
-computer-animated movies or organic life-like models.
-
-OpenSCAD, unlike many CAD products, is not an interactive modeler.
-Instead it is something like a 2D/3D-compiler that reads in a program
-file that describes the object and renders the model from this file.
-This gives you (the designer) full control over the modelling process.
-This enables you to easily change any step in the modelling process and
-make designs that are defined by configurable parameters.
-
-OpenSCAD has two main operating modes, *Preview* and *Render*. Preview
-is relatively fast using [3D
-graphics](https://en.wikipedia.org/wiki/Z-buffering "w:Z-buffering") and
-the [computer's
-GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit "w:Graphics processing unit"),
-but is an approximation of the model and can produce
-[artifacts](https://en.wikipedia.org/wiki/Z-fighting "w:Z-fighting");
-Preview uses [OpenCSG](http://opencsg.org/) and
-[OpenGL](https://en.wikipedia.org/wiki/OpenGL "w:OpenGL"). Render
-generates exact geometry and a fully
-[tessellated](https://en.wikipedia.org/wiki/Tessellation_\(computer_graphics\) "w:Tessellation (computer graphics)")
-[mesh](https://en.wikipedia.org/wiki/Polygon_mesh "w:Polygon mesh"). It
-is not an approximation and as such it is often a lengthy process,
-taking minutes or hours for larger designs. Render uses
-[CGAL](https://en.wikipedia.org/wiki/CGAL "w:CGAL") as its geometry
-engine.
-
-OpenSCAD provides two types of 3D modelling:
-
-  - [Constructive Solid Geometry
-    (CSG)](https://en.wikipedia.org/wiki/Constructive_solid_geometry "w:Constructive solid geometry")
-  - extrusion of 2D primitives into 3D space.
-
-[SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics "w:Scalable Vector Graphics")
-is used for 2D while Autocad DXF files can be used as well for the data
-exchange format for 2D outlines. In addition to 2D paths for extrusion
-it is also possible to read design parameters from DXF files. Besides
-DXF files, OpenSCAD can read and create 3D models in the open
-[3mf](https://en.wikipedia.org/wiki/3D_Manufacturing_Format "w:3D Manufacturing Format"),
-[STL](https://en.wikipedia.org/wiki/STL_\(file_format\) "w:STL (file format)"),
-[OFF](https://en.wikipedia.org/wiki/OFF_\(file_format\) "w:OFF (file format)")
-and many more file formats.
-
-OpenSCAD can be downloaded from <https://www.openscad.org/>. More
-information is available on the [mailing
-list](https://www.openscad.org/community.html).
-
-<div class="mw-heading mw-heading2">
-
-## Additional Resources
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual&veaction=edit&section=T-2 "Edit section: Additional Resources")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual&action=edit&section=T-2 "Edit section's source code: Additional Resources")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-A clear guided introduction to using OpenSCAD and to the OpenSCAD
-language is available in the [OpenSCAD
-Tutorial](https://en.wikibooks.org/wiki/OpenSCAD_Tutorial).
-
-For Teachers: a basic 25-slide presentation from 2014 is available under
-[GNUFDL](https://en.wikipedia.org/wiki/GNU_Free_Documentation_License "w:GNU Free Documentation License")
-to walk your students through the process of using OpenSCAD
-[here](https://www.appropedia.org/w/images/5/5f/Intro_to_OpenSCAD_2014_Long.pdf "appropedia:w/images/5/5f/Intro to OpenSCAD 2014 Long.pdf").
-
-Fablab Lannion (France) edited a nice French-language [interactive
-tutorial](https://static.fablab-lannion.org/tutos/openscad/) that you
-might appreciate.
-
-A "[cheat sheet](https://www.openscad.org/cheatsheet/)" is a useful
-quick reference for the OpenSCAD language, with each item linking back
-to this Wikibook.
-
-A list of books can be found
-[here](http://openscad.org/documentation-books.html).
-
-<div class="mw-heading mw-heading2">
-
-## History
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual&veaction=edit&section=T-3 "Edit section: History")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual&action=edit&section=T-3 "Edit section's source code: History")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Periodically the two manuals below get cleaned up or have major
-transitions. Consider archiving the manuals prior to starting a major
-update.
-
-This can be done for the two 'printable version' links below to the
-[Internet Archive](https://archive.org)
-
-  - 2018-04-25 [The OpenSCAD User Manual - Print
-    Version](https://web.archive.org/web/20180425002648/https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Print_version)
-    & [The OpenSCAD Language - Print
-    Version](https://web.archive.org/web/20180425001407/https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/The_OpenSCAD_Language)
-  - 2019-07-22 [The OpenSCAD User
-    Manual](https://web.archive.org/web/20190722042509/https://en.wikibooks.org/wiki/OpenSCAD_User_Manual)
-    Which includes links to the archives of the above two printed
-    versions (as of this date).
-
-The Wayback Machine no longer has a free user requested site archive, so
-below is just the two 'printable version' manuals
-
-  - 2020-12-11 [The OpenSCAD User Manual - Print
-    Version](https://web.archive.org/web/20201211023636/https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Print_version)
-    & [The OpenSCAD Language - Print
-    Version](https://web.archive.org/web/20201211023916/https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/The_OpenSCAD_Language)
-
-<div class="mw-heading mw-heading1">
-
-# The OpenSCAD User Manual
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual&veaction=edit&section=T-4 "Edit section: The OpenSCAD User Manual")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual&action=edit&section=T-4 "Edit section's source code: The OpenSCAD User Manual")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-|                                                                                                                         |                                                                                                                                                                                                                                                                                                               |
-| :---------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| <span typeof="mw:File"><span>![](openscad_user_manual_media/595f4058875a33214077840add3d571c760710fe.png)</span></span> | A ***<span class="mw-selflink selflink">printable version</span>*** of OpenSCAD User Manual is available. <span class="small">OpenSCAD\_User\_Manual ([edit it](https://en.wikibooks.org/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&preload=Template%3APrint+version%2FPreload))</span> |
-
-1.  [Introduction](/wiki/OpenSCAD_User_Manual#Introduction "OpenSCAD User Manual")
-2.  [First
-    Steps](/wiki/OpenSCAD_User_Manual/First_Steps "OpenSCAD User Manual/First Steps")
-3.  [The OpenSCAD User
-    Interface](/wiki/OpenSCAD_User_Manual/The_OpenSCAD_User_Interface "OpenSCAD User Manual/The OpenSCAD User Interface")
-4.  [Input
-    Devices](/wiki/OpenSCAD_User_Manual/Input_Devices "OpenSCAD User Manual/Input Devices")
-5.  [Customizer](/wiki/OpenSCAD_User_Manual/Customizer "OpenSCAD User Manual/Customizer")
-6.  Import - STL, 3MF, OFF, AMF, DXF, SVG, CSG
-    1.  [SVG
-        Import](/wiki/OpenSCAD_User_Manual/SVG_Import "OpenSCAD User Manual/SVG Import")
-7.  Export - STL, 3MF, OFF, AMF, DXF, SVG, CSG, PNG
-    1.  [STL
-        Export](/wiki/OpenSCAD_User_Manual/STL_Export "OpenSCAD User Manual/STL Export")
-    2.  [CSG
-        Export](/wiki/OpenSCAD_User_Manual/CSG_Export "OpenSCAD User Manual/CSG Export")
-    3.  [DXF
-        Extrusion](/wiki/OpenSCAD_User_Manual/DXF_Extrusion "OpenSCAD User Manual/DXF Extrusion")
-    4.  [Other 2D
-        formats](/wiki/OpenSCAD_User_Manual/Other_2D_formats "OpenSCAD User Manual/Other 2D formats")
-8.  [Example
-    Projects](/wiki/OpenSCAD_User_Manual/Commented_Example_Projects "OpenSCAD User Manual/Commented Example Projects")
-    1.  [Strandbeest](/wiki/OpenSCAD_User_Manual/Example/Strandbeest "OpenSCAD User Manual/Example/Strandbeest")
-9.  [Paths](/wiki/OpenSCAD_User_Manual/Paths "OpenSCAD User Manual/Paths")
-10. [Using an external Editor with
-    OpenSCAD](/wiki/OpenSCAD_User_Manual/Using_an_external_Editor_with_OpenSCAD "OpenSCAD User Manual/Using an external Editor with OpenSCAD")
-11. [Integration with other
-    applications](/wiki/OpenSCAD_User_Manual/Integration_with_other_applications "OpenSCAD User Manual/Integration with other applications")
-12. [Using OpenSCAD in a command line
-    environment](/wiki/OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment "OpenSCAD User Manual/Using OpenSCAD in a command line environment")
-13. [Building OpenSCAD from
-    Sources](/wiki/OpenSCAD_User_Manual/Building_OpenSCAD_from_Sources "OpenSCAD User Manual/Building OpenSCAD from Sources")
-    1.  [Building on
-        Linux/UNIX](/wiki/OpenSCAD_User_Manual/Building_on_Linux/UNIX "OpenSCAD User Manual/Building on Linux/UNIX")
-    2.  [Cross-compiling for Windows on Linux or Mac OS
-        X](/wiki/OpenSCAD_User_Manual/Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X "OpenSCAD User Manual/Cross-compiling for Windows on Linux or Mac OS X")
-    3.  [Building on Windows
-        (Outdated)](/wiki/OpenSCAD_User_Manual/Building_on_Windows "OpenSCAD User Manual/Building on Windows")
-    4.  [Building on Windows
-        (New)](/wiki/OpenSCAD_User_Manual/Building_on_Microsoft_Windows "OpenSCAD User Manual/Building on Microsoft Windows")
-    5.  [Building on Mac OS
-        X](/wiki/OpenSCAD_User_Manual/Building_on_Mac_OS_X "OpenSCAD User Manual/Building on Mac OS X")
-    6.  [Submitting
-        patches](/wiki/OpenSCAD_User_Manual/Submitting_patches "OpenSCAD User Manual/Submitting patches")
-14. [Frequently Asked
-    Questions](/wiki/OpenSCAD_User_Manual/FAQ "OpenSCAD User Manual/FAQ")
-15. [Libraries](/wiki/OpenSCAD_User_Manual/Libraries "OpenSCAD User Manual/Libraries")
-16. [Tips and
-    Tricks](/wiki/OpenSCAD_User_Manual/Tips_and_Tricks "OpenSCAD User Manual/Tips and Tricks")
-17. [Command
-    Glossary](/wiki/OpenSCAD_User_Manual/Command_Glossary "OpenSCAD User Manual/Command Glossary")
-    - Very short name and syntax reference
-
-<div class="mw-heading mw-heading1">
-
-# The OpenSCAD Language Reference
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual&veaction=edit&section=T-5 "Edit section: The OpenSCAD Language Reference")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual&action=edit&section=T-5 "Edit section's source code: The OpenSCAD Language Reference")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-|                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                               |
-| :---------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <span typeof="mw:File"><span>![](openscad_user_manual_media/595f4058875a33214077840add3d571c760710fe.png)</span></span> | A ***[printable version](/wiki/OpenSCAD_User_Manual/The_OpenSCAD_Language "OpenSCAD User Manual/The OpenSCAD Language")*** of OpenSCAD User Manual is available. <span class="small">The\_OpenSCAD\_Language ([edit it](https://en.wikibooks.org/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_Language&action=edit&preload=Template%3APrint+version%2FPreload))</span> |
-
-1.  [The OpenSCAD
-    Language](/wiki/OpenSCAD_User_Manual/The_OpenSCAD_Language "OpenSCAD User Manual/The OpenSCAD Language")
-    1.  [General](/wiki/OpenSCAD_User_Manual/General "OpenSCAD User Manual/General")
-        - READ THIS FIRST -
-        [comments](/wiki/OpenSCAD_User_Manual/General#Comments "OpenSCAD User Manual/General"),
-        [values and data
-        types](/wiki/OpenSCAD_User_Manual/General#Values_and_Data_Types "OpenSCAD User Manual/General"),
-        [variables](/wiki/OpenSCAD_User_Manual/General#Variables "OpenSCAD User Manual/General"),
-        [vectors](/wiki/OpenSCAD_User_Manual/General#Vectors "OpenSCAD User Manual/General"),
-        [objects](/wiki/OpenSCAD_User_Manual/General#Objects "OpenSCAD User Manual/General"),
-        [getting
-        input](/wiki/OpenSCAD_User_Manual/General#Getting_input "OpenSCAD User Manual/General")
-2.  [3D
-    objects](/wiki/OpenSCAD_User_Manual/Primitive_Solids "OpenSCAD User Manual/Primitive Solids")
-    -
-    1.  [3D Primitive
-        Solids](/wiki/OpenSCAD_User_Manual/Primitive_Solids "OpenSCAD User Manual/Primitive Solids")
-        -
-        [cube](/wiki/OpenSCAD_User_Manual/Primitive_Solids#cube "OpenSCAD User Manual/Primitive Solids"),
-        [sphere](/wiki/OpenSCAD_User_Manual/Primitive_Solids#sphere "OpenSCAD User Manual/Primitive Solids"),
-        [cylinder](/wiki/OpenSCAD_User_Manual/Primitive_Solids#cylinder "OpenSCAD User Manual/Primitive Solids"),
-        [polyhedron](/wiki/OpenSCAD_User_Manual/Primitive_Solids#polyhedron "OpenSCAD User Manual/Primitive Solids")
-    2.  [3D to 2D
-        Projection](/wiki/OpenSCAD_User_Manual/3D_to_2D_Projection "OpenSCAD User Manual/3D to 2D Projection")
-3.  [2D
-    Objects](/wiki/OpenSCAD_User_Manual/Using_the_2D_Subsystem "OpenSCAD User Manual/Using the 2D Subsystem")
-    1.  [2D
-        Primitives](/wiki/OpenSCAD_User_Manual/2D_Primitives "OpenSCAD User Manual/2D Primitives")
-        -
-        [square](/wiki/OpenSCAD_User_Manual/2D_Primitives#square "OpenSCAD User Manual/2D Primitives"),
-        [circle](/wiki/OpenSCAD_User_Manual/2D_Primitives#circle "OpenSCAD User Manual/2D Primitives"),
-        [polygon](/wiki/OpenSCAD_User_Manual/2D_Primitives#polygon "OpenSCAD User Manual/2D Primitives")
-    2.  [Text](/wiki/OpenSCAD_User_Manual/Text "OpenSCAD User Manual/Text")
-        - Generate text using installed or user supplied font files;
-        functions to retrieve text metrics.
-    3.  [2D to
-        3D](/wiki/OpenSCAD_User_Manual/2D_to_3D_Extrusion "OpenSCAD User Manual/2D to 3D Extrusion")
-        -
-        [linear\_extrude](/wiki/OpenSCAD_User_Manual/2D_to_3D_Extrusion#linear_extrude "OpenSCAD User Manual/2D to 3D Extrusion"),
-        [rotate\_extrude](/wiki/OpenSCAD_User_Manual/2D_to_3D_Extrusion#rotate_extrude "OpenSCAD User Manual/2D to 3D Extrusion")
-4.  [Transform](/wiki/OpenSCAD_User_Manual/Transformations "OpenSCAD User Manual/Transformations")
-    1.  [color](/wiki/OpenSCAD_User_Manual/Transformations#color "OpenSCAD User Manual/Transformations")
-    2.  [rotate](/wiki/OpenSCAD_User_Manual/Transformations#rotate "OpenSCAD User Manual/Transformations"),
-        [translate](/wiki/OpenSCAD_User_Manual/Transformations#translate "OpenSCAD User Manual/Transformations"),
-        [mirror](/wiki/OpenSCAD_User_Manual/Transformations#mirror "OpenSCAD User Manual/Transformations"),
-        [multmatrix](/wiki/OpenSCAD_User_Manual/Transformations#multmatrix "OpenSCAD User Manual/Transformations")
-    3.  [scale](/wiki/OpenSCAD_User_Manual/Transformations#scale "OpenSCAD User Manual/Transformations"),
-        [resize](/wiki/OpenSCAD_User_Manual/Transformations#resize "OpenSCAD User Manual/Transformations")
-    4.  [offset](/wiki/OpenSCAD_User_Manual/Transformations#offset "OpenSCAD User Manual/Transformations"),
-        [minkowski](/wiki/OpenSCAD_User_Manual/Transformations#minkowski "OpenSCAD User Manual/Transformations"),
-        [hull](/wiki/OpenSCAD_User_Manual/Transformations#hull "OpenSCAD User Manual/Transformations")
-    5.  [Combining
-        transformations](/wiki/OpenSCAD_User_Manual/Transformations#Combining_transformations "OpenSCAD User Manual/Transformations")
-5.  [Boolean
-    combination](/wiki/OpenSCAD_User_Manual/CSG_Modelling "OpenSCAD User Manual/CSG Modelling")
-    1.  [union](/wiki/OpenSCAD_User_Manual/CSG_Modelling#union "OpenSCAD User Manual/CSG Modelling"),
-        [difference](/wiki/OpenSCAD_User_Manual/CSG_Modelling#difference "OpenSCAD User Manual/CSG Modelling"),
-        [intersection](/wiki/OpenSCAD_User_Manual/CSG_Modelling#intersection "OpenSCAD User Manual/CSG Modelling"),
-        [render](/wiki/OpenSCAD_User_Manual/CSG_Modelling#render "OpenSCAD User Manual/CSG Modelling")
-6.  Other Functions and Operators
-    1.  [Conditional and Iterator
-        Functions](/wiki/OpenSCAD_User_Manual/Conditional_and_Iterator_Functions "OpenSCAD User Manual/Conditional and Iterator Functions")
-        -
-        [for](/wiki/OpenSCAD_User_Manual/Conditional_and_Iterator_Functions#For_Loop "OpenSCAD User Manual/Conditional and Iterator Functions"),
-        [intersection\_for](/wiki/OpenSCAD_User_Manual/Conditional_and_Iterator_Functions#Intersection_For_Loop "OpenSCAD User Manual/Conditional and Iterator Functions"),
-        [if](/wiki/OpenSCAD_User_Manual/Conditional_and_Iterator_Functions#If_Statement "OpenSCAD User Manual/Conditional and Iterator Functions"),
-        [conditional ? :](/wiki/OpenSCAD_User_Manual/Conditional_and_Iterator_Functions#Conditional_?_: "OpenSCAD User Manual/Conditional and Iterator Functions"),
-        [assign](/wiki/OpenSCAD_User_Manual/Conditional_and_Iterator_Functions#Assign_Statement "OpenSCAD User Manual/Conditional and Iterator Functions"),
-        [let](/wiki/OpenSCAD_User_Manual/Conditional_and_Iterator_Functions#Let_Statement "OpenSCAD User Manual/Conditional and Iterator Functions")
-    2.  [Mathematical
-        Operators](/wiki/OpenSCAD_User_Manual/Mathematical_Operators "OpenSCAD User Manual/Mathematical Operators")
-        -
-        [General](/wiki/OpenSCAD_User_Manual/Mathematical_Operators "OpenSCAD User Manual/Mathematical Operators"),
-        [Vectors](/wiki/OpenSCAD_User_Manual/Mathematical_Operators#Vector-Number_Operators "OpenSCAD User Manual/Mathematical Operators"),
-        [Matrix
-        multiplication](/wiki/OpenSCAD_User_Manual/Mathematical_Operators#Matrix_Multiplication "OpenSCAD User Manual/Mathematical Operators")
-    3.  [Mathematical
-        Functions](/wiki/OpenSCAD_User_Manual/Mathematical_Functions "OpenSCAD User Manual/Mathematical Functions")
-        1.  [Trigonometric](/wiki/OpenSCAD_User_Manual/Mathematical_Functions#Trigonometric_Functions "OpenSCAD User Manual/Mathematical Functions")
-            (cos sin tan acos asin atan atan2)
-        2.  [Other](/wiki/OpenSCAD_User_Manual/Mathematical_Functions#Other_Mathematical_Functions "OpenSCAD User Manual/Mathematical Functions")
-            (abs ceil concat cross exp floor ln len let log lookup max
-            min norm pow rands round sign sqrt)
-    4.  [String
-        Functions](/wiki/OpenSCAD_User_Manual/String_Functions "OpenSCAD User Manual/String Functions")
-        -
-        [str](/wiki/OpenSCAD_User_Manual/String_Functions#str "OpenSCAD User Manual/String Functions"),
-        [chr](/wiki/OpenSCAD_User_Manual/String_Functions#chr "OpenSCAD User Manual/String Functions"),
-        [ord](/wiki/OpenSCAD_User_Manual/String_Functions#ord "OpenSCAD User Manual/String Functions")
-    5.  [Type Test
-        Functions](/wiki/OpenSCAD_User_Manual/Type_Test_Functions "OpenSCAD User Manual/Type Test Functions")
-        -
-        [is\_undef](/wiki/OpenSCAD_User_Manual/Type_Test_Functions#is_undef "OpenSCAD User Manual/Type Test Functions"),
-        [is\_bool](/wiki/OpenSCAD_User_Manual/Type_Test_Functions#is_bool "OpenSCAD User Manual/Type Test Functions"),
-        [is\_num](/wiki/OpenSCAD_User_Manual/Type_Test_Functions#is_num "OpenSCAD User Manual/Type Test Functions"),
-        [is\_string](/wiki/OpenSCAD_User_Manual/Type_Test_Functions#is_string "OpenSCAD User Manual/Type Test Functions"),
-        [is\_list](/wiki/OpenSCAD_User_Manual/Type_Test_Functions#is_list "OpenSCAD User Manual/Type Test Functions"),
-        [is\_object](/wiki/OpenSCAD_User_Manual/Type_Test_Functions#is_object "OpenSCAD User Manual/Type Test Functions")
-    6.  [List
-        Comprehensions](/wiki/OpenSCAD_User_Manual/List_Comprehensions "OpenSCAD User Manual/List Comprehensions")
-    7.  [Other Language
-        Features](/wiki/OpenSCAD_User_Manual/Other_Language_Features "OpenSCAD User Manual/Other Language Features")
-        - [Special '$'
-        variables](/wiki/OpenSCAD_User_Manual/Other_Language_Features#Special_variables "OpenSCAD User Manual/Other Language Features"),
-        [echo](/wiki/OpenSCAD_User_Manual/Other_Language_Features#Echo_Statements "OpenSCAD User Manual/Other Language Features"),
-        [render](/wiki/OpenSCAD_User_Manual/Other_Language_Features#Render "OpenSCAD User Manual/Other Language Features"),
-        [surface](/wiki/OpenSCAD_User_Manual/Other_Language_Features#surface "OpenSCAD User Manual/Other Language Features"),
-        [search](/wiki/OpenSCAD_User_Manual/Other_Language_Features#Search "OpenSCAD User Manual/Other Language Features")
-        , [version(),
-        version\_num()](/wiki/OpenSCAD_User_Manual/Other_Language_Features#OpenSCAD_Version "OpenSCAD User Manual/Other Language Features"),
-        [parent\_module(n) and
-        $parent\_modules](/wiki/OpenSCAD_User_Manual/Other_Language_Features#parent_module.28n.29_and_.24parent_modules "OpenSCAD User Manual/Other Language Features"),
-        [assert](/wiki/OpenSCAD_User_Manual/Other_Language_Features#assert "OpenSCAD User Manual/Other Language Features")
-7.  [User-Defined Functions and
-    Modules](/wiki/OpenSCAD_User_Manual/User-Defined_Functions_and_Modules "OpenSCAD User Manual/User-Defined Functions and Modules")
-    -
-    [Functions](/wiki/OpenSCAD_User_Manual/User-Defined_Functions_and_Modules#Functions "OpenSCAD User Manual/User-Defined Functions and Modules"),
-    [Modules](/wiki/OpenSCAD_User_Manual/User-Defined_Functions_and_Modules#Modules "OpenSCAD User Manual/User-Defined Functions and Modules"),
-    [Children](/wiki/OpenSCAD_User_Manual/User-Defined_Functions_and_Modules#Children "OpenSCAD User Manual/User-Defined Functions and Modules")
-8.  [Debugging
-    aids](/wiki/OpenSCAD_User_Manual/Modifier_Characters "OpenSCAD User Manual/Modifier Characters")
-    -  % \# \! \*
-    [echo](/wiki/OpenSCAD_User_Manual/Other_Language_Features#Echo_Statements "OpenSCAD User Manual/Other Language Features")
-9.  External libraries and code files
-    1.  [include - SCAD,
-        CSG](/wiki/OpenSCAD_User_Manual/Include_Statement "OpenSCAD User Manual/Include Statement")
-    2.  [use -
-        SCAD](/wiki/OpenSCAD_User_Manual/Include_Statement "OpenSCAD User Manual/Include Statement")
-    3.  [import - STL, OFF,
-        DXF](/wiki/OpenSCAD_User_Manual/Importing_Geometry "OpenSCAD User Manual/Importing Geometry")
-        1.  [import\_dxf](/wiki/OpenSCAD_User_Manual/2D_Primitives#import_dxf "OpenSCAD User Manual/2D Primitives")
-            - Deprecated
-        2.  [import\_stl](/wiki/OpenSCAD_User_Manual/Importing_Geometry#import_stl "OpenSCAD User Manual/Importing Geometry")
-            - Deprecated
-    4.  [export - STL, OFF, AMF, 3MF, DXF, SVG, PNG,
-        CSG](/wiki/OpenSCAD_User_Manual/Export "OpenSCAD User Manual/Export")
-    5.  [surface](/wiki/OpenSCAD_User_Manual/Other_Language_Features#Surface "OpenSCAD User Manual/Other Language Features")
-        - PNG
-
-<div class="mw-heading mw-heading1">
-
-# Work in progress
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual&veaction=edit&section=T-6 "Edit section: Work in progress")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual&action=edit&section=T-6 "Edit section's source code: Work in progress")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-This section contains documentation about ongoing work which is
-available as experimental features in snapshot versions of OpenSCAD or
-not yet integrated at all and pending in a
-[branch](https://github.com/openscad/openscad/branches) or
-[pull-request](https://github.com/openscad/openscad/pulls) at the
-[OpenSCAD github repository](https://github.com/openscad/openscad/).
-
-  - [Work in
-    progress](/wiki/OpenSCAD_User_Manual/WIP "OpenSCAD User Manual/WIP")
-
-  
-<span style="color:red;">**Please add `{{alphabetical}}` only to book
-title pages.**</span>
-
-  
-
-<div class="mw-heading mw-heading1">
-
-# Contents
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=2 "Edit section: Contents")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=2 "Edit section's source code: Contents")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual without [The OpenSCAD Language
-Reference](/wiki/OpenSCAD_User_Manual/The_OpenSCAD_Language "OpenSCAD User Manual/The OpenSCAD Language")
-
-1.  [First Steps](#Chapter_1_--_First_Steps)
-2.  [The OpenSCAD User
-    Interface](#Chapter_2_--_The_OpenSCAD_User_Interface)
-3.  [Commented Example
-    Projects](#Chapter_3_--_Commented_Example_Projects)
-4.  [Export](#Chapter_4_--_Export)
-5.  [Using an external Editor with
-    OpenSCAD](#Chapter_5_--_Using_an_external_Editor_with_OpenSCAD)
-6.  [Using OpenSCAD in a command line
-    environment](#Chapter_6_--_Using_OpenSCAD_in_a_command_line_environment)
-7.  [Path locations](#Chapter_7_--_Path_locations)
-8.  [Building OpenSCAD from
-    Sources](#Chapter_8_--_Building_OpenSCAD_from_Sources)
-    1.  [Building on Linux/UNIX](#Building_on_Linux/UNIX)
-    2.  [Cross-compiling for Windows on Linux or Mac OS
-        X](#Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X)
-    3.  [Building on Windows](#Building_on_Windows)
-    4.  [Building on Mac OS X](#Building_on_Mac_OS_X)
-9.  [Frequently Asked
-    Questions](#Chapter_9_--_Frequently_Asked_Questions)
-10. [Libraries](#Chapter_10_--_Libraries)
-11. [Glossary](#Chapter_11_--_Command_Glossary)
-
------
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 1 -- First Steps
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=3 "Edit section: Chapter 1 -- First Steps")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=3 "Edit section's source code: Chapter 1 -- First Steps")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-For our first model, we create a simple 2×3×4 cuboid.
-
-To get started, launch OpenSCAD. You should have a preview window,
-toolbar, console and editor windows open. If one is hidden you can turn
-it on by going to the View menu and unselect the hidden items.
-
-To create our cuboid we use the openSCAD editor window to type a
-one-line command:
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td></td>
-<td><strong>Usage example 1 - simple cuboid:</strong></td>
-</tr>
-<tr class="even">
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>// Copo cônico 500ml com texto ADEGA21
-<p>$fn = 100;</p>
-<p>altura = 120;      // mm</p>
-<p>raio_base = 63;    // mm</p>
-<p>raio_topo = 40;    // mm</p>
-<p>espessura = 2;     // mm</p>
-<p>// Copo externo</p>
-<p>difference() {</p>
-<p>    cylinder(h = altura, r1 = raio_base, r2 = raio_topo, center = false);</p>
-<p>   </p>
-<p>    // Copo interno (oco)</p>
-<p>    translate([0, 0, espessura])</p>
-<p>        cylinder(h = altura - espessura*2,</p>
-<p>                 r1 = raio_base - espessura,</p>
-<p>                 r2 = raio_topo - espessura,</p>
-<p>                 center = false);</p>
-<p>   </p>
-<p>    // Texto ADEGA21 (gravado)</p>
-<p>    rotate([0, 0, 0])</p>
-<p>    translate([0, raio_base - espessura/2, altura/2])</p>
-<p>    rotate([90, 0, 0])</p>
-<p>    linear_extrude(height = espessura + 0.5)</p>
-<p>        text("ADEGA21", size = 20, font = "Liberation Sans:style=Bold", halign = "center", valign = "center");</p>
-<p>}</p></td>
-</tr>
-<tr class="even">
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading3">
-
-### Compiling and rendering our first model
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Creating_a_simple_model&veaction=edit&section=T-1 "Edit section: Compiling and rendering our first model")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Creating_a_simple_model&action=edit&section=T-1 "Edit section's source code: Compiling and rendering our first model")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The cuboid can now be compiled and rendered by pressing F5 or F6
-Function key on your keyboard while the OpenSCAD editor has focus. You
-should now see your object in the preview window as shown above.
-
-<span typeof="mw:File/Frameless">[![green arrow pointing left to
-previous
-page](openscad_user_manual_media/a72b7dfb6024c0bf1db13867c7813c327b65d993.png)](/wiki/OpenSCAD_User_Manual/First_Steps "OpenSCAD User Manual/First Steps")</span>  
-[First Steps:
-Introduction](/wiki/OpenSCAD_User_Manual/First_Steps "OpenSCAD User Manual/First Steps")
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-[First Steps](/wiki/OpenSCAD_User_Manual "OpenSCAD User Manual")
-
-<span typeof="mw:File">[![green arrow pointing right to next
-page](openscad_user_manual_media/bffa84f0348e3e7dc8b621f48f0ce37f8e379d0b.png)](/wiki/OpenSCAD_User_Manual/First_Steps/Positioning_an_object "OpenSCAD User Manual/First Steps/Positioning an object")</span>  
-[First Steps: Positioning an
-object](/wiki/OpenSCAD_User_Manual/First_Steps/Positioning_an_object "OpenSCAD User Manual/First Steps/Positioning an object")
-
-Print version
-
-![OpenSCAD after
-starting](openscad_user_manual_media/8e936f65b74f5289d5734336390150dd82a950ba.png)
-
-Open one of the many examples that come with OpenSCAD (*File*,
-*Examples*). Or you can copy and paste this simple example into the
-OpenSCAD window:
-
-<table>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><strong>Usage example 1</strong></td>
-</tr>
-<tr class="even">
-<td><div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-<pre><code>difference() {
-    cube(30, center=true);
-    sphere(20);
-}
-translate([0, 0, 30]) {
-    cylinder(h=40, r=10);
-}</code></pre>
-</div></td>
-</tr>
-</tbody>
-</table>
-
-![OpenSCAD after pasting the example code and pressing
-F5](openscad_user_manual_media/68ecadcf71ed8c83aa04bd2cd8ffd1eb19f61ca3.png)
-
-Then **press F5** to get a graphical preview of what you typed (or
-**press F6** to get a graphical view).
-
-You get three types of movement in the preview frame:
-
-1.  Drag with left mouse button to rotate the view around the rotation
-    center (view with ctrl-3) along the X and Z Axis. The bottom line
-    changes the rotate values. (use shift while left-drag to rotate
-    around X and Y )
-2.  Drag with any other mouse button (or control-drag under OSX) to
-    translate (move) the view. The bottom line changes translate values.
-3.  Use the mouse scroll to zoom in and out. Alternatively you can use
-    the + and - keys, or right-drag with the mouse while pressing a
-    shift key (or control-shift-drag under OSX). The Viewport line at
-    the bottom of the window shows a change in the distance value.
-
-<span typeof="mw:File/Frameless">[![green arrow pointing left to
-previous
-page](openscad_user_manual_media/a72b7dfb6024c0bf1db13867c7813c327b65d993.png)](/wiki/OpenSCAD_User_Manual/First_Steps/Model_views "OpenSCAD User Manual/First Steps/Model views")</span>  
-[First Steps: Model
-views](/wiki/OpenSCAD_User_Manual/First_Steps/Model_views "OpenSCAD User Manual/First Steps/Model views")
-
-[First Steps](/wiki/OpenSCAD_User_Manual "OpenSCAD User Manual")
-
-<span typeof="mw:File">[![green arrow pointing right to next
-page](openscad_user_manual_media/bffa84f0348e3e7dc8b621f48f0ce37f8e379d0b.png)](/wiki/OpenSCAD_User_Manual/The_OpenSCAD_User_Interface "OpenSCAD User Manual/The OpenSCAD User Interface")</span>  
-[Manual: User
-Interface](/wiki/OpenSCAD_User_Manual/The_OpenSCAD_User_Interface "OpenSCAD User Manual/The OpenSCAD User Interface")
-
-Print version
-
-We have already seen how to create a simple cuboid. Our next task is to
-attempt to use the translate positioning command to place an identical
-cuboid next to the existing cuboid. Type the data as shown below. There
-are a total of 4 lines of code. Press F5 or F6 function key when done to
-see the preview.
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><strong>Usage example 1 - positioning an object:</strong></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-<pre><code>cube([2,3,4]);
-translate([3,0,0]) {
-  cube([2,3,4]);
-}</code></pre>
-</div></td>
-<td><figure>
-<img src="openscad_user_manual_media/e5cc8955ba0af4b8010ea390ce3247cf85af1d73.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/e/ec/OpenSCAD_Positioning_an_Object.png/375px-OpenSCAD_Positioning_an_Object.png 1.5x, //upload.wikimedia.org/wikipedia/commons/e/ec/OpenSCAD_Positioning_an_Object.png 2x" width="250" height="233" alt="" /><figcaption>OpenSCAD positioning an object</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading3">
-
-### Translate Operator May Not End A Statement
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Positioning_an_object&veaction=edit&section=T-1 "Edit section: Translate Operator May Not End A Statement")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Positioning_an_object&action=edit&section=T-1 "Edit section's source code: Translate Operator May Not End A Statement")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Notice that there is no semicolon following the [Translate
-Operator](/wiki/OpenSCAD_User_Manual/Transformations#Transform_Modules "OpenSCAD User Manual/Transformations").
-An operator module must be followed by an Object Module.
-
-<span typeof="mw:File/Frameless">[![green arrow pointing left to
-previous
-page](openscad_user_manual_media/a72b7dfb6024c0bf1db13867c7813c327b65d993.png)](/wiki/OpenSCAD_User_Manual/First_Steps/Creating_a_simple_model "OpenSCAD User Manual/First Steps/Creating a simple model")</span>  
-[First Steps: Creating a
-model](/wiki/OpenSCAD_User_Manual/First_Steps/Creating_a_simple_model "OpenSCAD User Manual/First Steps/Creating a simple model")
-
-[First
-Steps](/wiki/OpenSCAD_User_Manual/First_Steps "OpenSCAD User Manual/First Steps")
-
-<span typeof="mw:File">[![green arrow pointing right to next
-page](openscad_user_manual_media/bffa84f0348e3e7dc8b621f48f0ce37f8e379d0b.png)](/wiki/OpenSCAD_User_Manual/First_Steps/Changing_the_color_of_an_object "OpenSCAD User Manual/First Steps/Changing the color of an object")</span>  
-[First Steps: Changing
-color](/wiki/OpenSCAD_User_Manual/First_Steps/Changing_the_color_of_an_object "OpenSCAD User Manual/First Steps/Changing the color of an object")
-
-Print version
-
-And object, or a group of them, may be colored by preceding the [object
-module](/wiki/OpenSCAD_User_Manual/Primitive_Solids "OpenSCAD User Manual/Primitive Solids")
-call with the
-[`color()`](/wiki/OpenSCAD_User_Manual/Transformations#color "OpenSCAD User Manual/Transformations")
-[operator
-module](/wiki/OpenSCAD_User_Manual/User-Defined_Functions_and_Modules#Operator_modules "OpenSCAD User Manual/User-Defined Functions and Modules").
-
-There are two ways to specify the color to set:
-
-  - RGB vector  
-    three floats in the range \[0.0:1.0\] in a three element vector
-    \[\<redval\>,\<greenval\>,\<blueval\>\]
-  - "\<colorname"  
-    a string containing a color name from [the list of Web
-    Colors](https://en.wikipedia.org/wiki/Web_Colors "w:Web Colors").
-
-<table>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><p><strong>Note:</strong><br />
-Red-Green-Blue (thus RGB) values are generally specified as integers from 0 to 255. As OpenSCAD does not have an integer type the RGB numbers are fractions normalized to fall between 0.0 and 1.0</p></td>
-</tr>
-</tbody>
-</table>
-
-  
-
-<table>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><p><strong>Note:</strong><br />
-changing the colors works only in Preview mode (F5); render mode (F6) does not currently support color</p></td>
-</tr>
-</tbody>
-</table>
-
-  
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><strong>Usage example 1 - changing the color of an object:</strong></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-<pre><code>color([1,0,0])
-   cube([2,3,4]);
-translate([3,0,0])
-   color([0,1,0])
-      cube([2,3,4]);
-translate([6,0,0])
-   color([0,0,1])
-      cube([2,3,4]);</code></pre>
-</div></td>
-<td><figure>
-<img src="openscad_user_manual_media/bc838e40d2581a1dde9079e424cb6aef3e68d1c0.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/2/25/OpenSCAD_Changing_Color.png/330px-OpenSCAD_Changing_Color.png 2x" width="150" height="140" alt="" /><figcaption>OpenSCAD changing the color of an object</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-A `color()` operator may be included, the same as any other operator,
-like `translate()`, in a stack of operators that precede call to an
-object module.
-
-Using braces ("{}") to define a level of scope will apply color, or any
-other operator module, to all of the objects included in the scope
-
-<div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-
-    color([0,0,1]) {
-        translate([6,0,0])
-           cube([2,3,4]);
-        translate([-6,0,0])
-           cube([2,3,4]);
-        }
-
-</div>
-
-In a stack of operators the first call to `color()` overrides all others
-so that come later.
-
-<span typeof="mw:File/Frameless">[![green arrow pointing left to
-previous
-page](openscad_user_manual_media/a72b7dfb6024c0bf1db13867c7813c327b65d993.png)](/wiki/OpenSCAD_User_Manual/First_Steps/Positioning_an_object "OpenSCAD User Manual/First Steps/Positioning an object")</span>  
-[Positioning an
-object](/wiki/OpenSCAD_User_Manual/First_Steps/Positioning_an_object "OpenSCAD User Manual/First Steps/Positioning an object")
-
-[First
-Steps](/wiki/OpenSCAD_User_Manual/First_Steps "OpenSCAD User Manual/First Steps")
-
-<span typeof="mw:File">[![green arrow pointing right to next
-page](openscad_user_manual_media/bffa84f0348e3e7dc8b621f48f0ce37f8e379d0b.png)](/wiki/OpenSCAD_User_Manual/First_Steps/Model_views "OpenSCAD User Manual/First Steps/Model views")</span>  
-[First Steps: Model
-views](/wiki/OpenSCAD_User_Manual/First_Steps/Model_views "OpenSCAD User Manual/First Steps/Model views")
-
-Print version
-
-<span class="noprint"></span>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><div class="mbox-image-div">
-<span typeof="mw:File"><span><img src="openscad_user_manual_media/6154d5fac35dbeeb51921a74aa5727db2f1e48f2.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/60px-Information_icon4.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/120px-Information_icon4.svg.png 2x" width="40" height="40" /></span></span>
-</div></td>
-<td><div class="mbox-text-span">
-<strong>The text in its current form is incomplete.</strong>
-</div></td>
-</tr>
-</tbody>
-</table>
-
-The "View" menu at the top of the OpenSCAD application window provides a
-variety of view options in the OpenSCAD model view window.
-
-<div class="mw-heading mw-heading2">
-
-## Surfaces
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&veaction=edit&section=T-1 "Edit section: Surfaces")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&action=edit&section=T-1 "Edit section's source code: Surfaces")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The surface view is the initial model view that appears when the model
-code is first rendered. You can get back to this view by choosing "View
-\>\> Surfaces" (F10 on Linux).
-
-<div class="mw-heading mw-heading2">
-
-## Wireframe
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&veaction=edit&section=T-2 "Edit section: Wireframe")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&action=edit&section=T-2 "Edit section's source code: Wireframe")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Designers often choose "View \>\> Wireframe" (F11 on Linux) when working
-with a particularly complex 3D model. The Wireframe view presents only a
-grid--the "scaffolding" beneath the surface. Think of the Eiffel Tower.
-
-A wireframe is a visual presentation of a three dimensional or physical
-object. This method of modelling consists only of lines, points and
-curves defining the edges of an object. Using a wireframe model allows
-visualization of the underlying design structure of a 3D model. Since
-wireframe renderings are relatively simple and fast to calculate, they
-are often used in cases where a higher screen frame rate is needed (for
-instance, when working with a particularly complex 3D model, or in
-real-time systems that model exterior phenomena). When greater graphical
-detail is desired, surface textures can be added automatically after
-completion of the initial rendering of the wireframe. This allows the
-designer to quickly review changes or rotate the object to new desired
-views without long delays associated with more realistic rendering. The
-wireframe format is also well suited and widely used in programming tool
-paths for DNC (Direct Numerical Control) machine tools. Wireframe models
-are also used as the input for CAM (computer-Aided Manufacturing).
-Wireframe is the most abstract and least realistic of the three main CAD
-views.
-<sup>[<span class="cite-bracket">\[</span>1<span class="cite-bracket">\]</span>](#cite_note-1)</sup>
-
-<div class="mw-heading mw-heading2">
-
-## The OpenCSG view
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&veaction=edit&section=T-3 "Edit section: The OpenCSG view")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&action=edit&section=T-3 "Edit section's source code: The OpenCSG view")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Choosing "View \>\> Preview (F9)", the OpenCSG view uses the open
-constructive solid geometry library to generate the model view utilizing
-OpenGL. If the OpenCSG library is not available or the video card or
-drivers do not support OpenGL, then this view does not produce visible
-output.
-
-<div class="mw-heading mw-heading2">
-
-## The Thrown Together View
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&veaction=edit&section=T-4 "Edit section: The Thrown Together View")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&action=edit&section=T-4 "Edit section's source code: The Thrown Together View")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Choosing "View \>\> Thrown Together" overlays all the previous views
-together on the same screen. Importantly, objects subtracted by the
-`difference()` command are rendered as solid objects in green (by
-default).
-
-<div class="mw-heading mw-heading2">
-
-## References
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&veaction=edit&section=T-5 "Edit section: References")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/First_Steps/Model_views&action=edit&section=T-5 "Edit section's source code: References")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="reflist">
-
-<div class="mw-references-wrap">
-
-1.  <span id="cite_note-1"><span class="mw-cite-backlink">[↑](#cite_ref-1)</span>
-    <span class="reference-text"></span></span>
-    ["Wire-frame
-    model"](https://en.wikipedia.org/wiki/Wire-frame_model).
-    Wikipedia.<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=unknown&amp;rft.btitle=Wire-frame+model&amp;rft.pub=Wikipedia&amp;rft_id=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FWire-frame_model&amp;rfr_id=info%3Asid%2Fen.wikibooks.org%3AOpenSCAD+User+Manual%2FPrint+version"></span>
-
-</div>
-
-</div>
-
-<span typeof="mw:File/Frameless">[![green arrow pointing left to
-previous
-page](openscad_user_manual_media/a72b7dfb6024c0bf1db13867c7813c327b65d993.png)](/wiki/OpenSCAD_User_Manual/First_Steps/Changing_the_color_of_an_object "OpenSCAD User Manual/First Steps/Changing the color of an object")</span>  
-[First Steps: Changing
-colors](/wiki/OpenSCAD_User_Manual/First_Steps/Changing_the_color_of_an_object "OpenSCAD User Manual/First Steps/Changing the color of an object")
-
-[First
-Steps](/wiki/OpenSCAD_User_Manual/First_Steps "OpenSCAD User Manual/First Steps")
-
-<span typeof="mw:File">[![green arrow pointing right to next
-page](openscad_user_manual_media/bffa84f0348e3e7dc8b621f48f0ce37f8e379d0b.png)](/wiki/OpenSCAD_User_Manual/First_Steps/Opening_an_existing_example_model "OpenSCAD User Manual/First Steps/Opening an existing example model")</span>  
-[First Steps: Opening a
-model](/wiki/OpenSCAD_User_Manual/First_Steps/Opening_an_existing_example_model "OpenSCAD User Manual/First Steps/Opening an existing example model")
-
-Print version
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 2 -- The OpenSCAD User Interface
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=4 "Edit section: Chapter 2 -- The OpenSCAD User Interface")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=4 "Edit section's source code: Chapter 2 -- The OpenSCAD User Interface")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-<div class="mw-heading mw-heading2">
-
-## User Interface
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-1 "Edit section: User Interface")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-1 "Edit section's source code: User Interface")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![Main Window of OpenSCAD with a small program generating the
-OpenSCAD-Logo.](openscad_user_manual_media/4bb60d258e59bd0d0ba1d535969d49323835f5a5.png)
-
-The user interface of OpenSCAD has three parts
-
-  - The viewing area
-  - The console window
-  - The text editor
-
-<div class="mw-heading mw-heading3">
-
-### Viewing area
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-2 "Edit section: Viewing area")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-2 "Edit section's source code: Viewing area")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Preview and rendering output goes into the viewing area. Using the *Show
-Axes* menu entry an indicator for the coordinate axes can be enabled.
-
-<div class="mw-heading mw-heading3">
-
-### Console window
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-3 "Edit section: Console window")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-3 "Edit section's source code: Console window")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Status information, warnings and errors are displayed in the console
-window.
-
-During a render a progress-bar is displayed at the bottom of the
-console. It includes a Cancel button to stop the render.  
-
-![A render can be cancel using the X button at the end of the progress
-bar.](openscad_user_manual_media/1db23100f32636aa8430a074e1938cca90021feb.jpg)
-
-<div style="clear: both;">
-
-</div>
-
-<div class="mw-heading mw-heading3">
-
-### Text editor
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-4 "Edit section: Text editor")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-4 "Edit section's source code: Text editor")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The built-in text editor provides basic editing features like text
-search & replace and also supports syntax highlighting. There are
-predefined color schemes that can be selected in the Preferences dialog.
-
-<div class="thumb tmulti tnone center">
-
-<div class="thumbinner" style="width:448px;max-width:448px">
-
-<div class="trow">
-
-<div class="tsingle" style="width:222px;max-width:222px">
-
-<div class="thumbimage">
-
-<span typeof="mw:File">[![OpenSCAD Find
-Dialog](openscad_user_manual_media/bfc67c5b770270adf7e36c8fe94946a3654f9804.png)](/wiki/File:OpenSCAD_Find_Dialog.png)</span>
-
-</div>
-
-</div>
-
-<div class="tsingle" style="width:222px;max-width:222px">
-
-<div class="thumbimage">
-
-<span typeof="mw:File">[![OpenSCAD Replace
-Dialog](openscad_user_manual_media/3c789e101cede84de13b0878e7dc256e432082a7.png)](/wiki/File:OpenSCAD_Replace_Dialog.png)</span>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="trow" style="display:flex">
-
-<div class="thumbcaption">
-
-OpenSCAD Editor with Find / Replace functionality.
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-  
-
-<div class="mw-heading mw-heading2">
-
-## Interactive modification of the numerical value
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-5 "Edit section: Interactive modification of the numerical value")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-5 "Edit section's source code: Interactive modification of the numerical value")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-It is possible to change a numeric value in the source code and observe
-the result in real time.
-
-Placing the cursor after a digit and pressing Alt+ up arrow or Alt +
-down arrow will increment or decrement the chosen digit. The object is
-re-rendered and displayed in *preview mode* after each change of the
-selected number in the source code. The cursor is moved after the next
-digit by Alt + right arrow, the further decimal digits are added when
-needed by moving the cursor after the last digit on the right side. The
-cursor is moved left behind the most significant digits of the number by
-Alt + left arrow.
-
-NOTE: On MacOS, use Option + Shift instead of Alt.
-
-| Key                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Description                                                                             |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| <span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Alt</span> + <span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Up Arrow</span>    | Increment the numeric value to the left of the cursor and preview the object.           |
-| <span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Alt</span> + <span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Down Arrow</span>  | Decrement the numeric value to the left of the cursor and preview the object.           |
-| <span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Alt</span> + <span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Left Arrow</span>  | Move the cursor left to more significant digit.                                         |
-| <span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Alt</span> + <span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Right Arrow</span> | Move the cursor right to less significant digit, eventually add one more decimal digit. |
-
-<div class="mw-heading mw-heading2">
-
-## View navigation
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-6 "Edit section: View navigation")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-6 "Edit section's source code: View navigation")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The viewing area is navigated primarily using the mouse:
-
-Action
-
-Icons
-
-Description
-
-rotating the view
-
-<span typeof="mw:File">[![](openscad_user_manual_media/d53fcd83c271a62d8c59f766e0998d741d1bb64d.png)](/wiki/File:Farm-Fresh_mouse_select_left.png)</span>
-
-Dragging with the left mouse button rotates the view along the axes of
-the viewing area. It preserves the vertical axis' direction.
-
-Double-click the left button to set the point of rotation.
-
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">⇧
-Shift</span> +
-<span typeof="mw:File">[![](openscad_user_manual_media/d53fcd83c271a62d8c59f766e0998d741d1bb64d.png)](/wiki/File:Farm-Fresh_mouse_select_left.png)</span>
-
-Dragging with the left mouse button when the shift key is pressed
-rotates the view along the vertical axis and the axis pointing towards
-the user.
-
-moving the viewing area
-
-<span typeof="mw:File">[![](openscad_user_manual_media/adea5dde703435c86d0034e215e898ac5c1dfd80.png)](/wiki/File:Farm-Fresh_mouse_select_right.png)</span>
-
-Dragging with the right mouse button moves the viewing area.
-
-zooming
-
-<span typeof="mw:File">[![](openscad_user_manual_media/31de147fb6192d7031105964a8d8f03ddbbc8c57.png)](/wiki/File:Mouse_wheel_up.svg)</span><span typeof="mw:File">[![](openscad_user_manual_media/cba220d497ebf8f0a1350f3eca13dcc2547963ee.png)](/wiki/File:Mouse_wheel_down.svg)</span>
-
-Using the scroll wheel
-
-<span typeof="mw:File">[![](openscad_user_manual_media/2d1df5ae22a961354543f4b79d1b6b52cbcf8039.png)](/wiki/File:Farm-Fresh_mouse_select_scroll.png)</span>
-
-Dragging with the middle mouse button
-
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">⇧
-Shift</span> +
-<span typeof="mw:File">[![](openscad_user_manual_media/adea5dde703435c86d0034e215e898ac5c1dfd80.png)](/wiki/File:Farm-Fresh_mouse_select_right.png)</span>
-
-Dragging with the right or middle mouse button and the shift key pressed
-
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">⇧
-Shift</span> +
-<span typeof="mw:File">[![](openscad_user_manual_media/2d1df5ae22a961354543f4b79d1b6b52cbcf8039.png)](/wiki/File:Farm-Fresh_mouse_select_scroll.png)</span>
-
-*<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">+</span>*
-and
-*<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">-</span>*
-
-The keys
-*<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">+</span>*
-and
-*<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">-</span>*
-(*<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Ctrl+\[</span>*
-and
-*<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Ctrl+\]</span>*)
-
-show/hide rotation center
-
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Ctrl</span>+<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">3</span>
-
-Turn on or off the graphic showing the center of rotation. (It is always
-in the center of the viewing area).
-
-rotation reset
-
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Ctrl</span>+<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">0</span>
-
-Rotation can be reset using the shortcut
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Ctrl</span>+<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">0</span>.
-
-translation reset
-
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Ctrl</span>
-+  
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">⇧
-Shift</span>+<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">0</span>
-
-Translation can be reset using the shortcut
-<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">Ctrl</span>+<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">⇧
-Shift</span>+<span class="kbd keyboard-key nowrap" style="border:1px solid #aaa; border-radius:0.2em; -moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); -webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1); background-color:#f9f9f9; color:black; background-image: -moz-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -o-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: -webkit-linear-gradient(top, #eee, #f9f9f9, #eee); background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee); padding:0.1em 0.3em; font-family:inherit; font-size:0.85em;">0</span>.
-
-<div class="mw-heading mw-heading2">
-
-## View setup
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-7 "Edit section: View setup")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-7 "Edit section's source code: View setup")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The viewing area can be configured to use different rendering methods
-and other options using the View menu. Most of the options described
-here are available using shortcuts as well.
-
-<div class="mw-heading mw-heading3">
-
-### Render modes
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-8 "Edit section: Render modes")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-8 "Edit section's source code: Render modes")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading4">
-
-#### <span id="OpenCSG_.28F9.29"></span>OpenCSG (F9)
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-9 "Edit section: OpenCSG (F9)")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-9 "Edit section's source code: OpenCSG (F9)")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-This method produces instantaneous results, but has low frame rates when
-working with highly non convex objects.
-
-Selecting the OpenCSG mode using F9 switches to the last generated
-OpenCSG view, but does not re-evaluate the source code. You may want to
-use the *Compile* function (F5, found in the *Design* menu) to
-re-evaluate the source code, build the OpenCSG objects and *then* switch
-to OpenCSG view.
-
-<div class="mw-heading mw-heading5">
-
-##### Implementation Details
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-10 "Edit section: Implementation Details")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-10 "Edit section's source code: Implementation Details")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-In OpenCSG mode, the [OpenCSG library](http://opencsg.org/) is used for
-generating the visible model. This library uses advanced OpenGL features
-(2.0) like the Z buffer and does not require an explicit description of
-the resulting mesh – instead, it tracks how objects are to be combined.
-For example, when rendering a spherical dent in a cube, it first renders
-the cube on the graphics card and then render the sphere, but instead of
-using the Z buffer to **hide** the parts of the sphere that are covered
-by the cube, it renders **only** those parts of the sphere, visually
-resulting in a cube with a spherical dent.
-
-<div class="mw-heading mw-heading4">
-
-#### <span id="CGAL_.28Surfaces_and_Grid.2C_F10_and_F11.29"></span>CGAL (Surfaces and Grid, F10 and F11)
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-11 "Edit section: CGAL (Surfaces and Grid, F10 and F11)")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-11 "Edit section's source code: CGAL (Surfaces and Grid, F10 and F11)")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-This method might need some time when first used with a new program, but
-then has higher frame rates.
-
-As before with OpenCSG, F10 and F11 enable only CGAL display mode and
-don't update the underlying objects; for that, use the *Compile and
-Render* function (F6, found in the *Design* menu).
-
-To combine the benefits of those two display methods, you can
-selectively wrap parts of your program in a
-[render](/wiki/OpenSCAD_User_Manual/The_OpenSCAD_Language#render "OpenSCAD User Manual/The OpenSCAD Language")
-function and force them to be baken into a mesh even with OpenCSG mode
-enabled.
-
-<div class="mw-heading mw-heading5">
-
-##### Implementation Details
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-12 "Edit section: Implementation Details")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-12 "Edit section's source code: Implementation Details")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The acronym CGAL refers to The Open Source Computational Geometry
-Algorithms Library.
-
-In CGAL mode, the CGAL library is used to compute the mesh of the root
-object, which is then displayed using simple OpenGL.
-
-<div class="mw-heading mw-heading3">
-
-### View options
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-13 "Edit section: View options")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-13 "Edit section's source code: View options")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading4">
-
-#### <span id="Show_Edges_.28Ctrl.2B1.29"></span>*Show Edges* (Ctrl+1)
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-14 "Edit section: Show Edges (Ctrl+1)")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-14 "Edit section's source code: Show Edges (Ctrl+1)")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![The difference between the CGAL and OpenCSG approaches can be seen at
-edges created by boolean
-operations.](openscad_user_manual_media/162b1c0fd07d2d735463bd4294d15ac9a0363c6b.png)
-
-If *Show Edges* is enabled, both OpenCSG and CGAL mode render edges as
-well as faces; CGAL even shows vertices. In CGAL grid mode, this option
-has no effect.
-
-Enabling this option shows the difference between OpenCSG and CGAL quite
-clearly: While in CGAL mode you see an edge drawn everywhere it
-"belongs", OpenCSG does not show edges resulting from boolean operations
-– this is because they were never explicitly calculated but are just
-where one object's Z clipping begins or ends.
-
-<div class="mw-heading mw-heading4">
-
-#### <span id="Show_Axes_.28Ctrl.2B2.29"></span>*Show Axes* (Ctrl+2)
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-15 "Edit section: Show Axes (Ctrl+2)")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-15 "Edit section's source code: Show Axes (Ctrl+2)")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-If *Show Axes* is enabled, the origin of the global coordinate system is
-indicated by an orthogonal axes indicator. Additionally, a smaller axes
-indicator with axes names are shown in the lower left corner of the
-viewing area. The smaller axes indicator is marked x, y, z and coloured
-red, green, blue respectively.
-
-<div class="mw-heading mw-heading4">
-
-#### <span id="Show_Crosshairs_.28Ctrl.2B3.29"></span>*Show Crosshairs* (Ctrl+3)
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-16 "Edit section: Show Crosshairs (Ctrl+3)")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-16 "Edit section's source code: Show Crosshairs (Ctrl+3)")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-If *Show Crosshairs* is enabled, the center of the viewport is indicated
-by four lines pointing in the room diagonal directions of the global
-coordinate system. This is useful when aligning the viewing area to a
-particular point in the model to keep it centered on screen during
-rotation.
-
-<div class="mw-heading mw-heading3">
-
-### Animation
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-17 "Edit section: Animation")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-17 "Edit section's source code: Animation")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The *Animate* option adds an animation bar to the lower edge of the
-screen. As soon as *FPS* and *Steps* are set (reasonable values to begin
-with are 10 and 100, respectively), the current *Time* is incremented by
-1/*Steps*, *FPS* times per second, until it reaches 1, when it wraps
-back to 0.
-
-Every time *Time* is changed, the program is re-evaluated with the
-variable `$t` set to the current time. Read more about how `$t` is used
-in section
-[Other\_Language\_Features](/wiki/OpenSCAD_User_Manual/Other_Language_Features#$t "OpenSCAD User Manual/Other Language Features").
-
-<div class="mw-heading mw-heading3">
-
-### View alignment
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&veaction=edit&section=T-18 "Edit section: View alignment")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/The_OpenSCAD_User_Interface&action=edit&section=T-18 "Edit section's source code: View alignment")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The menu items *Top, Bottom, …, Diagonal* and *Center* (Ctrl+4, Ctrl+5,
-…, Ctrl+0, Ctrl+Shift+0) align the view to the global coordinate
-system.
-
-*Top, Bottom, Left, Right, Front* and *Back* align it in parallel to the
-axes, the *Diagonal* option aligns it diagonally as it is aligned when
-OpenSCAD starts.
-
-The *Center* option puts the coordinate center in the middle of the
-screen (but not rotate the view).
-
-By default, the view is in *Perspective* mode, meaning that distances
-far away from the viewer appear shorter, as seen in the real world eyes
-or cameras. When the view mode is changed to *Orthogonal*, visible
-distances do not depend on the camera distance (the view simulates a
-camera at an infinite distance with an infinite focal length). This is
-especially useful in combination with the *Top* etc. options described
-above, as these orthogonal views result in a 2D images similar to what
-one would see in an engineering drawing.
-
-<span class="noprint"></span>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><div class="mbox-image-div">
-<span typeof="mw:File"><span><img src="openscad_user_manual_media/6154d5fac35dbeeb51921a74aa5727db2f1e48f2.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/60px-Information_icon4.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/120px-Information_icon4.svg.png 2x" width="40" height="40" /></span></span>
-</div></td>
-<td><div class="mbox-text-span">
-<strong>The text in its current form is incomplete.</strong>
-</div></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Dodecahedron
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-1 "Edit section: Dodecahedron")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-1 "Edit section's source code: Dodecahedron")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>//create a dodecahedron by intersecting 6 boxes
-module dodecahedron(height) 
-{
-    scale([height,height,height]) //scale by height parameter
-    {
-        intersection(){
-            //make a cube
-            cube([2,2,1], center = true); 
-            intersection_for(i=[0:4]) //loop i from 0 to 4, and intersect results
-            { 
-                //make a cube, rotate it 116.565 degrees around the X axis,
-                //then 72*i around the Z axis
-                rotate([0,0,72*i])
-                    rotate([116.565,0,0])
-                    cube([2,2,1], center = true); 
-            }
-        }
-    }
-}
-//create 3 stacked dodecahedra 
-//call the module with a height of 1 and move up 2
-translate([0,0,2])dodecahedron(1); 
-//call the module with a height of 2
-dodecahedron(2); 
-//call the module with a height of 4 and move down 4
-translate([0,0,-4])dodecahedron(4);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/65d4b1340414e2a0432d416ae625bbcabf00617a.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Openscad-Dodecahedron.png/375px-Openscad-Dodecahedron.png 1.5x, //upload.wikimedia.org/wikipedia/commons/d/d1/Openscad-Dodecahedron.png 2x" width="250" height="305" alt="" /><figcaption>The Dodecahedron as rendered from the example.</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Icosahedron
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-2 "Edit section: Icosahedron")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-2 "Edit section's source code: Icosahedron")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-An icosahedron can be created from three orthogonal
-[golden-ratio](https://en.wikipedia.org/wiki/Golden_ratio "w:Golden ratio")
-rectangles inside a `hull()` operation, where the golden ratio is
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(\varphi = \frac{\sqrt{5} + 1}{2}\)</span>![{\\displaystyle
-\\varphi ={\\frac {{\\sqrt
-{5}}+1}{2}}}](openscad_user_manual_media/cb64a941640957eb591af9ddecbef55138a31e26.svg)</span>.
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>phi=0.5*(sqrt(5)+1); // golden ratio
-
-// create an icosahedron by intersecting 3 orthogonal golden-ratio rectangles
-module icosahedron(edge_length) {
-   st=0.0001;  // microscopic sheet thickness
-   hull() {
-       cube([edge_length*phi, edge_length, st], true);
-       rotate([90,90,0]) cube([edge_length*phi, edge_length, st], true);
-       rotate([90,0,90]) cube([edge_length*phi, edge_length, st], true);
-   }
+translate([15, 15]) {
+  text("OpenSCAD", font = "Liberation Sans");
 }
 
-// display the 3 internal sheets alongside the icosahedron
-edge=10;
-translate([-20,0,0]) union() {
-   cube([edge*phi, edge, 0.01], true);
-   rotate([90,90,0]) cube([edge*phi, edge, 0.01], true);
-   rotate([90,0,90]) cube([edge*phi, edge, 0.01], true);
+translate([15, 0]) {
+  text("OpenSCAD", font = "Liberation Sans:style=Bold Italic");
 }
+```
 
-icosahedron(edge);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/7de2d0cbbfe4e67b1699a2dcc590ee695e802992.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/4/43/Icosahedron_OpenSCAD.png/500px-Icosahedron_OpenSCAD.png 1.5x" width="250" height="164" alt="" /><figcaption>The icosahedron and its internal structure as rendered from the example.</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
+## Alignment
 
-This icosahedron renders in an edge-up orientation. Rotating this
-icosahedron by
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(\arctan\left( \frac{1}{\varphi} \right)\)</span>![{\\displaystyle
-\\arctan {\\left({\\frac {1}{\\varphi
-}}\\right)}}](openscad_user_manual_media/b5ede473aba4648dd2fb3fcaf2a863e8cc15f24f.svg)</span>
-about the Y-axis results in a vertex-up orientation. Rotating by
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(\frac{1}{2}\arccos\left( {- \frac{\sqrt{5}}{3}} \right) - 90^{\circ}\)</span>![{\\displaystyle
-{\\frac {1}{2}}\\arccos {\\left(-{\\frac {\\sqrt
-{5}}{3}}\\right)}-90^{\\circ
-}}](openscad_user_manual_media/ff2a5b0053e7a0980f4817dbad10a4ceadc827d8.svg)</span>
-about the X-axis results in a face-up orientation. The edge length
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(L\)</span>![{\\displaystyle
-L}](openscad_user_manual_media/4fe88c32bbd06c4be529b7484fd667c088d3b6ac.svg)</span>
-is related to the inner diameter
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(D_{i}\)</span>![{\\displaystyle
-D\_{i}}](openscad_user_manual_media/3d1e3d456cbb7557a927fc834da4065a0db73d9f.svg)</span>
-(distance between opposite faces) by
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(L = \frac{D_{i}\sqrt{3}}{\varphi^{2}}\)</span>![{\\displaystyle
-L={\\frac {D\_{i}{\\sqrt {3}}}{\\varphi
-^{2}}}}](openscad_user_manual_media/9630b313dd9de58e027fd3c7e02df491283ada8e.svg)</span>.
+### Vertical alignment
 
-<div class="mw-heading mw-heading2">
+- top: Aligns so the top of the tallest character is at the given Y coordinate.
+- center: Centers the text bounding box at the given Y coordinate.
+- baseline: Aligns the font baseline at the given Y coordinate. Default. The only option that makes different text pieces align vertically like on lined paper.
+- bottom: Aligns so the lowest-reaching character bottom is at the given Y coordinate.
 
-## Icosphere
+```openscad
+text = "Align";
+font = "Liberation Sans";
+valign = [
+  [ 0,  "top"],
+  [ 40, "center"],
+  [ 75, "baseline"],
+  [110, "bottom"]
+];
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-3 "Edit section: Icosphere")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-3 "Edit section's source code: Icosphere")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    // Code via reddit with triangle winding fixes, cannot add link due to
-    // wikibooks considering it spam.
-    
-    // 4 is the realistic max.
-    // Don't do 5 or more, takes forever.
-    // set recursion to the desired level. 0=20 tris, 1=80 tris, 2=320 tris
-    module icosphere(radius=10, recursion=2, icoPnts, icoTris) {
-      //t = (1 + sqrt(5))/2;
-      //comment from monfera to get verts to unit sphere
-      t = sqrt((5+sqrt(5))/10);
-      s = sqrt((5-sqrt(5))/10);
-      
-      init = (icoPnts||icoTris) ? false : true; //initial call if icoPnts is empty
-      
-      // 1 --> draw icosphere from base mesh
-      // 2 --> loop through base mesh and subdivide by 4 --> 20 steps
-      // 3 --> loop through subdivided mesh and subdivide again (or subdivide by 16) --> 80 steps
-      // 4 ...
-      
-      verts = [
-        [-s, t, 0],  //0
-        [ s, t, 0],
-        [-s,-t, 0],
-        [ s,-t, 0],
-        [ 0,-s, t],
-        [ 0, s, t],
-        [ 0,-s,-t],
-        [ 0, s,-t],
-        [ t, 0,-s],
-        [ t, 0, s],
-        [-t, 0,-s],
-        [-t, 0, s]]; //11
-      
-      //base mesh with 20 faces
-      tris = [
-        //5 faces around point 0
-        [ 0, 5, 11], //0
-        [ 0, 1, 5],
-        [ 0, 7, 1],
-        [ 0, 10, 7],
-        [ 0, 11, 10], 
-        // 5 adjacent faces
-        [ 1, 9, 5], //5
-        [ 5, 4, 11],
-        [11, 2, 10],
-        [10, 6, 7],
-        [ 7, 8, 1], 
-        //5 faces around point 3
-        [ 3, 4, 9], //10
-        [ 3, 2, 4],
-        [ 3, 6, 2],
-        [ 3, 8, 6],
-        [ 3, 9, 8], 
-        //5 adjacent faces 
-        [ 4, 5, 9], //15
-        [ 2, 11, 4],
-        [ 6, 10, 2],
-        [ 8, 7, 6],
-        [ 9, 1, 8]];  //19
-        
-      if (recursion) {
-        verts = (init) ? verts : icoPnts;
-        tris = (init) ? tris : icoTris;
-        newSegments = recurseTris(verts,tris);
-        newVerts = newSegments[0];
-        newTris = newSegments[1];
-        icosphere(radius,recursion-1,newVerts,newTris);
-      } else if (init) { //draw the base icosphere if no recursion and initial call
-        scale(radius) polyhedron(verts, tris); 
-      } else { // if not initial call some recursion has to be happened
-        scale(radius) polyhedron(icoPnts, icoTris);
-      } 
-    }
-    
-    // Adds verts if not already there, 
-    // takes array of vertices and indices of a tri to expand
-    // returns expanded array of verts and indices of new polygon with 4 faces
-    // [[verts],[0,(a),(c)],[1,(b),(a)],[2,(c),(b)],[(a),(b),(c)]]
-    function addTris(verts, tri) = let(
-        a= getMiddlePoint(verts[tri[0]], verts[tri[1]]), //will produce doubles
-        b= getMiddlePoint(verts[tri[1]], verts[tri[2]]), //these are unique
-        c= getMiddlePoint(verts[tri[2]], verts[tri[0]]), //these are unique
-        
-        aIdx = search(verts, a), //point a already exists
-        l=len(verts)                       
-      ) len(aIdx) ? [concat(verts,[a,b,c]),[[tri[0],l,l+2],   //1
-                                            [tri[1],l+1,l],   //2
-                                            [tri[2],l+2,l+1], //3
-                                            [l,l+1,l+2]] ] :  //4
-    
-                    [concat(verts,[b,c]), [[tri[0],aIdx,l+1], //1
-                                          [tri[1],l,aIdx],    //2
-                                          [tri[2],l+1,l],     //3
-                                          [aIdx,l,l+1]] ];    //4
-    
-    // Recursive function that does one recursion on the whole icosphere (auto recursion steps derived from len(tris)).
-    function recurseTris(verts, tris, newTris=[], steps=0, step=0) = let(
-        stepsCnt = steps ? steps : len(tris)-1, //if initial call initialize steps
-        newSegment=addTris(verts=verts,tri=tris[step]),
-        newVerts=newSegment[0], //all old and new Vertices
-        newerTris=concat(newTris,newSegment[1]) //only new Tris
-      ) (stepsCnt==(step)) ? [newVerts,newerTris] :
-                               recurseTris(newVerts,tris,newerTris,stepsCnt,step+1);
-                    
-    // Get point between two verts on unit sphere.
-    function getMiddlePoint(p1, p2) = fixPosition((p1+p2)/2);
-    
-    // Fix position to be on unit sphere
-    function fixPosition(p) = let(l=norm(p)) [p.x/l,p.y/l,p.z/l];
-
-<div class="mw-heading mw-heading2">
-
-## Half-pyramid
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-4 "Edit section: Half-pyramid")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-4 "Edit section's source code: Half-pyramid")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-An upside-down half-pyramid is a useful shape for 3D printing a support
-for an overhang protruding from a vertical wall. With sloping sides no
-steeper than 45°, no removable support structure needs to be printed.
-
-While a half-pyramid can be made with a 4-sided cone (using the cylinder
-primitive) and subtracting a cube from half of it, the shape can be
-easily made in one operation by a scaled linear extrude of a rectangle
-having the middle of one edge on the origin.
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>// Create a half-pyramid from a single linear extrusion
-module halfpyramid(base, height) {
-   linear_extrude(height, scale=0.01)
-      translate([-base/2, 0, 0]) square([base, base/2]);
-}
-
-halfpyramid(20, 10);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/8910079ef96327a8931c3cafa733e5d047d37d6e.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/3/38/Halfpyramid.png/500px-Halfpyramid.png 1.5x" width="250" height="193" alt="" /><figcaption>The half-pyramid as rendered from the example.</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Bounding Box
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-5 "Edit section: Bounding Box")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-5 "Edit section's source code: Bounding Box")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>// Rather kludgy module for determining bounding box from intersecting projections
-module BoundingBox()
-{
-    intersection()
-    {
-        translate([0,0,0])
-        linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-        projection(cut=false) intersection()
-        {
-            rotate([0,90,0]) 
-            linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-            projection(cut=false) 
-            rotate([0,-90,0]) 
-            children(0);
-
-            rotate([90,0,0]) 
-            linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-            projection(cut=false) 
-            rotate([-90,0,0]) 
-            children(0);
-        }
-        rotate([90,0,0]) 
-        linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-        projection(cut=false) 
-        rotate([-90,0,0])
-        intersection()
-        {
-            rotate([0,90,0]) 
-            linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-            projection(cut=false) 
-            rotate([0,-90,0]) 
-            children(0);
-
-            rotate([0,0,0]) 
-            linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-            projection(cut=false) 
-            rotate([0,0,0]) 
-            children(0);
-        }
-    }
-}
-
-// Test module on ellipsoid
-translate([0,0,40]) scale([1,2,3]) sphere(r=5);
-BoundingBox() scale([1,2,3]) sphere(r=5);</code></pre>
-<p><br />
-</p></td>
-<td><figure>
-<img src="openscad_user_manual_media/6a398146281f02492b216e4920f9297776e9eac4.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/9/92/Openscad-BB.png/500px-Openscad-BB.png 1.5x" width="250" height="179" alt="" /><figcaption>Bounding Box applied to an Ellipsoid</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Linear Extrude extended use examples
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-6 "Edit section: Linear Extrude extended use examples")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-6 "Edit section's source code: Linear Extrude extended use examples")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading3">
-
-### Linear Extrude with Scale as an interpolated function
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-7 "Edit section: Linear Extrude with Scale as an interpolated function")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-7 "Edit section's source code: Linear Extrude with Scale as an interpolated function")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>//Linear Extrude with Scale as an interpolated function
-// This module does not need to be modified, 
-// - unless default parameters want to be changed 
-// - or additional parameters want to be forwarded (e.g. slices,...)
-module linear_extrude_fs(height=1,isteps=20,twist=0){
- //union of piecewise generated extrudes
- union(){ 
-   for(i = [ 0: 1: isteps-1]){
-     //each new piece needs to be adjusted for height
-     translate([0,0,i*height/isteps])
-      linear_extrude(
-       height=height/isteps,
-       twist=twist/isteps,
-       scale=f_lefs((i+1)/isteps)/f_lefs(i/isteps)
-      )
-       // if a twist constant is defined it is split into pieces
-       rotate([0,0,-(i/isteps)*twist])
-        // each new piece starts where the last ended
-        scale(f_lefs(i/isteps))
-         obj2D_lefs();
-   }
- }
-}
-// This function defines the scale function
-// - Function name must not be modified
-// - Modify the contents/return value to define the function
-function f_lefs(x) = 
- let(span=150,start=20,normpos=45)
- sin(x*span+start)/sin(normpos);
-// This module defines the base 2D object to be extruded
-// - Function name must not be modified
-// - Modify the contents to define the base 2D object
-module obj2D_lefs(){ 
- translate([-4,-3])
-  square([9,12]);
-}</code></pre>
-<pre><code>//Top rendered object demonstrating the interpolation steps
-translate([0,0,25])
-linear_extrude_fs(height=20,isteps=4);</code></pre>
-<pre><code>linear_extrude_fs(height=20);</code></pre>
-<pre><code>//Bottom rendered object demonstrating the inclusion of a twist
-translate([0,0,-25])
-linear_extrude_fs(height=20,twist=90,isteps=30);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/99ecbec9eb2d9e3f23e3347ed76f58bd8417084d.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Linear_extrude_fs_example.png/500px-Linear_extrude_fs_example.png 1.5x" width="250" height="177" alt="" /><figcaption>Example Linear Extrude of a rectangle with scale following part of a sine curve function</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-  
-
-<div class="mw-heading mw-heading3">
-
-### Linear Extrude with Twist as an interpolated function
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-8 "Edit section: Linear Extrude with Twist as an interpolated function")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-8 "Edit section's source code: Linear Extrude with Twist as an interpolated function")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>//Linear Extrude with Twist as an interpolated function
-// This module does not need to be modified, 
-// - unless default parameters want to be changed 
-// - or additional parameters want to be forwarded (e.g. slices,...)
-module linear_extrude_ft(height=1,isteps=20,scale=1){
-  //union of piecewise generated extrudes
-  union(){
-    for(i = [ 0: 1: isteps-1]){
-      //each new piece needs to be adjusted for height
-      translate([0,0,i*height/isteps])
-       linear_extrude(
-        height=height/isteps,
-        twist=f_left((i+1)/isteps)-f_left((i)/isteps),
-        scale=(1-(1-scale)*(i+1)/isteps)/(1-(1-scale)*i/isteps)
-       )
-        //Rotate to next start point
-        rotate([0,0,-f_left(i/isteps)])
-         //Scale to end of last piece size  
-         scale(1-(1-scale)*(i/isteps))
-          obj2D_left();
+for (a = valign) {
+  translate([10, 120 - a[0], 0]) {
+    color("red")  cube([135, 1,   0.1]);
+    color("blue") cube([1,   20,  0.1]);
+    linear_extrude(height = 0.5) {
+      text(text = str(text, "_", a[1]),
+           font = font, size = 20, valign = a[1]);
     }
   }
 }
-// This function defines the twist function
-// - Function name must not be modified
-// - Modify the contents/return value to define the function
-function f_left(x) = 
-  let(twist=90,span=180,start=0)
-  twist*sin(x*span+start);
-// This module defines the base 2D object to be extruded
-// - Function name must not be modified
-// - Modify the contents to define the base 2D object
-module obj2D_left(){
-  translate([-4,-3]) 
-   square([12,9]);
-}</code></pre>
-<pre><code>//Left rendered object demonstrating the interpolation steps
-translate([-20,0])
-linear_extrude_ft(height=30,isteps=5);</code></pre>
-<pre><code>linear_extrude_ft(height=30);</code></pre>
-<pre><code>//Right rendered object demonstrating the scale inclusion
-translate([25,0])
-linear_extrude_ft(height=30,scale=3);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/36ae1b0f915797820fedfc28803698656692d586.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Linear_extrude_ft_example.png/500px-Linear_extrude_ft_example.png 1.5x" width="250" height="177" alt="" /><figcaption>Example Linear Extrude of a rectangle with twist following part of a sine curve function</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading3">
-
-### Linear Extrude with Twist and Scale as interpolated functions
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-9 "Edit section: Linear Extrude with Twist and Scale as interpolated functions")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-9 "Edit section's source code: Linear Extrude with Twist and Scale as interpolated functions")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>//Linear Extrude with Twist and Scale as interpolated functions
-// This module does not need to be modified, 
-// - unless default parameters want to be changed 
-// - or additional parameters want to be forwarded
-module linear_extrude_ftfs(height=1,isteps=20,slices=0){
-  //union of piecewise generated extrudes
-  union(){ 
-   for(i=[0:1:isteps-1]){
-    translate([0,0,i*height/isteps])
-     linear_extrude(
-      height=height/isteps,
-      twist=leftfs_ftw((i+1)/isteps)-leftfs_ftw(i/isteps), 
-      scale=leftfs_fsc((i+1)/isteps)/leftfs_fsc(i/isteps),
-      slices=slices
-     )
-      rotate([0,0,-leftfs_ftw(i/isteps)])
-       scale(leftfs_fsc(i/isteps))
-        obj2D_leftfs();
-   }
-  }
-}
-// This function defines the scale function
-// - Function name must not be modified
-// - Modify the contents/return value to define the function
-function leftfs_fsc(x)=
-  let(scale=3,span=140,start=20)
-  scale*sin(x*span+start);
-// This function defines the twist function
-// - Function name must not be modified
-// - Modify the contents/return value to define the function
-function leftfs_ftw(x)=
-  let(twist=30,span=360,start=0)
-  twist*sin(x*span+start);
-// This module defines the base 2D object to be extruded
-// - Function name must not be modified
-// - Modify the contents to define the base 2D object
-module obj2D_leftfs(){
-   square([12,9]);
-}</code></pre>
-<pre><code>//Left rendered objects demonstrating the steps effect
-translate([0,-50,-60])
-rotate([0,0,90])
-linear_extrude_ftfs(height=50,isteps=3);
-
-translate([0,-50,0])
-linear_extrude_ftfs(height=50,isteps=3);</code></pre>
-<pre><code>//Center rendered objects demonstrating the slices effect
-translate([0,0,-60])
-rotate([0,0,90])
-linear_extrude_ftfs(height=50,isteps=3,slices=20);
-
-linear_extrude_ftfs(height=50,isteps=3,slices=20);</code></pre>
-<pre><code>//Right rendered objects with default parameters
-translate([0,50,-60])
-rotate([0,0,90])
-linear_extrude_ftfs(height=50);
-
-translate([0,50,0])
-linear_extrude_ftfs(height=50);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/8edbc8e1d1b488604ae7555b76e68c2147b9a4a6.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/a/af/Linear_extrude_ftfs_example.png/500px-Linear_extrude_ftfs_example.png 1.5x" width="250" height="177" alt="" /><figcaption>Example Linear Extrude of a rectangle with twist and scale following part of a sine curve function</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Rocket
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-10 "Edit section: Rocket")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-10 "Edit section's source code: Rocket")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![A rocket using
-rotate\_extrude()](openscad_user_manual_media/e407d819aa46d1742564634a52dc199655fb6965.png)
-
-<div class="mw-highlight mw-highlight-lang-cpp mw-content-ltr" dir="ltr">
-
-    // increase the visual detail
-    $fn = 100;
-    
-    // the main body :
-    // a cylinder
-    rocket_d = 30;               // 3 cm wide
-    rocket_r = rocket_d / 2;
-    rocket_h = 100;          // 10 cm tall
-    cylinder(d = rocket_d, h = rocket_h);
-    
-    // the head :
-    // a cone
-    head_d = 40;                 // 4 cm wide
-    head_r = head_d / 2;
-    head_h = 40;                 // 4 cm tall
-    // prepare a triangle
-    tri_base = head_r;
-    tri_height = head_h;
-    tri_points = [[0,          0],
-                  [tri_base,     0],
-                  [0,  tri_height]];
-    // rotation around X-axis and then 360° around Z-axis
-    // put it on top of the rocket's body
-    translate([0,0,rocket_h])
-    rotate_extrude(angle = 360)
-        polygon(tri_points);
-    
-    // the wings :
-    // 3x triangles
-    wing_w = 2;                  // 2 mm thick
-    many = 3;                    // 3x wings
-    wing_l = 40;             // length
-    wing_h = 40;             // height
-    wing_points = [[0,0],[wing_l,0],[0,wing_h]];
-    
-    module wing() {
-        // let it a bit inside the main body
-        in_by = 1;                // 1 mm
-        // set it up on the rocket's perimeter
-        translate([rocket_r - in_by,0,0])
-        // set it upright by rotating around X-axis
-        rotate([90,0,0])
-        // set some width and center it
-        linear_extrude(height = wing_w,center = true)
-        // make a triangle
-            polygon(wing_points);
-    }
-    
-    for (i = [0: many - 1])
-        rotate([0, 0, 370 / many * i])
-        wing();
-
-</div>
-
-<div class="mw-heading mw-heading2">
-
-## Horns
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-11 "Edit section: Horns")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-11 "Edit section's source code: Horns")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![Horns, by translation and
-twisting.](openscad_user_manual_media/45195cc9a61f219aaabdb4986541ec702964fbcc.png)
-
-<div class="mw-highlight mw-highlight-lang-cpp mw-content-ltr" dir="ltr">
-
-    // The idea is to twist a translated circle:
-    // -
-    /*
-       linear_extrude(height = 10, twist = 360, scale = 0)
-       translate([1,0])
-       circle(r = 1);
-    */
-    
-    module horn(height = 10, radius = 6, 
-                twist = 720, $fn = 50) 
-    {
-        // A centered circle translated by 1xR and 
-        // twisted by 360° degrees, covers a 2x(2xR) space.
-        // -
-        radius = radius/4;
-        // De-translate.
-        // -
-        translate([-radius,0])
-        // The actual code.
-        // -
-        linear_extrude(height = height, twist = twist, 
-                       scale=0, $fn = $fn)
-        translate([radius,0])
-        circle(r=radius);
-    }
-    
-    translate([3,0])
-    mirror()
-    horn();
-    
-    translate([-3,0])
-    horn();
-
-</div>
-
-<div class="mw-heading mw-heading2">
-
-## Strandbeest
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-12 "Edit section: Strandbeest")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-12 "Edit section's source code: Strandbeest")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-See the Strandbeest example
-[here](/wiki/OpenSCAD_User_Manual/Example/Strandbeest "OpenSCAD User Manual/Example/Strandbeest").
-
-<div class="mw-heading mw-heading2">
-
-## Previous
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-13 "Edit section: Previous")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-13 "Edit section's source code: Previous")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[Other 2D
-formats](/wiki/OpenSCAD_User_Manual/Other_2D_formats "OpenSCAD User Manual/Other 2D formats")
-
-<div class="mw-heading mw-heading2">
-
-## Next
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-14 "Edit section: Next")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-14 "Edit section's source code: Next")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[Paths](/wiki/OpenSCAD_User_Manual/Paths "OpenSCAD User Manual/Paths")
-
-<div class="mw-heading mw-heading3">
-
-### Command line usage
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-1 "Edit section: Command line usage")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-1 "Edit section's source code: Command line usage")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD can not only be used as a GUI, but also handles command line
-arguments.
-
-OpenSCAD (DEV/nightly) 2025.08.17 has these options
-
-    Usage: openscad.exe [options] file.scad
-    Allowed options:
-      --export-format arg               overrides format of exported scad file when
-                                        using option '-o', arg can be any of its
-                                        supported file extensions.  For ascii stl
-                                        export, specify 'asciistl', and for binary
-                                        stl export, specify 'binstl'.  Ascii export
-                                        is the current stl default, but binary stl
-                                        is planned as the future default so
-                                        asciistl should be explicitly specified in
-                                        scripts when needed.
-    
-      -o [ --o ] arg                    output specified file instead of running
-                                        the GUI. The file extension specifies the
-                                        type: stl, off, wrl, amf, 3mf, csg, dxf,
-                                        svg, pdf, png, echo, ast, term, nef3,
-                                        nefdbg, param, pov. May be used multiple
-                                        times for different exports. Use '-' for
-                                        stdout.
-    
-      -O [ --O ] arg                    pass settings value to the file export
-                                        using the format section/key=value, e.g
-                                        export-pdf/paper-size=a3. Use --help-export
-                                        to list all available settings.
-      -D [ --D ] arg                    var=val -pre-define variables
-      -p [ --p ] arg                    customizer parameter file
-      -P [ --P ] arg                    customizer parameter set
-      --enable arg                      enable experimental features (specify 'all'
-                                        for enabling all available features): roof
-                                        | input-driver-dbus | lazy-union |
-                                        vertex-object-renderers-indexing |
-                                        textmetrics | import-function |
-                                        predictible-output
-    
-      -h [ --help ]                     print this help message and exit
-      --help-export                     print list of export parameters and values
-                                        that can be set via -O
-      -v [ --version ]                  print the version
-      --info                            print information about the build process
-    
-      --camera arg                      camera parameters when exporting png:
-                                        =translate_x,y,z,rot_x,y,z,dist or
-                                        =eye_x,y,z,center_x,y,z
-      --autocenter                      adjust camera to look at object's center
-      --viewall                         adjust camera to fit object
-      --backend arg                     3D rendering backend to use: 'CGAL'
-                                        (old/slow) [default] or 'Manifold'
-                                        (new/fast)
-      --imgsize arg                     =width,height of exported png
-      --render arg                      for full geometry evaluation when exporting
-                                        png
-      --preview arg                     [=throwntogether] -for ThrownTogether
-                                        preview png
-      --animate arg                     export N animated frames
-      --animate_sharding arg            Parameter <shard>/<num_shards> - Divide
-                                        work into <num_shards> and only output
-                                        frames for <shard>. E.g. 2/5 only outputs
-                                        the second 1/5 of frames. Use to
-                                        parallelize work on multiple cores or
-                                        machines.
-      --view arg                        =view options: axes | crosshairs | edges |
-                                        scales
-      --projection arg                  =(o)rtho or (p)erspective when exporting
-                                        png
-      --csglimit arg                    =n -stop rendering at n CSG elements when
-                                        exporting png
-      --summary arg                     enable additional render summary and
-                                        statistics: all | cache | time | camera |
-                                        geometry | bounding-box | area
-      --summary-file arg                output summary information in JSON format
-                                        to the given file, using '-' outputs to
-                                        stdout
-      --colorscheme arg                 =colorscheme: *Cornfield | Metallic |
-                                        Sunset | Starnight | BeforeDawn | Nature |
-                                        Daylight Gem | Nocturnal Gem | DeepOcean |
-                                        Solarized | Tomorrow | Tomorrow Night |
-                                        ClearSky | Monotone
-    
-      -d [ --d ] arg                    deps_file -generate a dependency file for
-                                        make
-      -m [ --m ] arg                    make_cmd -runs make_cmd file if file is
-                                        missing
-      -q [ --quiet ]                    quiet mode (don't print anything *except*
-                                        errors)
-      --hardwarnings                    Stop on the first warning
-      --trace-depth arg                 =n, maximum number of trace messages
-      --trace-usermodule-parameters arg =true/false, configure the output of user
-                                        module parameters in a trace
-      --check-parameters arg            =true/false, configure the parameter check
-                                        for user modules and functions
-      --check-parameter-ranges arg      =true/false, configure the parameter range
-                                        check for builtin modules
-      --debug arg                       special debug info - specify 'all' or a set
-                                        of source file names
-      -s [ --s ] arg                    stl_file deprecated, use -o
-      -x [ --x ] arg                    dxf_file deprecated, use -o
-
-Export help
-
-    OpenSCAD version 2025.08.17
-    
-    List of settings that can be given using the -O option using the
-    format '<section>/<key>=value', e.g.:
-    openscad -O export-pdf/paper-size=a6 -O export-pdf/show-grid=false
-    
-    Section 'export-pdf':
-      - paper-size (enum): [a6,a5,<a4>,a3,letter,legal,tabloid]
-      - orientation (enum): [<portrait>,landscape,auto]
-      - show-filename (bool): <true>/false
-      - show-scale (bool): <true>/false
-      - show-scale-message (bool): <true>/false
-      - show-grid (bool): <true>/false
-      - grid-size (double): 1.000000 : <10.000000> : 100.000000
-      - add-meta-data (bool): <true>/false
-      - meta-data-title (string): ""
-      - meta-data-author (string): ""
-      - meta-data-subject (string): ""
-      - meta-data-keywords (string): ""
-    Section 'export-3mf':
-      - color-mode (enum): [<model>,none,selected-only]
-      - unit (enum): [micron,<millimeter>,centimeter,meter,inch,foot]
-      - color (string): "#f9d72c"
-      - material-type (enum): [color,<basematerial>]
-      - decimal-precision (int): 1 : <6> : 16
-      - add-meta-data (bool): <true>/false
-      - meta-data-title (string): ""
-      - meta-data-designer (string): ""
-      - meta-data-description (string): ""
-      - meta-data-copyright (string): ""
-      - meta-data-license-terms (string): ""
-      - meta-data-rating (string): ""
-
-  
-
-OpenSCAD 2021.01 has these options:
-
-    Usage: openscad [options] file.scad
-    Allowed options:
-     --export-format arg          overrides format of exported scad file when
-                                  using option '-o', arg can be any of its
-                                  supported file extensions.  For ascii stl
-                                  export, specify 'asciistl', and for binary stl
-                                  export, specify 'binstl'.  Ascii export is the
-                                  current stl default, but binary stl is planned
-                                  as the future default so asciistl should be
-                                  explicitly specified in scripts when needed.
-     
-     -o [ --o ] arg               output specified file instead of running the
-                                  GUI, the file extension specifies the type: stl,
-                                  off, wrl, amf, 3mf, csg, dxf, svg, pdf, png,
-                                  echo, ast, term, nef3, nefdbg (May be used
-                                  multiple time for different exports). Use '-'
-                                  for stdout
-     
-     -D [ --D ] arg               var=val -pre-define variables
-     -p [ --p ] arg               customizer parameter file
-     -P [ --P ] arg               customizer parameter set
-     --enable arg                 enable experimental features (specify 'all' for
-                                  enabling all available features): roof |
-                                  input-driver-dbus | lazy-union |
-                                  vertex-object-renderers |
-                                  vertex-object-renderers-indexing |
-                                  vertex-object-renderers-direct |
-                                  vertex-object-renderers-prealloc | textmetrics
-     
-     -h [ --help ]                print this help message and exit
-     -v [ --version ]             print the version
-     --info                       print information about the build process
-     
-     --camera arg                 camera parameters when exporting png:
-                                  =translate_x,y,z,rot_x,y,z,dist or
-                                  =eye_x,y,z,center_x,y,z
-     --autocenter                 adjust camera to look at object's center
-     --viewall                    adjust camera to fit object
-     --imgsize arg                =width,height of exported png
-     --render                     for full geometry evaluation when exporting png
-     --preview arg                [=throwntogether] -for ThrownTogether preview
-                                  png
-     --animate arg                export N animated frames
-     --view arg                   =view options: axes | crosshairs | edges |
-                                  scales | wireframe
-     --projection arg             =(o)rtho or (p)erspective when exporting png
-     --csglimit arg               =n -stop rendering at n CSG elements when
-                                  exporting png
-     --summary arg                enable additional render summary and statistics:
-                                  all | cache | time | camera | geometry |
-                                  bounding-box | area
-     --summary-file arg           output summary information in JSON format to the
-                                  given file, using '-' outputs to stdout
-     --colorscheme arg            =colorscheme: *Cornfield | Metallic | Sunset |
-                                  Starnight | BeforeDawn | Nature | DeepOcean |
-                                  Solarized | Tomorrow | Tomorrow Night | Monotone
-     
-     -d [ --d ] arg               deps_file -generate a dependency file for make
-     -m [ --m ] arg               make_cmd -runs make_cmd file if file is missing
-     -q [ --quiet ]               quiet mode (don't print anything *except*
-                                  errors)
-     --hardwarnings               Stop on the first warning
-     --check-parameters arg       =true/false, configure the parameter check for
-                                  user modules and functions
-     --check-parameter-ranges arg =true/false, configure the parameter range check
-                                  for builtin modules
-     --debug arg                  special debug info - specify 'all' or a set of
-                                  source file names
-
-<div class="mw-heading mw-heading3">
-
-### Export options
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-2 "Edit section: Export options")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-2 "Edit section's source code: Export options")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-When called with the `-o` option, OpenSCAD does not start the GUI, but
-executes the given file and exports to the *output\_file* in a format
-depending on the extension (`.stl` / `.off` / `.dxf`, `.csg`).
-
-Some versions use -s/-d/-o to determine the output file format instead;
-check with "openscad --help".
-
-If the option `-d` is given in addition to an export command, all files
-accessed while building the mesh are written in the argument of `-d` in
-the syntax of a Makefile.
-
-For at least 2015.03-2+, specifying the extension `.echo` causes
-openscad to produce a text file containing error messages and the output
-of all `echo()` calls in `filename` as they would appear in the console
-window visible in the GUI. Multiple output files are not supported, so
-using this option you cannot also obtain the model that would have
-normally been generated.
-
-Note: When exporting to STL, the GUI defaults to binary STL (smaller,
-faster) and the CLI defaults to ASCII STL (larger, slower).
-Post-processing pipelines may prefer ASCII STL; they should explicitly
-say \`--export-format asciistl\` in preparation for the default
-eventually changing to binary STL.
-
-<div class="mw-heading mw-heading4">
-
-#### Camera and image output
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-3 "Edit section: Camera and image output")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-3 "Edit section's source code: Camera and image output")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-For 2013.05+, the option to output a `.png` image was added. There are
-two types of cameras available for the generation of images.
-
-The first camera type is a 'gimbal' camera that uses Euler angles,
-translation, and a camera distance, like OpenSCAD's GUI viewport display
-at the bottom of the OpenSCAD window.
-
-The second camera type is a 'vector' camera, with an 'eye' camera
-location vector and a 'lookat' center vector.
-
-\--imgsize x,y chooses the .png dimensions and --projection chooses
-orthogonal or perspective, as in the GUI.
-
-By default, cmdline .png output uses Preview mode (f5) with OpenCSG. For
-some situations it may be desirable to output the full render, with
-CGAL. This is done by adding '--render' as an option.
-
-<div class="mw-heading mw-heading3">
-
-### Constants
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-4 "Edit section: Constants")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-4 "Edit section's source code: Constants")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-In order to pre-define variables, use the `-D` option. It can be given
-repeatedly. Each occurrence of `-D` must be followed by an assignment.
-Unlike normal OpenSCAD assignments, these assignments don't define
-variables, but constants, which cannot be changed inside the program,
-and can thus be used to overwrite values defined in the program at
-export time.
-
-If you want to assign the -D variable to another variable, the -D
-variable MUST be initialized in the main .scad program
-
-    param1=17;       // must be initialized
-    val=param1;      // param1 passed via -D on cmd-line
-    echo(val,param1); // outputs 17,17
-
-without the first line, val would be undefined.
-
-The right hand sides can be arbitrary OpenSCAD expressions, including
-mathematical operations and strings.
-
-Be aware that your shell (bash, cmd, etc.) parses the arguments before
-passing them to `openscad`, therefore you need to properly quote or
-escape arguments with special characters like spaces or quotation marks.
-For example to assign a string `production` to a `quality` parameter one
-has to ensure the `"` characters OpenSCAD expects aren't stripped by the
-shell. In bash one could write:
-
-    openscad -o my_model_production.stl -D 'quality="production"' my_model.scad
-
-or from the Windows prompt:
-
-    openscad.com -o my_model_production.stl -D "quality=""production""" my_model.scad
-
-or you may need to escape the inner quotes instead:
-
-    openscad -o my_model_production.stl -D "quality=\"production\"" my_model.scad
-
-Note that this sort of double-escaping isn't necessary when executing
-OpenSCAD from another process that isn't using a shell, because each
-argument is passed separately. For example a Java application might
-start a process like so:
-
-``` 
-   pb = new ProcessBuilder("/usr/bin/openscad",
-     "-o", "my_model_production.stl",
-     "-D", "quality=\"production\"",
-     "my_model.scad");
 ```
 
-<div class="mw-heading mw-heading3">
-
-### Command to build required files
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-5 "Edit section: Command to build required files")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-5 "Edit section's source code: Command to build required files")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-In a complex build process, some missing files required by an OpenSCAD
-file can be generated if they are defined in a Makefile. If OpenSCAD is
-given the option `-m make`, it starts `make file` the first time it
-tries to access a missing *file*.
-
-<div class="mw-heading mw-heading3">
-
-### Processing all .scad files in a folder
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-6 "Edit section: Processing all .scad files in a folder")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-6 "Edit section's source code: Processing all .scad files in a folder")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Example to convert all the .scad in a folder into .stl:
-
-In a folder with .scad files, make a .bat file with text:
-
-``` 
-   FOR %%f in (*.scad)  DO openscad -o "%%~nf.stl" "%%f" 
-```
-
-If it closes without processing, check to set the PATH by adding
-openscad directory to:
-
-``` 
-     Start - Settings - Control Panel - System - Advanced tab - Environment Variables - System Variables, select Path, then click Edit.
-```
-
-Add the openscad directory to the list
-
-  
-
-<div class="mw-heading mw-heading3">
-
-### Makefile example
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-7 "Edit section: Makefile example")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-7 "Edit section's source code: Makefile example")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The `-d` and `-m` options only make sense together. (`-m` without `-d`
-would not consider modified dependencies when building exports, `-d`
-without `-m` would require the files to be already built for the first
-run that generates the dependencies.)
-
-Here is an example of a basic Makefile that creates an .stl file from an
-.scad file of the same name:
-
-    # explicit wildcard expansion suppresses errors when no files are found
-    include $(wildcard *.deps)
-    
-    %.stl: %.scad
-        openscad -m make -o $@ -d $@.deps $<
-
-When `make my_example.stl` is run for the first time, it finds no .deps
-files, and must depend on `my_example.scad`. Because `my_example.stl` is
-not yet preset, it gets created unconditionally. If OpenSCAD finds
-missing files, it calls `make` to build them, and it lists all used
-files in `my_example.stl.deps`.
-
-When `make my_example.stl` is called subsequently, it finds and includes
-`my_example.stl.deps` and check if any of the files listed there,
-including `my_example.scad`, changed since `my_example.stl` was built,
-based on their time stamps. Only if that is the case, it builds
-`my_example.stl` again.
-
-<div class="mw-heading mw-heading4">
-
-#### Automatic targets
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-8 "Edit section: Automatic targets")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-8 "Edit section's source code: Automatic targets")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-When building similar .stl files from a single .scad file, there is a
-way to automate that too:
-
-    # match "module foobar() { // `make` me"
-    TARGETS=$(shell sed '/^module [a-z0-9_-]*().*make..\?me.*$$/!d;s/module //;s/().*/.stl/' base.scad)
-    
-    all: ${TARGETS}
-    
-    # auto-generated .scad files with .deps make make re-build always. keeping the
-    # scad files solves this problem. (explanations are welcome.)
-    .SECONDARY: $(shell echo "${TARGETS}" | sed 's/\.stl/.scad/g')
-    
-    # explicit wildcard expansion suppresses errors when no files are found
-    include $(wildcard *.deps)
-    
-    %.scad:
-        echo -ne 'use <base.scad>\n$*();' > $@
-    
-    %.stl: %.scad
-        openscad -m make -o $@ -d $@.deps $<
-
-All objects that are supposed to be exported automatically have to be
-defined in `base.scad` in an own module with their future file name
-(without the ".stl"), and have a comment like "`// make me`" in the line
-of the module definition. The "`TARGETS=`" line picks these out of the
-base file and creates the file names. These are built when `make all`
-(or `make`, for short) is called.
-
-As the convention from the last example is to create the .stl files from
-.scad files of the same base name, for each of these files, an .scad
-file must be generated. This is done in the "`%.scad:`" paragraph;
-`my_example.scad` is a simple OpenSCAD file:
-
-    use <base.scad>
-    my_example();
-
-The "`.SECONDARY`" line is there to keep `make` from deleting the
-generated .scad files. Its presence helps determine which files no
-longer need to be rebuilt; please post ideas about what exactly goes
-wrong there (or how to fix it better) on the
-[talk](/wiki/Talk:OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment "Talk:OpenSCAD User Manual/Using OpenSCAD in a command line environment")
-page\!
-
-<div class="mw-heading mw-heading3">
-
-### Windows notes
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-9 "Edit section: Windows notes")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-9 "Edit section's source code: Windows notes")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-On Windows, openscad.com should be called from the command line as a
-wrapper for openscad.exe. This is because Openscad uses the 'devenv'
-solution to the Command-Line/GUI output issue. Typing 'openscad' at the
-cmd.exe prompt calls the .com program wrapper by default.
-
-<div class="mw-heading mw-heading3">
-
-### MacOS notes
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-10 "Edit section: MacOS notes")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-10 "Edit section's source code: MacOS notes")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-On MacOS the binary is normally hidden inside the App folder. If
-OpenSCAD is installed in the global Applications folder, it can be
-called from command line like in the following example that just shows
-the OpenSCAD version:
-
-    macbook:/$ /Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD -v
-    OpenSCAD version 2013.06
-
-Alternatively, you may create a symbolic link to the binary to make
-calls from the command line easier:
-
-``` 
- macbook:/$ sudo ln -sf /Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD /usr/local/bin/openscad
-```
-
-Now you can call `openscad` directly without having to type in the full
-path.
-
-``` 
- macbook:/$ openscad -v
- OpenSCAD version 2015.03-3
-```
-
-On some versions of MacOS, you might get the following error when
-attempting to run openscad via that link:
-
-``` 
- This application failed to start because it could not find or load the Qt platform plugin "cocoa".
-```
-
-``` 
- Reinstalling the application may fix this problem.
- Abort trap: 6
-```
-
-You can fix this by creating a wrapper script to invoke the executable
-directly:
-
-``` 
- sudo rm -f /usr/local/bin/openscad
- echo '#!/bin/sh' > test
- echo '/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD "$@"' >> test
- chmod +x test ; sudo mv test /usr/local/bin/openscad
-```
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 3 -- Commented Example Projects
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=5 "Edit section: Chapter 3 -- Commented Example Projects")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=5 "Edit section's source code: Chapter 3 -- Commented Example Projects")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-<span class="noprint"></span>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><div class="mbox-image-div">
-<span typeof="mw:File"><span><img src="openscad_user_manual_media/6154d5fac35dbeeb51921a74aa5727db2f1e48f2.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/60px-Information_icon4.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/120px-Information_icon4.svg.png 2x" width="40" height="40" /></span></span>
-</div></td>
-<td><div class="mbox-text-span">
-<strong>The text in its current form is incomplete.</strong>
-</div></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Dodecahedron
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-1 "Edit section: Dodecahedron")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-1 "Edit section's source code: Dodecahedron")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>//create a dodecahedron by intersecting 6 boxes
-module dodecahedron(height) 
-{
-    scale([height,height,height]) //scale by height parameter
-    {
-        intersection(){
-            //make a cube
-            cube([2,2,1], center = true); 
-            intersection_for(i=[0:4]) //loop i from 0 to 4, and intersect results
-            { 
-                //make a cube, rotate it 116.565 degrees around the X axis,
-                //then 72*i around the Z axis
-                rotate([0,0,72*i])
-                    rotate([116.565,0,0])
-                    cube([2,2,1], center = true); 
-            }
-        }
-    }
-}
-//create 3 stacked dodecahedra 
-//call the module with a height of 1 and move up 2
-translate([0,0,2])dodecahedron(1); 
-//call the module with a height of 2
-dodecahedron(2); 
-//call the module with a height of 4 and move down 4
-translate([0,0,-4])dodecahedron(4);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/65d4b1340414e2a0432d416ae625bbcabf00617a.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Openscad-Dodecahedron.png/375px-Openscad-Dodecahedron.png 1.5x, //upload.wikimedia.org/wikipedia/commons/d/d1/Openscad-Dodecahedron.png 2x" width="250" height="305" alt="" /><figcaption>The Dodecahedron as rendered from the example.</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Icosahedron
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-2 "Edit section: Icosahedron")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-2 "Edit section's source code: Icosahedron")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-An icosahedron can be created from three orthogonal
-[golden-ratio](https://en.wikipedia.org/wiki/Golden_ratio "w:Golden ratio")
-rectangles inside a `hull()` operation, where the golden ratio is
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(\varphi = \frac{\sqrt{5} + 1}{2}\)</span>![{\\displaystyle
-\\varphi ={\\frac {{\\sqrt
-{5}}+1}{2}}}](openscad_user_manual_media/cb64a941640957eb591af9ddecbef55138a31e26.svg)</span>.
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>phi=0.5*(sqrt(5)+1); // golden ratio
-
-// create an icosahedron by intersecting 3 orthogonal golden-ratio rectangles
-module icosahedron(edge_length) {
-   st=0.0001;  // microscopic sheet thickness
-   hull() {
-       cube([edge_length*phi, edge_length, st], true);
-       rotate([90,90,0]) cube([edge_length*phi, edge_length, st], true);
-       rotate([90,0,90]) cube([edge_length*phi, edge_length, st], true);
-   }
-}
-
-// display the 3 internal sheets alongside the icosahedron
-edge=10;
-translate([-20,0,0]) union() {
-   cube([edge*phi, edge, 0.01], true);
-   rotate([90,90,0]) cube([edge*phi, edge, 0.01], true);
-   rotate([90,0,90]) cube([edge*phi, edge, 0.01], true);
-}
-
-icosahedron(edge);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/7de2d0cbbfe4e67b1699a2dcc590ee695e802992.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/4/43/Icosahedron_OpenSCAD.png/500px-Icosahedron_OpenSCAD.png 1.5x" width="250" height="164" alt="" /><figcaption>The icosahedron and its internal structure as rendered from the example.</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-This icosahedron renders in an edge-up orientation. Rotating this
-icosahedron by
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(\arctan\left( \frac{1}{\varphi} \right)\)</span>![{\\displaystyle
-\\arctan {\\left({\\frac {1}{\\varphi
-}}\\right)}}](openscad_user_manual_media/b5ede473aba4648dd2fb3fcaf2a863e8cc15f24f.svg)</span>
-about the Y-axis results in a vertex-up orientation. Rotating by
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(\frac{1}{2}\arccos\left( {- \frac{\sqrt{5}}{3}} \right) - 90^{\circ}\)</span>![{\\displaystyle
-{\\frac {1}{2}}\\arccos {\\left(-{\\frac {\\sqrt
-{5}}{3}}\\right)}-90^{\\circ
-}}](openscad_user_manual_media/ff2a5b0053e7a0980f4817dbad10a4ceadc827d8.svg)</span>
-about the X-axis results in a face-up orientation. The edge length
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(L\)</span>![{\\displaystyle
-L}](openscad_user_manual_media/4fe88c32bbd06c4be529b7484fd667c088d3b6ac.svg)</span>
-is related to the inner diameter
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(D_{i}\)</span>![{\\displaystyle
-D\_{i}}](openscad_user_manual_media/3d1e3d456cbb7557a927fc834da4065a0db73d9f.svg)</span>
-(distance between opposite faces) by
-<span class="mwe-math-element mwe-math-element-inline"><span class="mwe-math-mathml-inline mwe-math-mathml-a11y" style="display: none;">\(L = \frac{D_{i}\sqrt{3}}{\varphi^{2}}\)</span>![{\\displaystyle
-L={\\frac {D\_{i}{\\sqrt {3}}}{\\varphi
-^{2}}}}](openscad_user_manual_media/9630b313dd9de58e027fd3c7e02df491283ada8e.svg)</span>.
-
-<div class="mw-heading mw-heading2">
-
-## Icosphere
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-3 "Edit section: Icosphere")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-3 "Edit section's source code: Icosphere")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    // Code via reddit with triangle winding fixes, cannot add link due to
-    // wikibooks considering it spam.
-    
-    // 4 is the realistic max.
-    // Don't do 5 or more, takes forever.
-    // set recursion to the desired level. 0=20 tris, 1=80 tris, 2=320 tris
-    module icosphere(radius=10, recursion=2, icoPnts, icoTris) {
-      //t = (1 + sqrt(5))/2;
-      //comment from monfera to get verts to unit sphere
-      t = sqrt((5+sqrt(5))/10);
-      s = sqrt((5-sqrt(5))/10);
-      
-      init = (icoPnts||icoTris) ? false : true; //initial call if icoPnts is empty
-      
-      // 1 --> draw icosphere from base mesh
-      // 2 --> loop through base mesh and subdivide by 4 --> 20 steps
-      // 3 --> loop through subdivided mesh and subdivide again (or subdivide by 16) --> 80 steps
-      // 4 ...
-      
-      verts = [
-        [-s, t, 0],  //0
-        [ s, t, 0],
-        [-s,-t, 0],
-        [ s,-t, 0],
-        [ 0,-s, t],
-        [ 0, s, t],
-        [ 0,-s,-t],
-        [ 0, s,-t],
-        [ t, 0,-s],
-        [ t, 0, s],
-        [-t, 0,-s],
-        [-t, 0, s]]; //11
-      
-      //base mesh with 20 faces
-      tris = [
-        //5 faces around point 0
-        [ 0, 5, 11], //0
-        [ 0, 1, 5],
-        [ 0, 7, 1],
-        [ 0, 10, 7],
-        [ 0, 11, 10], 
-        // 5 adjacent faces
-        [ 1, 9, 5], //5
-        [ 5, 4, 11],
-        [11, 2, 10],
-        [10, 6, 7],
-        [ 7, 8, 1], 
-        //5 faces around point 3
-        [ 3, 4, 9], //10
-        [ 3, 2, 4],
-        [ 3, 6, 2],
-        [ 3, 8, 6],
-        [ 3, 9, 8], 
-        //5 adjacent faces 
-        [ 4, 5, 9], //15
-        [ 2, 11, 4],
-        [ 6, 10, 2],
-        [ 8, 7, 6],
-        [ 9, 1, 8]];  //19
-        
-      if (recursion) {
-        verts = (init) ? verts : icoPnts;
-        tris = (init) ? tris : icoTris;
-        newSegments = recurseTris(verts,tris);
-        newVerts = newSegments[0];
-        newTris = newSegments[1];
-        icosphere(radius,recursion-1,newVerts,newTris);
-      } else if (init) { //draw the base icosphere if no recursion and initial call
-        scale(radius) polyhedron(verts, tris); 
-      } else { // if not initial call some recursion has to be happened
-        scale(radius) polyhedron(icoPnts, icoTris);
-      } 
-    }
-    
-    // Adds verts if not already there, 
-    // takes array of vertices and indices of a tri to expand
-    // returns expanded array of verts and indices of new polygon with 4 faces
-    // [[verts],[0,(a),(c)],[1,(b),(a)],[2,(c),(b)],[(a),(b),(c)]]
-    function addTris(verts, tri) = let(
-        a= getMiddlePoint(verts[tri[0]], verts[tri[1]]), //will produce doubles
-        b= getMiddlePoint(verts[tri[1]], verts[tri[2]]), //these are unique
-        c= getMiddlePoint(verts[tri[2]], verts[tri[0]]), //these are unique
-        
-        aIdx = search(verts, a), //point a already exists
-        l=len(verts)                       
-      ) len(aIdx) ? [concat(verts,[a,b,c]),[[tri[0],l,l+2],   //1
-                                            [tri[1],l+1,l],   //2
-                                            [tri[2],l+2,l+1], //3
-                                            [l,l+1,l+2]] ] :  //4
-    
-                    [concat(verts,[b,c]), [[tri[0],aIdx,l+1], //1
-                                          [tri[1],l,aIdx],    //2
-                                          [tri[2],l+1,l],     //3
-                                          [aIdx,l,l+1]] ];    //4
-    
-    // Recursive function that does one recursion on the whole icosphere (auto recursion steps derived from len(tris)).
-    function recurseTris(verts, tris, newTris=[], steps=0, step=0) = let(
-        stepsCnt = steps ? steps : len(tris)-1, //if initial call initialize steps
-        newSegment=addTris(verts=verts,tri=tris[step]),
-        newVerts=newSegment[0], //all old and new Vertices
-        newerTris=concat(newTris,newSegment[1]) //only new Tris
-      ) (stepsCnt==(step)) ? [newVerts,newerTris] :
-                               recurseTris(newVerts,tris,newerTris,stepsCnt,step+1);
-                    
-    // Get point between two verts on unit sphere.
-    function getMiddlePoint(p1, p2) = fixPosition((p1+p2)/2);
-    
-    // Fix position to be on unit sphere
-    function fixPosition(p) = let(l=norm(p)) [p.x/l,p.y/l,p.z/l];
-
-<div class="mw-heading mw-heading2">
-
-## Half-pyramid
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-4 "Edit section: Half-pyramid")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-4 "Edit section's source code: Half-pyramid")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-An upside-down half-pyramid is a useful shape for 3D printing a support
-for an overhang protruding from a vertical wall. With sloping sides no
-steeper than 45°, no removable support structure needs to be printed.
-
-While a half-pyramid can be made with a 4-sided cone (using the cylinder
-primitive) and subtracting a cube from half of it, the shape can be
-easily made in one operation by a scaled linear extrude of a rectangle
-having the middle of one edge on the origin.
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>// Create a half-pyramid from a single linear extrusion
-module halfpyramid(base, height) {
-   linear_extrude(height, scale=0.01)
-      translate([-base/2, 0, 0]) square([base, base/2]);
-}
-
-halfpyramid(20, 10);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/8910079ef96327a8931c3cafa733e5d047d37d6e.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/3/38/Halfpyramid.png/500px-Halfpyramid.png 1.5x" width="250" height="193" alt="" /><figcaption>The half-pyramid as rendered from the example.</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Bounding Box
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-5 "Edit section: Bounding Box")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-5 "Edit section's source code: Bounding Box")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>// Rather kludgy module for determining bounding box from intersecting projections
-module BoundingBox()
-{
-    intersection()
-    {
-        translate([0,0,0])
-        linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-        projection(cut=false) intersection()
-        {
-            rotate([0,90,0]) 
-            linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-            projection(cut=false) 
-            rotate([0,-90,0]) 
-            children(0);
-
-            rotate([90,0,0]) 
-            linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-            projection(cut=false) 
-            rotate([-90,0,0]) 
-            children(0);
-        }
-        rotate([90,0,0]) 
-        linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-        projection(cut=false) 
-        rotate([-90,0,0])
-        intersection()
-        {
-            rotate([0,90,0]) 
-            linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-            projection(cut=false) 
-            rotate([0,-90,0]) 
-            children(0);
-
-            rotate([0,0,0]) 
-            linear_extrude(height = 1000, center = true, convexity = 10, twist = 0) 
-            projection(cut=false) 
-            rotate([0,0,0]) 
-            children(0);
-        }
-    }
-}
-
-// Test module on ellipsoid
-translate([0,0,40]) scale([1,2,3]) sphere(r=5);
-BoundingBox() scale([1,2,3]) sphere(r=5);</code></pre>
-<p><br />
-</p></td>
-<td><figure>
-<img src="openscad_user_manual_media/6a398146281f02492b216e4920f9297776e9eac4.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/9/92/Openscad-BB.png/500px-Openscad-BB.png 1.5x" width="250" height="179" alt="" /><figcaption>Bounding Box applied to an Ellipsoid</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Linear Extrude extended use examples
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-6 "Edit section: Linear Extrude extended use examples")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-6 "Edit section's source code: Linear Extrude extended use examples")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading3">
-
-### Linear Extrude with Scale as an interpolated function
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-7 "Edit section: Linear Extrude with Scale as an interpolated function")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-7 "Edit section's source code: Linear Extrude with Scale as an interpolated function")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>//Linear Extrude with Scale as an interpolated function
-// This module does not need to be modified, 
-// - unless default parameters want to be changed 
-// - or additional parameters want to be forwarded (e.g. slices,...)
-module linear_extrude_fs(height=1,isteps=20,twist=0){
- //union of piecewise generated extrudes
- union(){ 
-   for(i = [ 0: 1: isteps-1]){
-     //each new piece needs to be adjusted for height
-     translate([0,0,i*height/isteps])
-      linear_extrude(
-       height=height/isteps,
-       twist=twist/isteps,
-       scale=f_lefs((i+1)/isteps)/f_lefs(i/isteps)
-      )
-       // if a twist constant is defined it is split into pieces
-       rotate([0,0,-(i/isteps)*twist])
-        // each new piece starts where the last ended
-        scale(f_lefs(i/isteps))
-         obj2D_lefs();
-   }
- }
-}
-// This function defines the scale function
-// - Function name must not be modified
-// - Modify the contents/return value to define the function
-function f_lefs(x) = 
- let(span=150,start=20,normpos=45)
- sin(x*span+start)/sin(normpos);
-// This module defines the base 2D object to be extruded
-// - Function name must not be modified
-// - Modify the contents to define the base 2D object
-module obj2D_lefs(){ 
- translate([-4,-3])
-  square([9,12]);
-}</code></pre>
-<pre><code>//Top rendered object demonstrating the interpolation steps
-translate([0,0,25])
-linear_extrude_fs(height=20,isteps=4);</code></pre>
-<pre><code>linear_extrude_fs(height=20);</code></pre>
-<pre><code>//Bottom rendered object demonstrating the inclusion of a twist
-translate([0,0,-25])
-linear_extrude_fs(height=20,twist=90,isteps=30);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/99ecbec9eb2d9e3f23e3347ed76f58bd8417084d.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Linear_extrude_fs_example.png/500px-Linear_extrude_fs_example.png 1.5x" width="250" height="177" alt="" /><figcaption>Example Linear Extrude of a rectangle with scale following part of a sine curve function</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-  
-
-<div class="mw-heading mw-heading3">
-
-### Linear Extrude with Twist as an interpolated function
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-8 "Edit section: Linear Extrude with Twist as an interpolated function")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-8 "Edit section's source code: Linear Extrude with Twist as an interpolated function")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>//Linear Extrude with Twist as an interpolated function
-// This module does not need to be modified, 
-// - unless default parameters want to be changed 
-// - or additional parameters want to be forwarded (e.g. slices,...)
-module linear_extrude_ft(height=1,isteps=20,scale=1){
-  //union of piecewise generated extrudes
-  union(){
-    for(i = [ 0: 1: isteps-1]){
-      //each new piece needs to be adjusted for height
-      translate([0,0,i*height/isteps])
-       linear_extrude(
-        height=height/isteps,
-        twist=f_left((i+1)/isteps)-f_left((i)/isteps),
-        scale=(1-(1-scale)*(i+1)/isteps)/(1-(1-scale)*i/isteps)
-       )
-        //Rotate to next start point
-        rotate([0,0,-f_left(i/isteps)])
-         //Scale to end of last piece size  
-         scale(1-(1-scale)*(i/isteps))
-          obj2D_left();
+Notes on multi-line text:
+- text() does not support multi-line content; use separate text() calls per line with translate() for spacing.
+- Minimum spacing to avoid overlap with descenders: 1.4 * size.
+- Approximate single-spacing (as in word processors): 1.6 * size.
+- Use valign="baseline" for even line spacing regardless of character shapes.
+
+### Horizontal alignment
+
+- left: Aligns the left side of the bounding box at the given X coordinate. Default.
+- center: Centers the text bounding box at the given X coordinate.
+- right: Aligns the right side of the bounding box at the given X coordinate.
+
+```openscad
+text = "Align";
+font = "Liberation Sans";
+halign = [
+  [10, "left"],
+  [50, "center"],
+  [90, "right"]
+];
+
+for (a = halign) {
+  translate([140, a[0], 0]) {
+    color("red")  cube([115, 2,  0.1]);
+    color("blue") cube([2,   20, 0.1]);
+    linear_extrude(height = 0.5) {
+      text(text = str(text, "_", a[1]),
+           font = font, size = 20, halign = a[1]);
     }
   }
 }
-// This function defines the twist function
-// - Function name must not be modified
-// - Modify the contents/return value to define the function
-function f_left(x) = 
-  let(twist=90,span=180,start=0)
-  twist*sin(x*span+start);
-// This module defines the base 2D object to be extruded
-// - Function name must not be modified
-// - Modify the contents to define the base 2D object
-module obj2D_left(){
-  translate([-4,-3]) 
-   square([12,9]);
-}</code></pre>
-<pre><code>//Left rendered object demonstrating the interpolation steps
-translate([-20,0])
-linear_extrude_ft(height=30,isteps=5);</code></pre>
-<pre><code>linear_extrude_ft(height=30);</code></pre>
-<pre><code>//Right rendered object demonstrating the scale inclusion
-translate([25,0])
-linear_extrude_ft(height=30,scale=3);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/36ae1b0f915797820fedfc28803698656692d586.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Linear_extrude_ft_example.png/500px-Linear_extrude_ft_example.png 1.5x" width="250" height="177" alt="" /><figcaption>Example Linear Extrude of a rectangle with twist following part of a sine curve function</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
+```
 
-<div class="mw-heading mw-heading3">
+## 3D text
 
-### Linear Extrude with Twist and Scale as interpolated functions
+Text can be turned into a 3D object using linear_extrude.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-9 "Edit section: Linear Extrude with Twist and Scale as interpolated functions")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-9 "Edit section's source code: Linear Extrude with Twist and Scale as interpolated functions")<span class="mw-editsection-bracket">\]</span></span>
+```openscad
+// 3D Text Example
+linear_extrude(4) text("Text");
+```
 
-</div>
+## Metrics
 
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><pre><code>//Linear Extrude with Twist and Scale as interpolated functions
-// This module does not need to be modified, 
-// - unless default parameters want to be changed 
-// - or additional parameters want to be forwarded
-module linear_extrude_ftfs(height=1,isteps=20,slices=0){
-  //union of piecewise generated extrudes
-  union(){ 
-   for(i=[0:1:isteps-1]){
-    translate([0,0,i*height/isteps])
-     linear_extrude(
-      height=height/isteps,
-      twist=leftfs_ftw((i+1)/isteps)-leftfs_ftw(i/isteps), 
-      scale=leftfs_fsc((i+1)/isteps)/leftfs_fsc(i/isteps),
-      slices=slices
-     )
-      rotate([0,0,-leftfs_ftw(i/isteps)])
-       scale(leftfs_fsc(i/isteps))
-        obj2D_leftfs();
-   }
+Note: Requires version Development snapshot
+
+### textmetrics()
+
+The `textmetrics()` function accepts the same parameters as `text()` and returns an object describing how the text would be rendered.
+
+Returned object members:
+- position: Lower-left corner of the generated text.
+- size: Size of the generated text.
+- ascent: Amount extending above the baseline.
+- descent: Amount extending below the baseline.
+- offset: Lower-left corner of the box containing the text, including inter-glyph spacing before the first glyph.
+- advance: The point where additional text should start.
+
+```openscad
+s = "Hello, World!";
+size = 20;
+font = "Liberation Serif";
+
+tm = textmetrics(s, size = size, font = font);
+echo(tm);
+
+translate([0, 0, 1]) text(s, size = size, font = font);
+color("black") translate(tm.position) square(tm.size);
+```
+
+Example echo output (reformatted):
+
+```
+ECHO: {
+  position = [0.7936, -4.2752];
+  size     = [149.306, 23.552];
+  ascent   = 19.2768;
+  descent  = -4.2752;
+  offset   = [0, 0];
+  advance  = [153.09, 0];
+}
+```
+
+### fontmetrics()
+
+The `fontmetrics()` function accepts an optional font size and font name and returns global characteristics of the font.
+
+Parameters:
+- size: Decimal, optional. As for `text()`.
+- font: String, optional. As for `text()`.
+
+Returns an object:
+- nominal: Usual glyph dimensions
+  - ascent: Height above baseline
+  - descent: Depth below baseline
+- max: Maximum glyph dimensions
+  - ascent: Height above baseline
+  - descent: Depth below baseline
+- interline: Design distance from one baseline to the next
+- font: Identification info
+  - family: Font family name
+  - style: Style (Regular, Italic, etc.)
+
+```openscad
+echo(fontmetrics(font = "Liberation Serif"));
+```
+
+Example echo output (reformatted):
+
+```
+ECHO: {
+  nominal = { ascent = 12.3766; descent = -3.0043; };
+  max     = { ascent = 13.6312; descent = -4.2114; };
+  interline = 15.9709;
+  font = { family = "Liberation Serif"; style = "Regular"; };
+}
+```
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual User-Defined Functions And Modules Children
+
+# OpenSCAD User Manual — User-Defined Functions and Modules (Children)
+
+Users can extend the language by defining their own functions and modules. This allows grouping portions of script for easy reuse with different values. Well-chosen names also help document your script.
+
+- Functions return values.
+- Modules perform actions and do not return values.
+- OpenSCAD calculates the value of variables at compile-time, not run-time. The last variable assignment within a scope applies everywhere in that scope and in inner scopes (children). Think of them as override-able constants rather than runtime variables.
+- For functions and modules, OpenSCAD makes copies of pertinent portions of the script for each use. Each copy has its own scope containing fixed values for variables and expressions unique to that instance.
+- Names of functions and modules are case-sensitive: test() and TEST() are different.
+
+## Scope
+
+Modules and functions can be defined within a module definition, where they are visible only within that module’s scope.
+
+```openscad
+function parabola(f, x) = (1 / (4 * f)) * x * x;
+
+module plotParabola(f, wide, steps = 1) {
+  function y(x) = parabola(f, x);
+
+  module plot(x, y) {
+    translate([x, y]) circle(1, $fn = 12);
+  }
+
+  xAxis = [-wide / 2 : steps : wide / 2];
+  for (x = xAxis) plot(x, y(x));
+}
+
+color("red")  plotParabola(10, 100, 5);
+color("blue") plotParabola(4, 60, 2);
+```
+
+The function y() and module plot() cannot be called in the global scope.
+
+## Functions
+
+Function definition:
+
+```
+function name(parameters) = value;
+```
+
+Field | Description
+---|---
+name | Your function name. Valid characters: [a-zA-Z0-9_]
+parameters | Zero or more arguments. Parameters can have default values. Parameter names are local and do not conflict with external variables of the same name.
+value | An expression that calculates a value (can be scalar or vector).
+
+### Function use
+
+When used, functions are treated as values and do not end with a semicolon.
+
+```openscad
+// example 1
+function func0()         = 5;
+function func1(x = 3)    = 2 * x + 1;
+function func2()         = [1, 2, 3, 4];
+function func3(y = 7)    = (y == 7) ? 5 : 2;
+function func4(p0, p1, p2, p3) = [p0, p1, p2, p3];
+
+echo(func0());                    // 5
+a = func1();                      // 7
+b = func1(5);                     // 11
+echo(func2());                    // [1, 2, 3, 4]
+echo(func3(2), func3());          // 2, 5
+z = func4(func0(), func1(), func2(), func3());
+// z = [5, 7, [1, 2, 3, 4], 5]
+
+translate([0, -4 * func0(), 0])
+  cube([func0(), 2 * func0(), func0()]);
+// same as:
+// translate([0, -20, 0]) cube([5, 10, 5]);
+
+// example 2: creates for() range to give desired number of steps
+function steps(start, no_steps, end) = [start : (end - start) / (no_steps - 1) : end];
+
+echo(steps(10, 3, 5));    // [10 : -2.5 : 5]
+for (i = steps(10, 3, 5)) echo(i);  // 10 7.5 5
+
+echo(steps(10, 3, 15));   // [10 : 2.5 : 15]
+for (i = steps(10, 3, 15)) echo(i); // 10 12.5 15
+
+echo(steps(0, 5, 5));     // [0 : 1.25 : 5]
+for (i = steps(0, 5, 5)) echo(i);   // 0 1.25 2.5 3.75 5
+
+// example 3: rectangle with top pushed over, keeping same y
+function rhomboid(x = 1, y = 1, angle = 90) =
+  [[0, 0],
+   [x, 0],
+   [x + x * cos(angle) / sin(angle), y],
+   [x * cos(angle) / sin(angle), y]];
+
+echo(v1);
+v1 = rhomboid(10, 10, 35);
+// [[0, 0],
+//  [10, 0],
+//  [24.2815, 10],
+//  [14.2815, 10]]
+
+polygon(v1);
+polygon(rhomboid(10, 10, 35));
+
+// alternate: performing the same action with a module
+module parallelogram(x = 1, y = 1, angle = 90) {
+  polygon([
+    [0, 0],
+    [x, 0],
+    [x + x * cos(angle) / sin(angle), y],
+    [x * cos(angle) / sin(angle), y]
+  ]);
+}
+parallelogram(10, 10, 35);
+```
+
+You can also use let to create variables in a function:
+
+```openscad
+function get_square_triangle_perimeter(p1, p2) =
+  let (hypotenuse = sqrt(p1 * p1 + p2 * p2))
+    p1 + p2 + hypotenuse;
+```
+
+### Recursive functions
+
+Recursive function calls are supported. Use the conditional operator to terminate recursion.
+
+```openscad
+// recursion example: add all integers up to n
+function add_up_to(n) = (n == 0 ? 0 : n + add_up_to(n - 1));
+```
+
+There is a built-in recursion limit (a few thousands). If the limit is hit, you get an error like:
+ERROR: Recursion detected calling function ...
+
+Tail-recursion elimination is supported for tail-recursive functions:
+
+```openscad
+// tail-recursion elimination example: add all integers up to n
+function add_up_to(n, sum = 0) = n == 0 ? sum : add_up_to(n - 1, sum + n);
+
+echo(sum = add_up_to(100000));  // ECHO: sum = 5.00005e+009
+```
+
+Tail-recursion elimination allows much higher recursion limits (up to about 1,000,000).
+
+### Function Literals
+
+Note: Requires version 2021.01
+
+Function literals (lambdas/closures) are expressions that define functions.
+
+```openscad
+// function literal
+function (x) x + x;
+```
+
+Function literals can be assigned to variables and passed around like any value. Call them with normal function call syntax.
+
+```openscad
+func = function (x) x * x;
+echo(func(5));  // ECHO: 25
+```
+
+Functions can return functions. Unbound variables are captured by lexical scope.
+
+```openscad
+a = 1;
+
+selector = function (which)
+  which == "add"
+    ? function (x) x + x + a
+    : function (x) x * x + a;
+
+echo(selector("add"));      // ECHO: function(x) ((x + x) + a)
+echo(selector("add")(5));   // ECHO: 11
+echo(selector("mul"));      // ECHO: function(x) ((x * x) + a)
+echo(selector("mul")(5));   // ECHO: 26
+```
+
+### Overwriting built-in functions
+
+It is possible to overwrite built-in functions. Definitions are processed first, so both echoes below print true.
+
+Source code:
+
+```openscad
+echo(sin(1));
+function sin(x) = true;
+echo(sin(1));
+```
+
+Console output:
+
+```
+Compiling design (CSG Tree generation)...
+ECHO: true
+ECHO: true
+Compiling design (CSG Products generation)...
+```
+
+## Modules
+
+Modules can be used to define objects or, using children(), define operators. Once defined, modules are temporarily added to the language.
+
+Module definition:
+
+```
+module name(parameters) { actions }
+```
+
+Field | Description
+---|---
+name | Your module name. Valid characters: [a-zA-Z0-9_]
+parameters | Zero or more arguments, optionally with default values. Names are local and do not conflict with external variables of the same name.
+actions | Any valid statements, including definitions of functions and modules. Such nested items are only visible within the enclosing module. Variables assigned inside are scoped to each use of the module. Modules do not return values.
+
+### Object modules
+
+Object modules use primitives and operators to define new objects. In use, object modules are actions ending with a semicolon.
+
+```openscad
+// example 1: Color bar
+translate([-30, -20, 0]) ShowColorBars(Expense);
+
+ColorBreak = [
+  [  0,   ""],
+  [ 20,   "lime"],        // upper limit of color range
+  [ 40,   "greenyellow"],
+  [ 60,   "yellow"],
+  [ 75,   "LightCoral"],
+  [200,   "red"]
+];
+
+Expense = [16, 20, 25, 85, 52, 63, 45];
+
+module ColorBar(value, period, range) { // 1 color on 1 bar
+  RangeHi = ColorBreak[range][0];
+  RangeLo = ColorBreak[range - 1][0];
+
+  color(ColorBreak[range][1])
+    translate([10 * period, 0, RangeLo])
+      if (value > RangeHi)
+        cube([5, 2, RangeHi - RangeLo]);
+      else if (value > RangeLo)
+        cube([5, 2, value - RangeLo]);
+}
+
+module ShowColorBars(values) {
+  for (month = [0 : len(values) - 1], range = [1 : len(ColorBreak) - 1])
+    ColorBar(values[month], month, range);
+}
+```
+
+```openscad
+// example 2: House
+module house(roof = "flat", paint = [1, 0, 0]) {
+  color(paint)
+    if (roof == "flat") {
+      translate([0, -1, 0]) cube();
+    } else if (roof == "pitched") {
+      rotate([90, 0, 0])
+        linear_extrude(height = 1)
+          polygon(points = [[0,0], [0,1], [0.5,1.5], [1,1], [1,0]]);
+    } else if (roof == "domical") {
+      translate([0, -1, 0]) {
+        translate([0.5, 0.5, 1]) sphere(r = 0.5, $fn = 20);
+        cube();
+      }
+    }
+}
+
+house();
+translate([2, 0, 0]) house("pitched");
+translate([4, 0, 0]) house("domical", [0, 1, 0]);
+translate([6, 0, 0]) house(roof = "pitched", paint = [0, 0, 1]);
+translate([0, 3, 0]) house(paint = [0, 0, 0], roof = "pitched");
+translate([2, 3, 0]) house(roof = "domical");
+translate([4, 3, 0]) house(paint = [0, 0.5, 0.5]);
+```
+
+```openscad
+// example 3: Coaster data
+element_data = [
+  [0, "",         "",   0],       // must be in order
+  [1, "Hydrogen", "H",  1.008],   // indexed via atomic number
+  [2, "Helium",   "He", 4.003]    // redundant atomic number to preserve sanity later
+];
+
+Hydrogen = 1;
+Helium   = 2;
+
+module coaster(atomic_number) {
+  element      = element_data[atomic_number][1];
+  symbol       = element_data[atomic_number][2];
+  atomic_mass  = element_data[atomic_number][3];
+  // rest of script
+}
+```
+
+### Operator modules
+
+#### Children
+
+Use of children() allows modules to act as operators applied to any or all of the objects within the module instantiation. In use, operator modules do not end with a semicolon.
+
+```
+name(parameter values) { scope of operator }
+```
+
+Basic use: apply a modification to the scoped children.
+
+```openscad
+module myModification() {
+  rotate([0, 45, 0]) children();
+}
+
+myModification()  // The modification
+{                 // Begin focus
+  cylinder(10, 4, 4);          // First child
+  cube([20, 2, 2], true);      // Second child
+}                 // End focus
+```
+
+Objects are indexed via integers from 0 to $children - 1. OpenSCAD sets $children to the total number of objects within the scope. Objects grouped into a sub-scope are treated as one child. Note that children(), echo(), and empty block statements (including ifs) count as $children objects, even if no geometry is present.
+
+Form | Description
+---|---
+children(); | All children
+children(index); | Select one child by index
+children([start : step : end]); | Range from start to end with step
+children([start : end]); | Range with implicit step (1 or -1)
+children([vector]); | Selection of several children by indices
+
+Deprecated child() mapping (2013.06 and earlier):
+
+Up to 2013.06 | 2014.03 and later
+---|---
+child() | children(0)
+child(x) | children(x)
+for (a = [0 : $children - 1]) child(a) | children([0 : $children - 1])
+
+Examples:
+
+```openscad
+// Use all children
+module move(x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) {
+  translate([x, y, z]) rotate([rx, ry, rz]) children();
+}
+
+move(10)                    cube(10, true);
+move(-10)                   cube(10, true);
+move(z = 7.07,  ry = 45)    cube(10, true);
+move(z = -7.07, ry = 45)    cube(10, true);
+```
+
+```openscad
+// Use only the first child, multiple times
+module lineup(num, space) {
+  for (i = [0 : num - 1])
+    translate([space * i, 0, 0]) children(0);
+}
+
+lineup(5, 65) {
+  sphere(30);
+  cube(35);
+}
+```
+
+```openscad
+// Separate action for each child
+module SeparateChildren(space) {
+  for (i = [0 : 1 : $children - 1])           // step needed if $children < 2
+    translate([i * space, 0, 0]) {
+      children(i);
+      text(str(i));
+    }
+}
+
+SeparateChildren(-20) {
+  cube(5);                       // 0
+  sphere(5);                     // 1
+  translate([0, 20, 0]) {        // 2
+    cube(5);
+    sphere(5);
+  }
+  cylinder(15);                  // 3
+  cube(8, true);                 // 4
+}
+
+translate([0, 40, 0]) color("lightblue")
+  SeparateChildren(20) { cube(3, true); }
+```
+
+```openscad
+// Multiple ranges
+module MultiRange() {
+  color("lightblue")  children([0 : 1]);
+  color("lightgreen") children([2 : $children - 2]);
+  color("lightpink")  children($children - 1);
+}
+
+MultiRange() {
+  cube(5);                       // 0
+  sphere(5);                     // 1
+  translate([0, 20, 0]) {        // 2
+    cube(5);
+    sphere(5);
+  }
+  cylinder(15);                  // 3
+  cube(8, true);                 // 4
+}
+```
+
+### Further module examples
+
+Objects:
+
+```openscad
+module arrow() {
+  cylinder(10);
+  cube([4, 0.5, 3], true);
+  cube([0.5, 4, 3], true);
+  translate([0, 0, 10]) cylinder(4, 2, 0, true);
+}
+
+module cannon() {
+  difference() {
+    union() { sphere(10); cylinder(40, 10, 8); }
+    cylinder(41, 4, 4);
   }
 }
-// This function defines the scale function
-// - Function name must not be modified
-// - Modify the contents/return value to define the function
-function leftfs_fsc(x)=
-  let(scale=3,span=140,start=20)
-  scale*sin(x*span+start);
-// This function defines the twist function
-// - Function name must not be modified
-// - Modify the contents/return value to define the function
-function leftfs_ftw(x)=
-  let(twist=30,span=360,start=0)
-  twist*sin(x*span+start);
-// This module defines the base 2D object to be extruded
-// - Function name must not be modified
-// - Modify the contents to define the base 2D object
-module obj2D_leftfs(){
-   square([12,9]);
-}</code></pre>
-<pre><code>//Left rendered objects demonstrating the steps effect
-translate([0,-50,-60])
-rotate([0,0,90])
-linear_extrude_ftfs(height=50,isteps=3);
 
-translate([0,-50,0])
-linear_extrude_ftfs(height=50,isteps=3);</code></pre>
-<pre><code>//Center rendered objects demonstrating the slices effect
-translate([0,0,-60])
-rotate([0,0,90])
-linear_extrude_ftfs(height=50,isteps=3,slices=20);
-
-linear_extrude_ftfs(height=50,isteps=3,slices=20);</code></pre>
-<pre><code>//Right rendered objects with default parameters
-translate([0,50,-60])
-rotate([0,0,90])
-linear_extrude_ftfs(height=50);
-
-translate([0,50,0])
-linear_extrude_ftfs(height=50);</code></pre></td>
-<td><figure>
-<img src="openscad_user_manual_media/8edbc8e1d1b488604ae7555b76e68c2147b9a4a6.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/a/af/Linear_extrude_ftfs_example.png/500px-Linear_extrude_ftfs_example.png 1.5x" width="250" height="177" alt="" /><figcaption>Example Linear Extrude of a rectangle with twist and scale following part of a sine curve function</figcaption>
-</figure></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading2">
-
-## Rocket
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-10 "Edit section: Rocket")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-10 "Edit section's source code: Rocket")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![A rocket using
-rotate\_extrude()](openscad_user_manual_media/e407d819aa46d1742564634a52dc199655fb6965.png)
-
-<div class="mw-highlight mw-highlight-lang-cpp mw-content-ltr" dir="ltr">
-
-    // increase the visual detail
-    $fn = 100;
-    
-    // the main body :
-    // a cylinder
-    rocket_d = 30;               // 3 cm wide
-    rocket_r = rocket_d / 2;
-    rocket_h = 100;          // 10 cm tall
-    cylinder(d = rocket_d, h = rocket_h);
-    
-    // the head :
-    // a cone
-    head_d = 40;                 // 4 cm wide
-    head_r = head_d / 2;
-    head_h = 40;                 // 4 cm tall
-    // prepare a triangle
-    tri_base = head_r;
-    tri_height = head_h;
-    tri_points = [[0,          0],
-                  [tri_base,     0],
-                  [0,  tri_height]];
-    // rotation around X-axis and then 360° around Z-axis
-    // put it on top of the rocket's body
-    translate([0,0,rocket_h])
-    rotate_extrude(angle = 360)
-        polygon(tri_points);
-    
-    // the wings :
-    // 3x triangles
-    wing_w = 2;                  // 2 mm thick
-    many = 3;                    // 3x wings
-    wing_l = 40;             // length
-    wing_h = 40;             // height
-    wing_points = [[0,0],[wing_l,0],[0,wing_h]];
-    
-    module wing() {
-        // let it a bit inside the main body
-        in_by = 1;                // 1 mm
-        // set it up on the rocket's perimeter
-        translate([rocket_r - in_by,0,0])
-        // set it upright by rotating around X-axis
-        rotate([90,0,0])
-        // set some width and center it
-        linear_extrude(height = wing_w,center = true)
-        // make a triangle
-            polygon(wing_points);
-    }
-    
-    for (i = [0: many - 1])
-        rotate([0, 0, 370 / many * i])
-        wing();
-
-</div>
-
-<div class="mw-heading mw-heading2">
-
-## Horns
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-11 "Edit section: Horns")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-11 "Edit section's source code: Horns")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![Horns, by translation and
-twisting.](openscad_user_manual_media/45195cc9a61f219aaabdb4986541ec702964fbcc.png)
-
-<div class="mw-highlight mw-highlight-lang-cpp mw-content-ltr" dir="ltr">
-
-    // The idea is to twist a translated circle:
-    // -
-    /*
-       linear_extrude(height = 10, twist = 360, scale = 0)
-       translate([1,0])
-       circle(r = 1);
-    */
-    
-    module horn(height = 10, radius = 6, 
-                twist = 720, $fn = 50) 
-    {
-        // A centered circle translated by 1xR and 
-        // twisted by 360° degrees, covers a 2x(2xR) space.
-        // -
-        radius = radius/4;
-        // De-translate.
-        // -
-        translate([-radius,0])
-        // The actual code.
-        // -
-        linear_extrude(height = height, twist = twist, 
-                       scale=0, $fn = $fn)
-        translate([radius,0])
-        circle(r=radius);
-    }
-    
-    translate([3,0])
-    mirror()
-    horn();
-    
-    translate([-3,0])
-    horn();
-
-</div>
-
-<div class="mw-heading mw-heading2">
-
-## Strandbeest
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-12 "Edit section: Strandbeest")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-12 "Edit section's source code: Strandbeest")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-See the Strandbeest example
-[here](/wiki/OpenSCAD_User_Manual/Example/Strandbeest "OpenSCAD User Manual/Example/Strandbeest").
-
-<div class="mw-heading mw-heading2">
-
-## Previous
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-13 "Edit section: Previous")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-13 "Edit section's source code: Previous")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[Other 2D
-formats](/wiki/OpenSCAD_User_Manual/Other_2D_formats "OpenSCAD User Manual/Other 2D formats")
-
-<div class="mw-heading mw-heading2">
-
-## Next
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&veaction=edit&section=T-14 "Edit section: Next")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Commented_Example_Projects&action=edit&section=T-14 "Edit section's source code: Next")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[Paths](/wiki/OpenSCAD_User_Manual/Paths "OpenSCAD User Manual/Paths")
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 4 -- Export
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=6 "Edit section: Chapter 4 -- Export")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=6 "Edit section's source code: Chapter 4 -- Export")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-  
-
-<span class="noprint"></span>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><div class="mbox-image-div">
-<span typeof="mw:File"><span><img src="openscad_user_manual_media/6154d5fac35dbeeb51921a74aa5727db2f1e48f2.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/60px-Information_icon4.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/120px-Information_icon4.svg.png 2x" width="40" height="40" /></span></span>
-</div></td>
-<td><div class="mbox-text-span">
-<strong>The text in its current form is incomplete.</strong>
-</div></td>
-</tr>
-</tbody>
-</table>
-
-<div class="mw-heading mw-heading3">
-
-### Export
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/STL_Export&veaction=edit&section=T-1 "Edit section: Export")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/STL_Export&action=edit&section=T-1 "Edit section's source code: Export")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-After rendering with F6, the "File --\> Export" menu can be used to
-export as STL, OFF, AMF, 3MF, DXF, SVG, CSG, PNG (image), or PDF.
-
-Be sure to check the console window for error messages.
-
-  - STL, OFF and DXF are imported using `import()`
-  - CSG can be imported using `include<>` or loaded like an SCAD file
-  - PNG can be imported using `surface()`
-  - There are open pull requests for SVG and AMF, which require a bit
-    more work/testing
-  - The file suffix is used to determine type
-
-<div class="mw-heading mw-heading3">
-
-### STL Export
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/STL_Export&veaction=edit&section=T-2 "Edit section: STL Export")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/STL_Export&action=edit&section=T-2 "Edit section's source code: STL Export")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-To export your design, select "Export as STL..." from the "File --\>
-Export" menu, then enter a filename in the ensuing dialog box. Don't
-forget to add the ".stl" extension.
-
-**Trouble shooting**:
-
-After *compile and render CGAL* (F6), you may see that your design is
-*simple: no*. That's bad news.
-
-See line 8 in the following output from *OpenSCAD 2010.02*:
-
-<div class="mw-highlight mw-highlight-lang-text mw-content-ltr" dir="ltr">
-
-    // Parameters
-    main_diameter = 70;
-    main_thickness = 30;
-    hole_diameter = 5;
-    num_holes = 3;
-    hole_radius = main_diameter / 2 - 5; // Inset from edge
-    
-    difference() {
-        // Main cylinder
-        cylinder(d=main_diameter, h=main_thickness, $fn=100);
-    
-        // Holes
-        for (i = [0 : 360 / num_holes : 359]) {
-            angle = i;
-            x = hole_radius * cos(angle);
-            y = hole_radius * sin(angle);
-            translate([x, y, 0])
-                cylinder(d=hole_diameter, h=main_thickness + 1, $fn=60); // Add height to ensure full cut
-        }
-    }
-
-</div>
-
-When you try to export this to .STL, this message appears:
-
-<div class="mw-highlight mw-highlight-lang-text mw-content-ltr" dir="ltr">
-
-    Object isn't a valid 2-manifold! Modify your design..
-
-</div>
-
-"Manifold" means that it is "water tight" and that there are no holes in
-the geometry. In a valid 2-manifold each edge must connect exactly two
-facets. That means that the program must be able to connect a face with
-an object. E.g. if you use a cube of height 10 to carve out something
-from a wider cube of height 10, it is not clear to which cube the top or
-the bottom belongs. So make the small extracting cube a bit "longer" (or
-"shorter"):
-
-<div class="mw-highlight mw-highlight-lang-java mw-content-ltr" dir="ltr">
-
-    difference() {
-        // original
-        cube (size = [2,2,2]);
-        // object that carves out
-        # translate ([0.5,0.5,-0.5]) {
-            cube (size = [1,1,3]);   
-        }
-    }
-
-</div>
-
-![Correct use of
-difference](openscad_user_manual_media/8d5f6043a1487e30f8610a891cccff4d7562fba7.png)
-
-Here is a more tricky little example taken from the
-[OpenSCAD](http://rocklinux.net/pipermail/openscad/2009-December/000018.html)
-Forum (retrieved 15:13, 22 March 2010 (UTC)):
-
-<div class="mw-highlight mw-highlight-lang-java mw-content-ltr" dir="ltr">
-
-    module example1() {
-            cube([20, 20, 20]);
-            translate([-20, -20, 0]) cube([20, 20, 20]);
-            cube([50, 50, 5], center = true);
-        }
-    module example2() {
-            cube([20.1, 20.1, 20]);
-            translate([-20, -20, 0]) cube([20.1, 20.1, 20]);
-            cube([50, 50, 5], center = true);
-        }
-
-</div>
-
-Example1 would render like this:
-
-![A not valid 2-manifold cube (simple =
-no)](openscad_user_manual_media/1c755102b1225bbb0822898d4de1a58c5e412be6.png)
-
-The **example1** module is not a valid 2-manifold because both cubes are
-sharing one edge. They touch each other but do not intersect.
-
-**Example2** is a valid 2-manifold because there is an intersection. Now
-the construct meets the 2-manifold constraint stipulating that *each
-edge must connect exactly two facets.*
-
-Pieces you are subtracting must extend past the original part.
-([OpenSCAD Tip: Manifold Space and
-Time](http://www.iheartrobotics.com/2010/01/openscad-tip-manifold-space-and-time.html),
-retrieved 18:40, 22 March 2010 (UTC)).
-
-For reference, another situation that causes the design to be
-non-exportable is when two faces that are each the result of a
-subtraction touch. Then the error message comes up.
-
-<div class="mw-highlight mw-highlight-lang-text mw-content-ltr" dir="ltr">
-
-    difference () {
-       cube ([20,10,10]);
-       translate ([10,0,0]) cube (10);
-    }
-    difference () {
-       cube ([20,10,10]);
-       cube (10);
-    }
-
-</div>
-
-simply touching surfaces is correctly handled.
-
-<div class="mw-highlight mw-highlight-lang-text mw-content-ltr" dir="ltr">
-
-    translate ([10,0,0]) cube (10);
-    cube (10);
-
-</div>
-
-\- STL, OFF, AMF, DXF, SVG, CSG, PNG
-
-  
-With the import() and extrusion modules it is possible to convert 2D
-objects read from DXF files to 3D objects. See also [2D to 3D
-Extrusion](/wiki/OpenSCAD_User_Manual/2D_to_3D_Extrusion "OpenSCAD User Manual/2D to 3D Extrusion").
-
-<div class="mw-heading mw-heading3">
-
-### Linear Extrude
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&veaction=edit&section=T-1 "Edit section: Linear Extrude")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&action=edit&section=T-1 "Edit section's source code: Linear Extrude")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Example of linear extrusion of a 2D object imported from a DXF file.
-
-    linear_extrude(height = fanwidth, center = true, convexity = 10)
-       import (file = "example009.dxf", layer = "fan_top");
-
-<div class="mw-heading mw-heading3">
-
-### Rotate Extrude
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&veaction=edit&section=T-2 "Edit section: Rotate Extrude")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&action=edit&section=T-2 "Edit section's source code: Rotate Extrude")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Example of rotational extrusion of a 2D object imported from a DXF file.
-
-    rotate_extrude(convexity = 10)
-       import (file = "example009.dxf", layer = "fan_side", origin = fan_side_center);
-
-<div class="mw-heading mw-heading3">
-
-### Getting Inkscape to work
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&veaction=edit&section=T-3 "Edit section: Getting Inkscape to work")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&action=edit&section=T-3 "Edit section's source code: Getting Inkscape to work")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Inkscape is an open source drawing program. Tutorials for transferring
-2d DXF drawings from Inkscape to OpenSCAD are available here:
-
-  - <http://repraprip.blogspot.com/2011/05/inkscape-to-openscad-dxf-tutorial.html>
-    (Very simple, needs path segments to be straight lines)
-  - [http://tonybuser.com/?tag=inkscape](http://web.archive.org/web/20130318112610/http://tonybuser.com/?tag=inkscape)
-    (More complicated, involves conversion to Postscript)
-  - <http://bobcookdev.com/inkscape/inkscape-dxf.html> (Better DXF
-    Export, native support for bezier curves)
-  - <http://www.bigbluesaw.com/saw/big-blue-saw-blog/general-updates/big-blue-saws-dxf-export-for-inkscape.html>
-    (even better support, works as of 10/29/2014, see link below
-    registration window. Note: As of 6/17/15 only works with version
-    0.48.5 or earlier of inkscape, due to a breaking change made in
-    0.91.)
-  - <http://www.instructables.com/id/Convert-any-2D-image-to-a-3D-object-using-OpenSCAD/>
-    (Convert any 2D image to a 3D object using OpenSCAD)
-  - <http://carrefour-numerique.cite-sciences.fr/fablab/wiki/doku.php?id=projets:de_inkscape_a_openscad>
-    (French, directly exports OpenSCAD file)
-
-<div class="mw-heading mw-heading2">
-
-## Previous
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&veaction=edit&section=T-4 "Edit section: Previous")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&action=edit&section=T-4 "Edit section's source code: Previous")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[CSG
-Export](/wiki/OpenSCAD_User_Manual/CSG_Export "OpenSCAD User Manual/CSG Export")
-
-<div class="mw-heading mw-heading2">
-
-## Next
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&veaction=edit&section=T-5 "Edit section: Next")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/DXF_Extrusion&action=edit&section=T-5 "Edit section's source code: Next")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[Other 2D
-formats](/wiki/OpenSCAD_User_Manual/Other_2D_formats "OpenSCAD User Manual/Other 2D formats")
-
-  
-Currently, OpenSCAD supports DXF only as a graphics format for 2D
-graphics. Other common formats are
-[PS](https://en.wikipedia.org/wiki/PostScript "w:PostScript")/[EPS](https://en.wikipedia.org/wiki/Encapsulated_Postscript "w:Encapsulated Postscript"),
-[SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics "w:Scalable Vector Graphics")
-and
-[AI](https://en.wikipedia.org/wiki/Adobe_Illustrator "w:Adobe Illustrator").
-
-<div class="mw-heading mw-heading3">
-
-### <span id="PS.2FEPS"></span>PS/EPS
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&veaction=edit&section=T-1 "Edit section: PS/EPS")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&action=edit&section=T-1 "Edit section's source code: PS/EPS")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The [pstoedit](http://www.pstoedit.net/) program can convert between
-various vector graphics formats. OpenSCAD needs the `-polyaslines`
-option passed to the dxf output plugin to understand the file. The `-mm`
-option sets one mm to be one unit in the dxf; include this if you use
-one unit in OpenSCAD as equal to one millimeter. The `-dt` options
-instructs pstoedit to render texts, which is usually what you want if
-you include text. (If the rendered text's resolution in terms of polygon
-count is too low, the easiest solution is to scale up the eps before
-converting; if you know a more elegant solution, please add it to the
-example.)
-
-    pstoedit -dt -f "dxf: -polyaslines -mm" infile.eps outfile.dxf
-
-<div class="mw-heading mw-heading3">
-
-### SVG
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&veaction=edit&section=T-2 "Edit section: SVG")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&action=edit&section=T-2 "Edit section's source code: SVG")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[Inkscape](http://inkscape.org) can convert SVG to EPS. Then pstoedit
-can convert the EPS to DXF.
-
-    inkscape -E intermediate.eps infile.svg
-    pstoedit -dt -f dxf:-polyaslines\ -mm intermediate.eps outfile.dxf
-
-<div class="mw-heading mw-heading3">
-
-### Makefile automation
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&veaction=edit&section=T-3 "Edit section: Makefile automation")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&action=edit&section=T-3 "Edit section's source code: Makefile automation")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The conversion can be automated using the make system; put the following
-lines in your `Makefile`:
-
-<div class="mw-highlight mw-highlight-lang-make mw-content-ltr" dir="ltr">
-
-``` 
- all: my_first_file.dxf my_second_file.dxf another_file.dxf
- 
- %.eps: %.svg
-    inkscape -E $@ $<
- 
- %.dxf: %.eps
-    pstoedit -dt -f dxf:-polyaslines\ -mm $< $@
+module base() {
+  difference() {
+    cube([40, 30, 20], true);
+    translate([0, 0, 5]) cube([50, 20, 15], true);
+  }
+}
 ```
 
-</div>
+Operators — Rotary Clusters:
 
-The first line specifies which dxf files are to be generated when `make`
-is called in the current directory. The second paragraph specifies how
-to convert a file ending in .svg to a file ending in .eps, and the third
-from .eps to .dxf.
-
-A more complete makefile could autogenerate dxf files from the any svg
-in the folder. In which case, put the following lines into your
-`Makefile`:
-
-<div class="mw-highlight mw-highlight-lang-make mw-content-ltr" dir="ltr">
-
-    SVG := $(wildcard *.svg)
-    DXF := $(SVG:%.svg=%.dxf)
-    EPS := $(SVG:%.svg=%.eps)
-    
-    .PHONY: all clean clean-eps clean-dxf
-    
-    all: $(DXF)
-    
-    %.eps: %.svg
-        inkscape -E $*.eps $*.svg
-     
-    %.dxf: %.eps
-        pstoedit -dt -f "dxf: -polyaslines -mm" $*.eps $*.dxf
-    
-    clean: clean-dxf clean-eps
-    
-    clean-dxf: 
-        rm -f $(DXF)
-    
-    clean-eps:
-        rm -f $(EPS)
-
-</div>
-
-It's still possible to call `make filename.dxf` to build a particular
-file, but this code also allows for (re)building of all dxf files in a
-folder just by calling `make` or `make all`.
-
-This code is also universal enough that it's possible to put the code in
-a single file and symlink every makefile in any directory that has svg
-files for dxf conversion by running:
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    ln -s /path/to/this/svg_to_dxf_makefile makefile
-
-</div>
-
-in each respective directory.
-
-<div class="mw-heading mw-heading3">
-
-### <span id="AI_.28Adobe_Illustrator.29"></span>AI (Adobe Illustrator)
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&veaction=edit&section=T-4 "Edit section: AI (Adobe Illustrator)")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&action=edit&section=T-4 "Edit section's source code: AI (Adobe Illustrator)")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Although Adobe Illustrator CC/CC.2014 allows you to export illustrations
-as DXF (and select DXF format versions as early as 12), it uses DXF
-entities that are not supported by OpenSCAD, such as `POLYLINE` and
-`SPLINE`.
-
-Since pstoedit does not natively support Adobe Illustrator files, one
-alternative is to use
-[EXDXF](http://www.baby-universe.co.jp/en/plug-in/products/exdxf-pro/),
-which is an Adobe Illustrator plug-in (30 free trial exports and then
-you have to pay $90 to register the plugin).
-
-Before exporting, it is recommended that you ensure that your Artboard
-is the same dimensions as the component you are exporting. Although
-EXDXF provides you with numerous options when exporting to DXF the most
-important option for OpenSCAD compliance is to set `Line Conversion` to
-`Line and Arc`.
-
-OpenSCAD doesn't always provide information about the issues it
-encountered with a DXF import. If this happens, select `Design | Flush
-Caches` and then `Design | Reload and Compile`.
-
-<div class="mw-heading mw-heading2">
-
-## Previous
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&veaction=edit&section=T-5 "Edit section: Previous")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&action=edit&section=T-5 "Edit section's source code: Previous")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[DXF
-Extrusion](/wiki/OpenSCAD_User_Manual/DXF_Extrusion "OpenSCAD User Manual/DXF Extrusion")
-
-<div class="mw-heading mw-heading2">
-
-## Next
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&veaction=edit&section=T-6 "Edit section: Next")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Other_2D_formats&action=edit&section=T-6 "Edit section's source code: Next")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-[Short and Commented Example
-Projects](/w/index.php?title=OpenSCAD_User_Manual/Short_and_Commented_Example_Projects&action=edit&redlink=1 "OpenSCAD User Manual/Short and Commented Example Projects (does not exist)")
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 5 -- Using an external Editor with OpenSCAD
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=7 "Edit section: Chapter 5 -- Using an external Editor with OpenSCAD")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=7 "Edit section's source code: Chapter 5 -- Using an external Editor with OpenSCAD")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-![OpenSCAD session using emacs as an external
-editor](openscad_user_manual_media/2cc636357cfa2d938b44c33d47cbc02d4542341f.png)
-
-// Woven / Herringbone Ring - OpenSCAD // Usage: Open this file in
-OpenSCAD (<https://openscad.org>). Edit parameters below, press F6 to
-render, then Export -\> STL.
-
-// ================= PARAMETERS (mm) ================= ring\_inner\_dia
-= 18; // inner diameter (mm). Change to match finger size band\_width =
-5.0; // axial width of the decorative band (mm) band\_thickness = 1.8;
-// radial thickness of band wall (mm) edge\_fillet = 0.6; // small
-rounding on band edges (mm)
-
-pattern\_rows = 3; // number of vertical rows of herringbone tiles
-tiles\_per\_row = 36; // how many rhombus tiles around the circumference
-per row rhombus\_length = 2.8; // long diagonal of the rhombus tile (mm)
-rhombus\_width = 1.2; // short diagonal (mm) pattern\_depth = 0.7; //
-how deep the engraved pattern is into the band; use negative to emboss
-pattern\_offset = 0.1; // gap between pattern surface and edge of band
-
-$fn = 220; // high resolution for smooth circle
-
-// ================= HELPER MODULES ================= module
-band(inner\_d, width, thickness){
-
-``` 
-   outer_d = inner_d + 2*thickness;
-   // base tube
-   difference(){
-       // outer cylinder
-       cylinder(h = width, d = outer_d, center=true);
-       // inner bore
-       translate([0,0,0])
-           cylinder(h = width + 2, d = inner_d, center=true);
-       // optional: thin lip to keep edges clean (cutaway corners)
-   }
-```
-
+```openscad
+module aim(elevation, azimuth = 0) {
+  rotate([0, 0, azimuth]) {
+    rotate([0, 90 - elevation, 0]) children(0);
+    children([1 : 1 : $children - 1]);   // step needed if $children < 2
+  }
 }
 
-module fillet\_edges(width, thickness, fillet){
+aim(30, 20) arrow();
+aim(35, 270) cannon();
+aim(15) { cannon(); base(); }
 
-``` 
-   // rounded outer edges by union of torus-like caps
-   outer_d = ring_inner_dia + 2*thickness;
-   translate([0,0,width/2])
-       rotate_extrude($fn=120)
-           translate([outer_d/2 - fillet, 0, 0])
-               circle(r=fillet, $fn=60);
-   translate([0,0,-width/2])
-       rotate_extrude($fn=120)
-           translate([outer_d/2 - fillet, 0, 0])
-               circle(r=fillet, $fn=60);
+module RotaryCluster(radius = 30, number = 8)
+  for (azimuth = [0 : 360 / number : 359])
+    rotate([0, 0, azimuth])
+      translate([radius, 0, 0]) {
+        children();
+        translate([40, 0, 30]) text(str(azimuth));
+      }
+
+RotaryCluster(200, 7) color("lightgreen") aim(15) { cannon(); base(); }
+rotate([0, 0, 110]) RotaryCluster(100, 4.5) aim(35) cannon();
+color("LightBlue") aim(55, 30) { cannon(); base(); }
 ```
 
+### Recursive modules
+
+Like functions, modules may contain recursive calls. There is no tail-recursion elimination for modules. The code below generates a simple tree. Keep recursion depth n below about 7 as the number of primitives grows exponentially.
+
+```openscad
+// A simple tree created with a recursive OpenSCAD module
+module simple_tree(size, dna, n) {
+  if (n > 0) {
+    // trunk
+    cylinder(r1 = size / 10, r2 = size / 12, h = size, $fn = 24);
+
+    // branches
+    translate([0, 0, size])
+      for (bd = dna) {
+        angx = bd[0];
+        angz = bd[1];
+        scal = bd[2];
+        rotate([angx, 0, angz])
+          simple_tree(scal * size, dna, n - 1);
+      }
+  } else {
+    // leaves
+    color("green")
+      scale([1, 1, 3])
+        translate([0, 0, size / 6])
+          rotate([90, 0, 0])
+            cylinder(r = size / 6, h = size / 10);
+  }
 }
 
-module rhombus\_tile(len, wid){
+// dna is a list of branching data bd of the tree:
+// bd[0] - inclination of the branch
+// bd[1] - Z rotation angle of the branch
+// bd[2] - relative scale of the branch
+dna = [
+  [12,  80, 0.85],
+  [55,   0, 0.60],
+  [62, 125, 0.60],
+  [57, -125, 0.60]
+];
 
-``` 
-   // create a flat rhombus centered at origin lying in XY plane
-   // rhombus built from polygon points (diamond shape)
-   pts = [ [0, len/2], [wid/2, 0], [0, -len/2], [-wid/2, 0] ];
-   linear_extrude(height = pattern_depth, center=true)
-       polygon(points=pts);
+simple_tree(50, dna, 5);
 ```
 
+Another example of a recursive module may be found in Tips and Tricks.
+
+### Overwriting built-in modules
+
+It is possible to overwrite built-in modules.
+
+```openscad
+module sphere() { square(); }
+sphere();
+```
+
+Note that the built-in sphere module cannot be called once overwritten.
+
+A common pattern is to overwrite 3D primitives with extruded 2D primitives to customize default parameters and add additional parameters.
+
+---
+
+# En.Wikibooks.Org W Index.Php Title Openscad User Manual Mathematical Operators Scalar Arithmetical Operators
+
+# OpenSCAD User Manual — Mathematical Operators
+
+The scalar and vector operators below define how OpenSCAD evaluates arithmetic, relational, logical, and matrix operations. Examples are provided as OpenSCAD code blocks.
+
+## Scalar arithmetic operators
+
+The scalar arithmetic operators take numbers as operands and produce a new number.
+
+| Operator | Description | Notes |
+|---|---|---|
+| + | add | |
+| - | subtract | Also used as a prefix to negate a number |
+| * | multiply | |
+| / | divide | |
+| % | modulo | |
+| ^ | exponent | Requires version 2021.01. Prior to 2021.01, use pow() |
+
+Example:
+```openscad
+a = [ for (i = [0:10]) i % 2 ];
+echo(a); // ECHO: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+```
+A number modulo 2 is zero if even and one if odd.
+
+## Binary arithmetic (bitwise)
+
+Note: Requires a development snapshot version.
+
+| Operator | Description |
+|---|---|
+| | | OR |
+| & | AND |
+| << | Left shift |
+| >> | Right shift (sign preserving) |
+| ~ | Unary NOT |
+
+Details:
+- Numbers are converted to 64-bit signed integers for binary arithmetic, then converted back.
+- OpenSCAD numbers have 53 bits of precision; binary arithmetic exceeding 2^53 will be imprecise.
+
+## Relational operators
+
+Relational operators produce a boolean result from two operands.
+
+| Operator | Description |
+|---|---|
+| < | less than |
+| <= | less or equal |
+| == | equal |
+| != | not equal |
+| >= | greater or equal |
+| > | greater than |
+
+Behavior by type:
+- Numbers: standard numeric comparison.
+- Strings: alphabetical order determines equality and order (e.g., "ab" > "aa" > "a").
+- Booleans: true > false. In comparisons between a Boolean and a number, true is 1 and false is 0. Other inequality tests involving Booleans return false.
+- Vectors: equality is true only if vectors are identical; all inequality comparisons with one or two vectors return false (e.g., [1] < [2] is false).
+- Dissimilar types: always unequal for == and !=; inequality comparisons (<, <=, >, >=) return false, except Boolean vs number as noted.
+- Note that [1] and 1 are different types, so [1] == 1 is false.
+- undef equals only undef. Inequality comparisons involving undef return false.
+- nan does not equal anything (not even itself). All inequality tests with nan produce false.
+
+## Logical operators
+
+All logical operators take Booleans as operands and produce a Boolean. Non-Boolean operands are converted to Booleans before evaluation.
+
+| Operator | Description |
+|---|---|
+| && | logical AND |
+| || | logical OR |
+| ! | logical unary NOT |
+
+Notes:
+- Since [false] is true (non-empty vectors are truthy), the expression false || [false] is also true.
+- Logical operators treat vectors differently than relational operators: [1, 1] > [0, 2] is false, but [false, false] && [false, false] is true.
+
+## Conditional operator
+
+The ?: operator conditionally evaluates one of two expressions, like in C-like languages.
+
+Usage example:
+```openscad
+a = 1;
+b = 2;
+c = (a == b) ? 4 : 5;
+// If a equals b, c = 4; otherwise c = 5.
+```
+The test expression (a == b) must evaluate to a boolean.
+
+## Vector-number operators
+
+The vector-number operators take a vector and a number as operands and produce a new vector.
+
+| Operator | Description |
+|---|---|
+| * | multiply all vector elements by a number |
+| / | divide all vector elements by a number |
+
+Example:
+```openscad
+L = [1, [2, [3, "a"]]];
+echo(5 * L); // ECHO: [5, [10, [15, undef]]]
+```
+
+## Vector operators
+
+The vector operators take vectors as operands and produce a new vector.
+
+| Operator | Description |
+|---|---|
+| + | add element-wise |
+| - | subtract element-wise; as a prefix, element-wise negate |
+
+Example:
+```openscad
+L1 = [1, [2, [3, "a"]]];
+L2 = [1, [2, 3]];
+echo(L1 + L1); // ECHO: [2, [4, [6, undef]]]
+echo(L1 + L2); // ECHO: [2, [4, undef]]
+```
+Using + or - with vector operands of different sizes produces a result vector with the size of the smaller vector.
+
+## Vector dot-product operator
+
+If both operands of multiplication are simple vectors, the result is a number per the dot product:
+- c = u * v equals sum over i of u_i * v_i.
+- If the operand sizes do not match, the result is undef.
+
+## Matrix multiplication
+
+If one or both operands of multiplication are matrices, the result follows standard linear algebra rules.
+
+Let A be n×m and B be m×p:
+- C = A * B is n×p with elements: C_ij = sum over k=0..m-1 of A_i,k * B_k,j.
+- B * A is defined only if p = n; otherwise the result is undef.
+
+Matrix–vector products:
+- For A (n×m) and v (size m): u = A * v is a vector of size n with u_i = sum over k=0..m-1 of A_i,k * v_k.
+- For v (size n) and A (n×m): u = v * A is a vector of size m with u_j = sum over k=0..n-1 of v_k * A_k,j.
+
+Matrix multiplication is not commutative:
+- A * B ≠ B * A
+- A * v ≠ v * A
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Include Statement
+
+# OpenSCAD User Manual: Include Statement
+
+For including code from external files in OpenSCAD, there are two commands:
+
+- include <filename> — acts as if the contents of the included file were written at that point in the including file.
+- use <filename> — imports modules and functions without executing any top-level module invocations.
+
+Library files are searched in:
+- The same folder as the design file.
+- The library folder of the OpenSCAD installation.
+- Folders specified by the OPENSCADPATH environment variable.
+
+You may use relative paths. If files are elsewhere, provide the full path. Wildcards (for example, include <MCAD/*.scad>) cannot be used. Newer versions have predefined user library locations.
+
+## include <filename>
+
+When file A includes file B, it is almost exactly as if B were inserted at that point in A. Everything in B is visible to A, and everything in A is visible to B.
+
+### Variables in included files
+
+OpenSCAD variables typically have a single value; reassigning normally triggers a warning, and the last assignment is used. Inclusion is a special exception: if B defines a variable and A later assigns a value to it, the warning is suppressed and A’s value is used throughout the variable’s life. This allows library files to provide defaults that the main file can override.
+
+```openscad
+// B.scad
+v = 1;
+```
+
+```openscad
+// A.scad
+include <B.scad>
+v = 5;
+echo(v = v);
+```
+
+Produces (no warning):
+
+```
+ECHO: v = 5
+```
+
+### Caution: Order of Execution
+
+Assignments in A are executed as if located at the original assignment location in B. If the expression depends on other variables, this can cause issues.
+
+```openscad
+// B.scad
+a = 1;
+b = 2;
+```
+
+```openscad
+// A.scad
+include <B.scad>
+a = b + 1;
+echo(a = a, b = b);
+```
+
+Output:
+
+```
+WARNING: Ignoring unknown variable "b" in file a.scad, line 2
+WARNING: undefined operation (undefined + number) in file a.scad, line 2
+ECHO: a = undef, b = 2
+```
+
+## var = include <filename>;
+
+Because include behaves like textual insertion, you can assign the contents of an external file to a variable.
+
+Example: data.txt contains a comma-delimited list of numbers:
+
+```
+8, 6, 3, 8, 6, 4, 5, 99, 8, 1, 3, 5
+```
+
+Import into an array:
+
+```openscad
+numlist = [ include <data.txt> ];
+echo(numlist);
+```
+
+Produces:
+
+```
+ECHO: [8, 6, 3, 8, 6, 4, 5, 99, 8, 1, 3, 5]
+```
+
+Note: Importing CSV with empty fields will not work reliably, as OpenSCAD ignores empty items, leading to uneven row lengths. Preprocess CSV into a compatible format first.
+
+Another example: a polyhedron described in cube.poly as an array of vertices and faces:
+
+```openscad
+// cube.poly
+[
+  [ // vertices
+    [37.5,67.5,0],
+    [37.5,42.5,0],
+    [12.5,42.5,0],
+    [12.5,67.5,0],
+    [37.5,67.5,25],
+    [12.5,67.5,25],
+    [12.5,42.5,25],
+    [37.5,42.5,25]
+  ],
+  [ // faces
+    [3,2,1,0],
+    [7,6,5,4],
+    [1,7,4,0],
+    [2,6,7,1],
+    [3,5,6,2],
+    [5,3,0,4]
+  ]
+]
+```
+
+Use it in OpenSCAD:
+
+```openscad
+cube_poly = include <cube.poly>;
+vertices = cube_poly[0];
+faces = cube_poly[1];
+polyhedron(vertices, faces);
+```
+
+When assigning the contents of an included file to a variable, avoid using .scad files for data. Prefer a non-.scad extension and ensure the file contains data, not OpenSCAD source code.
+
+## use <filename>
+
+When file A uses file B:
+
+- A can see B’s modules and functions.
+- A cannot see B’s global variables.
+- B cannot see A’s global variables.
+- B cannot see A’s modules and functions.
+- B’s top-level module invocations are not executed.
+- B’s top-level assignments are executed on every call from A to B. This can be useful if they depend on $ variables in A, but may affect performance. This behavior is subject to change.
+
+use <filename> is allowed only at the top level of a file.
+
+## Example: Ring Library
+
+Library file:
+
+```openscad
+// ring.scad
+module ring(r1, r2, h) {
+  difference() {
+    cylinder(r = r1, h = h);
+    translate([0, 0, -1])
+      cylinder(r = r2, h = h + 2);
+  }
 }
 
-module pattern\_row(row\_index, rows, tiles, ring\_d, width){
-
-``` 
-   // place a row of rhombus tiles around ring circumference
-   // row_index: 0..rows-1 (from bottom to top)
-   // rows stacked across band_width
-   row_spacing = (width - 2*pattern_offset) / (rows - 1);
-   zpos = -width/2 + pattern_offset + row_index*row_spacing;
+// Example invocation inside the library:
+ring(5, 4, 10);
 ```
 
-``` 
-   for(i = [0:tiles-1]){
-       // angle around ring
-       ang = i * 360/tiles;
-       // stagger every other row to create herringbone effect
-       stagger = (row_index % 2 == 0) ? 0 : 360/(2*tiles);
-       translate([0,0,zpos])
-           rotate([0,0,ang + stagger])
-               translate([ (ring_d/2) - (band_thickness/2) , 0, 0])
-                   rotate([0,0,90]) // align rhombus normal to band surface
-                       rhombus_tile(rhombus_length, rhombus_width);
-   }
+Using include:
+
+```openscad
+include <ring.scad>
+rotate([90, 0, 0])
+  ring(10, 1, 1);
 ```
 
+Result: both the example ring from the library and the rotated ring are shown.
+
+Using use:
+
+```openscad
+use <ring.scad>
+rotate([90, 0, 0])
+  ring(10, 1, 1);
+```
+
+Result: only the rotated ring is shown.
+
+## Additional Notes
+
+### Directory separators
+
+- Windows uses backslashes: directory\file.ext
+- Linux and macOS use forward slashes: directory/file.ext
+
+OpenSCAD on Windows accepts forward slashes, so using / in include or use statements works on all platforms.
+
+### Nested Include and Use
+
+OpenSCAD executes nested include and use statements. Caveat: use brings functions and modules only into the local file’s context. Modules and functions imported by a nested use are not visible to the base file; they fall out of scope before reaching the base context.
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Primitive Solids Cube
+
+# OpenSCAD User Manual — Primitive Solids
+
+This document summarizes the OpenSCAD primitive solids with syntax, parameters, defaults, and examples. It focuses on technical content and complete, properly formatted OpenSCAD code.
+
+## cube
+
+Creates a cube or rectangular prism (box) in the first octant by default. When center is true, the cube is centered on the origin. Argument names are optional if given in the order shown.
+
+Syntax:
+```openscad
+cube(size = [x, y, z], center = true/false);
+cube(size = x, center = true/false);
+```
+
+Parameters:
+- size:
+  - Single value: cube with all sides this length
+  - 3-value array [x, y, z]: rectangular prism with dimensions x, y, z
+- center:
+  - false (default): 1st (positive) octant, one corner at (0,0,0)
+  - true: cube is centered at (0,0,0)
+
+Defaults:
+```openscad
+cube();  // yields:
+cube(size = [1, 1, 1], center = false);
+```
+
+Examples (equivalent scripts for a cube of size 18):
+```openscad
+cube(size = 18);
+cube(18);
+cube([18,18,18]);
+
+cube(18,false);
+cube([18,18,18],false);
+cube([18,18,18],center=false);
+cube(size = [18,18,18], center = false);
+cube(center = false, size = [18,18,18]);
+```
+
+Examples (equivalent scripts for a box 18×28×8, centered):
+```openscad
+cube([18,28,8],true);
+box = [18,28,8]; cube(box,true);
+```
+
+---
+
+## sphere
+
+Creates a sphere at the origin. The r argument name is optional. If using d (diameter) instead of r, d must be named.
+
+Parameters:
+- r: Radius of the sphere. Resolution is controlled by $fa, $fs, $fn.
+- d: Diameter of the sphere (use named parameter).
+- $fa: Fragment angle in degrees (minimum angle of each fragment).
+- $fs: Fragment size in mm (minimum circumferential length).
+- $fn: Fixed number of fragments in 360 degrees. Values of 3 or more override $fa and $fs.
+
+Defaults:
+```openscad
+sphere();  // yields:
+sphere($fn = 0, $fa = 12, $fs = 2, r = 1);
+```
+
+Usage examples:
+```openscad
+sphere(r = 1);
+sphere(r = 5);
+sphere(r = 10);
+
+sphere(d = 2);
+sphere(d = 10);
+sphere(d = 20);
+
+// high resolution sphere with a 2 mm radius
+sphere(2, $fn = 100);
+
+// also 2 mm high resolution, fewer small triangles at the poles
+sphere(2, $fa = 5, $fs = 0.1);
+```
+
+---
+
+## cylinder
+
+Creates a cylinder or cone centered about the z-axis. When center is true, it is centered vertically along the z-axis. Parameter names are optional if given in the order shown. If a parameter is named, all following parameters must also be named.
+
+Syntax:
+```openscad
+cylinder(h = height, r1 = BottomRadius, r2 = TopRadius, center = true/false);
+```
+
+Notes:
+- The 2nd and 3rd positional parameters are r1 and r2. If r, d, d1, or d2 are used, they must be named.
+- Using r1 & r2 or d1 & d2 with either value zero creates a cone. A non-zero, non-equal pair produces a conical frustum.
+- r1/d1 define the base width at z=0; r2/d2 define the top width.
+
+Parameters:
+- h: Height of the cylinder or cone
+- r: Radius of cylinder; sets r1 = r2 = r
+- r1: Radius at bottom
+- r2: Radius at top
+- d: Diameter of cylinder; sets r1 = r2 = d/2 (requires version 2014.03 or later)
+- d1: Diameter at bottom; r1 = d1/2 (requires 2014.03+)
+- d2: Diameter at top; r2 = d2/2 (requires 2014.03+)
+- center:
+  - false (default): z ranges from 0 to h
+  - true: z ranges from -h/2 to +h/2
+- $fa: Minimum angle (degrees) per fragment
+- $fs: Minimum circumferential length per fragment
+- $fn: Fixed number of fragments; values ≥3 override $fa and $fs
+
+Defaults:
+```openscad
+cylinder();  // yields:
+cylinder($fn = 0, $fa = 12, $fs = 2, h = 1, r1 = 1, r2 = 1, center = false);
+```
+
+Equivalent scripts:
+```openscad
+cylinder(h=15, r1=9.5, r2=19.5, center=false);
+cylinder(15, 9.5, 19.5, false);
+cylinder(15, 9.5, 19.5);
+cylinder(15, 9.5, d2=39);
+cylinder(15, d1=19, d2=39);
+cylinder(15, d1=19, r2=19.5);
+```
+
+Cone equivalents:
+```openscad
+cylinder(h=15, r1=10, r2=0, center=true);
+cylinder(15, 10, 0, true);
+cylinder(h=15, d1=20, d2=0, center=true);
+```
+
+Cylinder with equal radii:
+```openscad
+cylinder(h=20, r=10, center=true);
+cylinder(20, 10, 10, true);
+cylinder(20, d=20, center=true);
+cylinder(20, r1=10, d2=20, center=true);
+cylinder(20, r1=10, d2=2*10, center=true);
+```
+
+### Use of $fn
+
+Larger $fn creates smoother, more circular surfaces at the cost of longer rendering time. During development, use medium values for faster preview; increase for the final render (F6). Small values can create interesting polygonal forms.
+
+Examples:
+```openscad
+cylinder(20, 20, 20, $fn = 3);
+cylinder(20, 20, 00, $fn = 4);
+cylinder(20, 20, 10, $fn = 4);
+```
+
+### Undersized holes
+
+Using cylinder() with difference() to place holes creates undersized holes because circles are approximated by inscribed polygons. To ensure the hole is not undersized, use a circumscribed polygon (increase radius so the polygon lies outside the circle).
+
+Modules for circumscribed holes (example):
+```openscad
+poly_n = 6;
+
+color("blue")
+translate([0, 0, 0.02])
+linear_extrude(0.1)
+circle(10, $fn = poly_n);
+
+color("green")
+translate([0, 0, 0.01])
+linear_extrude(0.1)
+circle(10, $fn = 360);
+
+color("purple")
+linear_extrude(0.1)
+circle(10 / cos(180 / poly_n), $fn = poly_n);
+```
+
+Regular n-gon relationships:
+- For a polygon of circumradius r, the apothem (midpoint radius) rm = r * cos(180/n).
+- If only the apothem rm is known (e.g., to fit a hex key), the circumradius r = rm / cos(180/n).
+
+---
+
+## polyhedron
+
+The most general 3D primitive. Can create regular or irregular shapes, concave or convex. Curved surfaces are approximated by flat faces.
+
+Syntax (before 2014.03):
+```openscad
+polyhedron(
+  points    = [ [X0, Y0, Z0], [X1, Y1, Z1], ... ],
+  triangles = [ [P0, P1, P2], ... ],
+  convexity = N
+);
+```
+
+Syntax (2014.03 and later):
+```openscad
+polyhedron(
+  points = [ [X0, Y0, Z0], [X1, Y1, Z1], ... ],
+  faces  = [ [P0, P1, P2, P3, ...], ... ],
+  convexity = N
+);
+```
+
+Parameters:
+- points: Vector of 3D points [x, y, z]. Points can be defined in any order and are indexed 0..N-1.
+- triangles: Deprecated (will be removed). Vector of faces, each a 3-index triangle into points.
+- faces: Vector of faces, each 3 or more indices into points. Define enough faces to fully enclose the solid, with no overlap. If coplanarity is violated, faces are triangulated automatically.
+- convexity: Integer specifying the maximum number of faces a ray might intersect (used for OpenCSG preview correctness only; no effect on final render). For most cases, 10 suffices.
+
+Defaults:
+```openscad
+polyhedron();  // yields:
+polyhedron(points = undef, faces = undef, convexity = 1);
+```
+
+Winding order:
+- For each face, the listed point indices must be ordered clockwise when viewed from outside the solid. Use the left-hand rule: curl fingers along the order; thumb points outward.
+
+### Example 1: Cube via polyhedron (10 × 7 × 5)
+
+```openscad
+CubePoints = [
+  [ 0, 0, 0 ],  // 0
+  [10, 0, 0 ],  // 1
+  [10, 7, 0 ],  // 2
+  [ 0, 7, 0 ],  // 3
+  [ 0, 0, 5 ],  // 4
+  [10, 0, 5 ],  // 5
+  [10, 7, 5 ],  // 6
+  [ 0, 7, 5 ]   // 7
+];
+
+CubeFaces = [
+  [0,1,2,3],   // bottom
+  [4,5,1,0],   // front
+  [7,6,5,4],   // top
+  [5,6,2,1],   // right
+  [6,7,3,2],   // back
+  [7,4,0,3]    // left
+];
+
+polyhedron(CubePoints, CubeFaces);
+```
+
+Equivalent descriptions of the bottom face:
+```openscad
+[0,1,2,3],
+[0,1,2,3,0],
+[1,2,3,0],
+[2,3,0,1],
+[3,0,1,2],
+[0,1,2], [2,3,0],   // two triangles, no overlap
+[1,2,3], [3,0,1],
+[1,2,3], [0,1,3]
+```
+
+### Example 2: Square-base pyramid
+
+```openscad
+polyhedron(
+  points = [
+    [ 10,  10, 0], [ 10, -10, 0], [-10, -10, 0], [-10,  10, 0],  // base
+    [  0,   0,10]                                                  // apex
+  ],
+  faces = [
+    [0,1,4], [1,2,4], [2,3,4], [3,0,4],  // triangular sides
+    [1,0,3], [2,1,3]                     // base (two triangles)
+  ]
+);
+```
+
+### Example 3: Triangular prism
+
+```openscad
+module prism(l, w, h) {
+  polyhedron(
+    // pt: 0  1     2     3    4    5
+    points = [[0,0,0], [0,w,h], [l,w,h], [l,0,0], [0,w,0], [l,w,0]],
+    faces  = [
+      [0,1,2,3],  // A: top sloping face
+      [2,1,4,5],  // B: vertical rectangular face
+      [0,3,5,4],  // C: bottom face
+      [0,4,1],    // D: rear triangular face
+      [3,2,5]     // E: front triangular face
+    ]
+  );
 }
 
-// ================= ASSEMBLY ================= // Base band
-translate(\[0,0,0\])
-
-``` 
-   union(){
-       band(ring_inner_dia, band_width, band_thickness);
-       // round edges slightly (visual only)
-       fillet_edges(band_width, band_thickness, edge_fillet);
-   }
+prism(10, 10, 5);
 ```
 
-// Create pattern (subtract to engrave). To emboss (raise pattern),
-change "difference" to "union". // Here we subtract the tiles to make
-engraved pattern. translate(\[0,0,0\])
+---
 
-``` 
-   difference(){
-       // keep band solid as base
-       band(ring_inner_dia, band_width, band_thickness);
+## Debugging polyhedra
+
+Common issues:
+- Faces not in clockwise order (as viewed from outside; view bottoms from below).
+- Overlapping faces.
+- Missing faces or portions of faces.
+- Non-manifold edges (every edge should be shared by exactly two faces; faces sharing only a vertex must be in the same face-edge cycle around that vertex).
+
+Tips:
+- In “Thrown together” view (F12) with preview (F5), counterclockwise (CCW) faces are shown in pink. Rotate to inspect all faces. Toggle pink view with F10.
+- Comment out faces temporarily to isolate issues:
+  - Line comments: //
+  - Block comments: /* ... */
+
+Show only two faces (example):
+```openscad
+CubeFaces = [
+  /* [0,1,2,3],  // bottom
+     [4,5,1,0],  // front */
+  [7,6,5,4],    // top
+  /* [5,6,2,1],  // right
+     [6,7,3,2],  // back */
+  [7,4,0,3]     // left
+];
 ```
 
-``` 
-       // pattern container: ensure pattern tiles only affect the outer band surface
-       // compute approximate ring diameter where tiles are placed
-       pattern_ring_d = ring_inner_dia + 2*(band_thickness - pattern_depth/2);
+Validation tip:
+- A polyhedron may preview fine but still be invalid for STL. Union it with any cube and render (F6). If it disappears, fix winding order and manifold issues.
+
+---
+
+## Mis-ordered faces
+
+Bad polyhedron (faces in wrong order highlighted in “Thrown together” F5 preview):
+```openscad
+// Bad polyhedron
+polyhedron(
+  points = [
+    [0, -10, 60], [0,  10, 60], [0, 10,  0], [0, -10,  0],
+    [60, -10, 60], [60, 10, 60],
+    [10, -10, 50], [10, 10, 50], [10, 10, 30], [10, -10, 30],
+    [30, -10, 50], [30, 10, 50]
+  ],
+  faces = [
+    [0,2,3], [0,1,2], [0,4,5], [0,5,1], [5,4,2], [2,4,3],
+    [6,8,9], [6,7,8], [6,10,11], [6,11,7], [10,8,11], [10,9,8],
+    [0,3,9], [9,0,6], [10,6,0], [0,4,10], [3,9,10], [3,10,4],
+    [1,7,11], [1,11,5], [1,7,8], [1,8,2], [2,8,11], [2,11,5]
+  ]
+);
 ```
 
-``` 
-       // generate rows
-       for(r = [0:pattern_rows-1]){
-           pattern_row(r, pattern_rows, tiles_per_row, pattern_ring_d, band_width);
-       }
-   }
+Corrected polyhedron:
+```openscad
+polyhedron(
+  points = [
+    [0, -10, 60], [0,  10, 60], [0, 10,  0], [0, -10,  0],
+    [60, -10, 60], [60, 10, 60],
+    [10, -10, 50], [10, 10, 50], [10, 10, 30], [10, -10, 30],
+    [30, -10, 50], [30, 10, 50]
+  ],
+  faces = [
+    [0,3,2], [0,2,1], [4,0,5], [5,0,1], [5,2,4], [4,2,3],
+    [6,8,9], [6,7,8], [6,10,11], [6,11,7], [10,8,11], [10,9,8],
+    [3,0,9], [9,0,6], [10,6,0], [0,4,10], [3,9,10], [3,10,4],
+    [1,7,11], [1,11,5], [1,8,7], [2,8,1], [8,2,11], [5,11,2]
+  ]
+);
 ```
 
-// ============== NOTES & TIPS ============== // - To change finger
-size, modify ring\_inner\_dia (mm). Standard sizes: 16-22 mm. // - To
-make the pattern shallower/deeper, change pattern\_depth. // - To emboss
-(raised tiles) instead of engraving, replace the final "difference()" //
-block with a "union()" that adds a scaled tile to the band outer
-surface. // - After editing parameters, press F6 to render and Export
--\> STL. // - For very fine pattern, increase tiles\_per\_row, but
-beware small features may not print well on some machines.
+Beginner’s tip:
+- Identify pink mis-oriented faces, then reverse their index order. Example: [0,4,5] becomes [4,0,5]. Face lists are circular; other clockwise permutations like [5,4,0] or [0,5,4] are also valid.
 
-<div class="mw-heading mw-heading2">
+Clockwise technique (left-hand rule):
+- With your left hand on the face, curl fingers in the order of the points. Your thumb should point outward. If not, reverse the order.
 
-## How to use an external editor
+Succinct polyhedron description:
+- points: list of vertices [x, y, z], auto-indexed from 0.
+- faces: list of polygons by vertex indices (3 or more).
+- Faces must list indices in clockwise order when viewed from outside.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_an_external_Editor_with_OpenSCAD&veaction=edit&section=T-1 "Edit section: How to use an external editor")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_an_external_Editor_with_OpenSCAD&action=edit&section=T-1 "Edit section's source code: How to use an external editor")<span class="mw-editsection-bracket">\]</span></span>
+---
 
-</div>
+## Point repetitions in a polyhedron point list
 
-OpenSCAD is able to check for changes of files and automatically
-recompile if a file change occurs. To use this feature enable
-*"Design-\>Automatic Reload and Preview"*
+Duplicate coordinates in the points list are treated as the same vertex.
 
-Once the feature is activated, just load the scad file within OpenSCAD
-as usual (*"File-\>Open.."*). After that, open the scad file in your
-favorite editor too. Edit and work on the scad file within the external
-editor. Whenever the file is saved to disk (from within the external
-editor), OpenSCAD recognizes the file change and automatically
-recompiles accordingly.
+Equivalent definitions of the same tetrahedron:
 
-The internal editor can be hidden by minimizing the frame with the mouse
-or by selecting *"Window-\>Hide editor"*.
+With repetitions:
+```openscad
+points = [
+  [ 0, 0, 0], [10, 0, 0], [ 0,10, 0],
+  [ 0, 0, 0], [10, 0, 0], [ 0,10, 0],
+  [ 0,10, 0], [10, 0, 0], [ 0, 0,10],
+  [ 0, 0, 0], [ 0, 0,10], [10, 0, 0],
+  [ 0, 0, 0], [ 0,10, 0], [ 0, 0,10]
+];
 
-<div class="mw-heading mw-heading2">
-
-## Support of external editors
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_an_external_Editor_with_OpenSCAD&veaction=edit&section=T-2 "Edit section: Support of external editors")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_an_external_Editor_with_OpenSCAD&action=edit&section=T-2 "Edit section's source code: Support of external editors")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-In principle all editors can be used. Some even have extensions/modes to
-provide features for OpenSCAD.
-
-  - **Atom**: There is a [Language OpenSCAD
-    package](https://atom.io/packages/language-openscad) for
-    [Atom](https://atom.io) that provides highlighting and snippets.
-  - **Emacs**: OpenSCAD provides an [emacs
-    mode](https://github.com/openscad/emacs-scad-mode) for OpenSCAD
-    files. Use the link or install `scad-mode` via emacs package
-    management (ELPA) with the [MELPA](https://melpa.org/#/scad-mode)
-    repository.
-  - **Geany**: [cobra18t](http://www.thingiverse.com/cobra18t/overview)
-    provides a [Geany syntax
-    file](http://www.thingiverse.com/thing:263620) for OpenSCAD. See
-    *Instructions* tab in Thingiverse to install it.
-  - **Gedit**: [Andy Turner](https://github.com/AndrewJamesTurner)
-    provides a [Gedit syntax
-    file](https://github.com/AndrewJamesTurner/openSCAD-lang-file) for
-    OpenSCAD.
-  - **IntelliJ**: has an 'OpenSCAD Language Support' plugin.
-  - **Kate**: [nerd256](http://www.thingiverse.com/nerd256/overview)
-    provides a [kate syntax
-    file](http://www.thingiverse.com/thing:29505) for OpenSCAD. See
-    *Instructions* tab in Thingiverse to install it. You could create
-    also a kate *External tool* to open OpenSCAD with the current file
-    with script `openscad %directory/%filename`
-  - **Neovim**: An example configuration including basic linting and
-    formatting is available via [OpenSCAD in
-    Neovim](https://n8henrie.com/2022/05/openscad-in-neovim/)
-  - **Notepad++**:
-    [TheHeadlessSourceMan](http://www.thingiverse.com/TheHeadlessSourceMan/overview)
-    provides a [Notepad++ syntax
-    file](http://www.thingiverse.com/thing:280319) for OpenSCAD. See
-    *Instructions* tab in Thingiverse to install it.
-  - **OpenSCADitor**: [OpenSCAD-dedicated
-    editor](https://www.openscad.org/)
-  - **Pulsar**: [Pulsar](https://pulsar-edit.dev/) has the
-    [language-openscad
-    package](https://web.pulsar-edit.dev/packages/language-openscad) to
-    provide highlighting and snippets.
-  - **Sublime**: [Syntax highlighting and Customizer
-    support](http://www.thingiverse.com/thing:67566)
-  - **Textmate**: [Syntax highlighting and Customizer
-    support](http://www.thingiverse.com/thing:67566)
-  - **VIM**: vim.org provides a [VIM syntax
-    file](http://www.vim.org/scripts/script.php?script_id=3556) for
-    OpenSCAD.
-  - **Visual Studio Code** and its FOSS build,
-    [**VSCodium**](https://vscodium.com), have multiple OpenSCAD
-    extensions available, providing highlighting, autocomplete, go to
-    definition, code formatting, preview and more. Type "OpenSCAD" into
-    the View \> Extensions panel search box to find and install.
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 6 -- Using OpenSCAD in a command line environment
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=8 "Edit section: Chapter 6 -- Using OpenSCAD in a command line environment")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=8 "Edit section's source code: Chapter 6 -- Using OpenSCAD in a command line environment")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-<div class="mw-heading mw-heading3">
-
-### Command line usage
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-1 "Edit section: Command line usage")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-1 "Edit section's source code: Command line usage")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD can not only be used as a GUI, but also handles command line
-arguments.
-
-OpenSCAD (DEV/nightly) 2025.08.17 has these options
-
-    Usage: openscad.exe [options] file.scad
-    Allowed options:
-      --export-format arg               overrides format of exported scad file when
-                                        using option '-o', arg can be any of its
-                                        supported file extensions.  For ascii stl
-                                        export, specify 'asciistl', and for binary
-                                        stl export, specify 'binstl'.  Ascii export
-                                        is the current stl default, but binary stl
-                                        is planned as the future default so
-                                        asciistl should be explicitly specified in
-                                        scripts when needed.
-    
-      -o [ --o ] arg                    output specified file instead of running
-                                        the GUI. The file extension specifies the
-                                        type: stl, off, wrl, amf, 3mf, csg, dxf,
-                                        svg, pdf, png, echo, ast, term, nef3,
-                                        nefdbg, param, pov. May be used multiple
-                                        times for different exports. Use '-' for
-                                        stdout.
-    
-      -O [ --O ] arg                    pass settings value to the file export
-                                        using the format section/key=value, e.g
-                                        export-pdf/paper-size=a3. Use --help-export
-                                        to list all available settings.
-      -D [ --D ] arg                    var=val -pre-define variables
-      -p [ --p ] arg                    customizer parameter file
-      -P [ --P ] arg                    customizer parameter set
-      --enable arg                      enable experimental features (specify 'all'
-                                        for enabling all available features): roof
-                                        | input-driver-dbus | lazy-union |
-                                        vertex-object-renderers-indexing |
-                                        textmetrics | import-function |
-                                        predictible-output
-    
-      -h [ --help ]                     print this help message and exit
-      --help-export                     print list of export parameters and values
-                                        that can be set via -O
-      -v [ --version ]                  print the version
-      --info                            print information about the build process
-    
-      --camera arg                      camera parameters when exporting png:
-                                        =translate_x,y,z,rot_x,y,z,dist or
-                                        =eye_x,y,z,center_x,y,z
-      --autocenter                      adjust camera to look at object's center
-      --viewall                         adjust camera to fit object
-      --backend arg                     3D rendering backend to use: 'CGAL'
-                                        (old/slow) [default] or 'Manifold'
-                                        (new/fast)
-      --imgsize arg                     =width,height of exported png
-      --render arg                      for full geometry evaluation when exporting
-                                        png
-      --preview arg                     [=throwntogether] -for ThrownTogether
-                                        preview png
-      --animate arg                     export N animated frames
-      --animate_sharding arg            Parameter <shard>/<num_shards> - Divide
-                                        work into <num_shards> and only output
-                                        frames for <shard>. E.g. 2/5 only outputs
-                                        the second 1/5 of frames. Use to
-                                        parallelize work on multiple cores or
-                                        machines.
-      --view arg                        =view options: axes | crosshairs | edges |
-                                        scales
-      --projection arg                  =(o)rtho or (p)erspective when exporting
-                                        png
-      --csglimit arg                    =n -stop rendering at n CSG elements when
-                                        exporting png
-      --summary arg                     enable additional render summary and
-                                        statistics: all | cache | time | camera |
-                                        geometry | bounding-box | area
-      --summary-file arg                output summary information in JSON format
-                                        to the given file, using '-' outputs to
-                                        stdout
-      --colorscheme arg                 =colorscheme: *Cornfield | Metallic |
-                                        Sunset | Starnight | BeforeDawn | Nature |
-                                        Daylight Gem | Nocturnal Gem | DeepOcean |
-                                        Solarized | Tomorrow | Tomorrow Night |
-                                        ClearSky | Monotone
-    
-      -d [ --d ] arg                    deps_file -generate a dependency file for
-                                        make
-      -m [ --m ] arg                    make_cmd -runs make_cmd file if file is
-                                        missing
-      -q [ --quiet ]                    quiet mode (don't print anything *except*
-                                        errors)
-      --hardwarnings                    Stop on the first warning
-      --trace-depth arg                 =n, maximum number of trace messages
-      --trace-usermodule-parameters arg =true/false, configure the output of user
-                                        module parameters in a trace
-      --check-parameters arg            =true/false, configure the parameter check
-                                        for user modules and functions
-      --check-parameter-ranges arg      =true/false, configure the parameter range
-                                        check for builtin modules
-      --debug arg                       special debug info - specify 'all' or a set
-                                        of source file names
-      -s [ --s ] arg                    stl_file deprecated, use -o
-      -x [ --x ] arg                    dxf_file deprecated, use -o
-
-Export help
-
-    OpenSCAD version 2025.08.17
-    
-    List of settings that can be given using the -O option using the
-    format '<section>/<key>=value', e.g.:
-    openscad -O export-pdf/paper-size=a6 -O export-pdf/show-grid=false
-    
-    Section 'export-pdf':
-      - paper-size (enum): [a6,a5,<a4>,a3,letter,legal,tabloid]
-      - orientation (enum): [<portrait>,landscape,auto]
-      - show-filename (bool): <true>/false
-      - show-scale (bool): <true>/false
-      - show-scale-message (bool): <true>/false
-      - show-grid (bool): <true>/false
-      - grid-size (double): 1.000000 : <10.000000> : 100.000000
-      - add-meta-data (bool): <true>/false
-      - meta-data-title (string): ""
-      - meta-data-author (string): ""
-      - meta-data-subject (string): ""
-      - meta-data-keywords (string): ""
-    Section 'export-3mf':
-      - color-mode (enum): [<model>,none,selected-only]
-      - unit (enum): [micron,<millimeter>,centimeter,meter,inch,foot]
-      - color (string): "#f9d72c"
-      - material-type (enum): [color,<basematerial>]
-      - decimal-precision (int): 1 : <6> : 16
-      - add-meta-data (bool): <true>/false
-      - meta-data-title (string): ""
-      - meta-data-designer (string): ""
-      - meta-data-description (string): ""
-      - meta-data-copyright (string): ""
-      - meta-data-license-terms (string): ""
-      - meta-data-rating (string): ""
-
-  
-
-OpenSCAD 2021.01 has these options:
-
-    Usage: openscad [options] file.scad
-    Allowed options:
-     --export-format arg          overrides format of exported scad file when
-                                  using option '-o', arg can be any of its
-                                  supported file extensions.  For ascii stl
-                                  export, specify 'asciistl', and for binary stl
-                                  export, specify 'binstl'.  Ascii export is the
-                                  current stl default, but binary stl is planned
-                                  as the future default so asciistl should be
-                                  explicitly specified in scripts when needed.
-     
-     -o [ --o ] arg               output specified file instead of running the
-                                  GUI, the file extension specifies the type: stl,
-                                  off, wrl, amf, 3mf, csg, dxf, svg, pdf, png,
-                                  echo, ast, term, nef3, nefdbg (May be used
-                                  multiple time for different exports). Use '-'
-                                  for stdout
-     
-     -D [ --D ] arg               var=val -pre-define variables
-     -p [ --p ] arg               customizer parameter file
-     -P [ --P ] arg               customizer parameter set
-     --enable arg                 enable experimental features (specify 'all' for
-                                  enabling all available features): roof |
-                                  input-driver-dbus | lazy-union |
-                                  vertex-object-renderers |
-                                  vertex-object-renderers-indexing |
-                                  vertex-object-renderers-direct |
-                                  vertex-object-renderers-prealloc | textmetrics
-     
-     -h [ --help ]                print this help message and exit
-     -v [ --version ]             print the version
-     --info                       print information about the build process
-     
-     --camera arg                 camera parameters when exporting png:
-                                  =translate_x,y,z,rot_x,y,z,dist or
-                                  =eye_x,y,z,center_x,y,z
-     --autocenter                 adjust camera to look at object's center
-     --viewall                    adjust camera to fit object
-     --imgsize arg                =width,height of exported png
-     --render                     for full geometry evaluation when exporting png
-     --preview arg                [=throwntogether] -for ThrownTogether preview
-                                  png
-     --animate arg                export N animated frames
-     --view arg                   =view options: axes | crosshairs | edges |
-                                  scales | wireframe
-     --projection arg             =(o)rtho or (p)erspective when exporting png
-     --csglimit arg               =n -stop rendering at n CSG elements when
-                                  exporting png
-     --summary arg                enable additional render summary and statistics:
-                                  all | cache | time | camera | geometry |
-                                  bounding-box | area
-     --summary-file arg           output summary information in JSON format to the
-                                  given file, using '-' outputs to stdout
-     --colorscheme arg            =colorscheme: *Cornfield | Metallic | Sunset |
-                                  Starnight | BeforeDawn | Nature | DeepOcean |
-                                  Solarized | Tomorrow | Tomorrow Night | Monotone
-     
-     -d [ --d ] arg               deps_file -generate a dependency file for make
-     -m [ --m ] arg               make_cmd -runs make_cmd file if file is missing
-     -q [ --quiet ]               quiet mode (don't print anything *except*
-                                  errors)
-     --hardwarnings               Stop on the first warning
-     --check-parameters arg       =true/false, configure the parameter check for
-                                  user modules and functions
-     --check-parameter-ranges arg =true/false, configure the parameter range check
-                                  for builtin modules
-     --debug arg                  special debug info - specify 'all' or a set of
-                                  source file names
-
-<div class="mw-heading mw-heading3">
-
-### Export options
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-2 "Edit section: Export options")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-2 "Edit section's source code: Export options")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-When called with the `-o` option, OpenSCAD does not start the GUI, but
-executes the given file and exports to the *output\_file* in a format
-depending on the extension (`.stl` / `.off` / `.dxf`, `.csg`).
-
-Some versions use -s/-d/-o to determine the output file format instead;
-check with "openscad --help".
-
-If the option `-d` is given in addition to an export command, all files
-accessed while building the mesh are written in the argument of `-d` in
-the syntax of a Makefile.
-
-For at least 2015.03-2+, specifying the extension `.echo` causes
-openscad to produce a text file containing error messages and the output
-of all `echo()` calls in `filename` as they would appear in the console
-window visible in the GUI. Multiple output files are not supported, so
-using this option you cannot also obtain the model that would have
-normally been generated.
-
-Note: When exporting to STL, the GUI defaults to binary STL (smaller,
-faster) and the CLI defaults to ASCII STL (larger, slower).
-Post-processing pipelines may prefer ASCII STL; they should explicitly
-say \`--export-format asciistl\` in preparation for the default
-eventually changing to binary STL.
-
-<div class="mw-heading mw-heading4">
-
-#### Camera and image output
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-3 "Edit section: Camera and image output")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-3 "Edit section's source code: Camera and image output")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-For 2013.05+, the option to output a `.png` image was added. There are
-two types of cameras available for the generation of images.
-
-The first camera type is a 'gimbal' camera that uses Euler angles,
-translation, and a camera distance, like OpenSCAD's GUI viewport display
-at the bottom of the OpenSCAD window.
-
-The second camera type is a 'vector' camera, with an 'eye' camera
-location vector and a 'lookat' center vector.
-
-\--imgsize x,y chooses the .png dimensions and --projection chooses
-orthogonal or perspective, as in the GUI.
-
-By default, cmdline .png output uses Preview mode (f5) with OpenCSG. For
-some situations it may be desirable to output the full render, with
-CGAL. This is done by adding '--render' as an option.
-
-<div class="mw-heading mw-heading3">
-
-### Constants
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-4 "Edit section: Constants")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-4 "Edit section's source code: Constants")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-In order to pre-define variables, use the `-D` option. It can be given
-repeatedly. Each occurrence of `-D` must be followed by an assignment.
-Unlike normal OpenSCAD assignments, these assignments don't define
-variables, but constants, which cannot be changed inside the program,
-and can thus be used to overwrite values defined in the program at
-export time.
-
-If you want to assign the -D variable to another variable, the -D
-variable MUST be initialized in the main .scad program
-
-    param1=17;       // must be initialized
-    val=param1;      // param1 passed via -D on cmd-line
-    echo(val,param1); // outputs 17,17
-
-without the first line, val would be undefined.
-
-The right hand sides can be arbitrary OpenSCAD expressions, including
-mathematical operations and strings.
-
-Be aware that your shell (bash, cmd, etc.) parses the arguments before
-passing them to `openscad`, therefore you need to properly quote or
-escape arguments with special characters like spaces or quotation marks.
-For example to assign a string `production` to a `quality` parameter one
-has to ensure the `"` characters OpenSCAD expects aren't stripped by the
-shell. In bash one could write:
-
-    openscad -o my_model_production.stl -D 'quality="production"' my_model.scad
-
-or from the Windows prompt:
-
-    openscad.com -o my_model_production.stl -D "quality=""production""" my_model.scad
-
-or you may need to escape the inner quotes instead:
-
-    openscad -o my_model_production.stl -D "quality=\"production\"" my_model.scad
-
-Note that this sort of double-escaping isn't necessary when executing
-OpenSCAD from another process that isn't using a shell, because each
-argument is passed separately. For example a Java application might
-start a process like so:
-
-``` 
-   pb = new ProcessBuilder("/usr/bin/openscad",
-     "-o", "my_model_production.stl",
-     "-D", "quality=\"production\"",
-     "my_model.scad");
+polyhedron(points, [
+  [0,1,2], [3,4,5], [6,7,8], [9,10,11], [12,13,14]
+]);
 ```
 
-<div class="mw-heading mw-heading3">
+Simplified:
+```openscad
+points = [
+  [0,0,0], [0,10,0], [10,0,0], [0,0,10]
+];
 
-### Command to build required files
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-5 "Edit section: Command to build required files")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-5 "Edit section's source code: Command to build required files")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-In a complex build process, some missing files required by an OpenSCAD
-file can be generated if they are defined in a Makefile. If OpenSCAD is
-given the option `-m make`, it starts `make file` the first time it
-tries to access a missing *file*.
-
-<div class="mw-heading mw-heading3">
-
-### Processing all .scad files in a folder
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-6 "Edit section: Processing all .scad files in a folder")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-6 "Edit section's source code: Processing all .scad files in a folder")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Example to convert all the .scad in a folder into .stl:
-
-In a folder with .scad files, make a .bat file with text:
-
-``` 
-   FOR %%f in (*.scad)  DO openscad -o "%%~nf.stl" "%%f" 
+polyhedron(points, [
+  [0,2,1], [0,1,3], [1,2,3], [0,3,2]
+]);
 ```
 
-If it closes without processing, check to set the PATH by adding
-openscad directory to:
+---
 
-``` 
-     Start - Settings - Control Panel - System - Advanced tab - Environment Variables - System Variables, select Path, then click Edit.
+# En.Wikibooks.Org Wiki Openscad User Manual General Dot Notation Indexing
+
+# OpenSCAD User Manual — General
+
+OpenSCAD is a 2D/3D solid modeling program based on a functional programming language. A script in the OpenSCAD language creates 2D/3D models, previewed on screen and rendered to meshes exportable to various formats.
+
+A script is a free-form list of action statements.
+
+```openscad
+object();
+variable = value;
+
+operator() action();
+
+operator() {
+  action();
+  action();
+}
+
+operator()
+operator() {
+  action();
+  action();
+}
+
+operator() {
+  operator() action();
+  operator() {
+    action();
+    action();
+  }
+}
 ```
 
-Add the openscad directory to the list
+## Objects
 
-  
+Objects are the building blocks for models, created by 2D/3D primitives. Objects end with a semicolon.
 
-<div class="mw-heading mw-heading3">
+Examples: cube(), sphere(), polygon(), circle(), etc.
 
-### Makefile example
+## Actions
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-7 "Edit section: Makefile example")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-7 "Edit section's source code: Makefile example")<span class="mw-editsection-bracket">\]</span></span>
+Action statements include creating objects using primitives and assigning values to variables. Action statements end with a semicolon.
 
-</div>
-
-The `-d` and `-m` options only make sense together. (`-m` without `-d`
-would not consider modified dependencies when building exports, `-d`
-without `-m` would require the files to be already built for the first
-run that generates the dependencies.)
-
-Here is an example of a basic Makefile that creates an .stl file from an
-.scad file of the same name:
-
-    # explicit wildcard expansion suppresses errors when no files are found
-    include $(wildcard *.deps)
-    
-    %.stl: %.scad
-        openscad -m make -o $@ -d $@.deps $<
-
-When `make my_example.stl` is run for the first time, it finds no .deps
-files, and must depend on `my_example.scad`. Because `my_example.stl` is
-not yet preset, it gets created unconditionally. If OpenSCAD finds
-missing files, it calls `make` to build them, and it lists all used
-files in `my_example.stl.deps`.
-
-When `make my_example.stl` is called subsequently, it finds and includes
-`my_example.stl.deps` and check if any of the files listed there,
-including `my_example.scad`, changed since `my_example.stl` was built,
-based on their time stamps. Only if that is the case, it builds
-`my_example.stl` again.
-
-<div class="mw-heading mw-heading4">
-
-#### Automatic targets
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-8 "Edit section: Automatic targets")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-8 "Edit section's source code: Automatic targets")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-When building similar .stl files from a single .scad file, there is a
-way to automate that too:
-
-    # match "module foobar() { // `make` me"
-    TARGETS=$(shell sed '/^module [a-z0-9_-]*().*make..\?me.*$$/!d;s/module //;s/().*/.stl/' base.scad)
-    
-    all: ${TARGETS}
-    
-    # auto-generated .scad files with .deps make make re-build always. keeping the
-    # scad files solves this problem. (explanations are welcome.)
-    .SECONDARY: $(shell echo "${TARGETS}" | sed 's/\.stl/.scad/g')
-    
-    # explicit wildcard expansion suppresses errors when no files are found
-    include $(wildcard *.deps)
-    
-    %.scad:
-        echo -ne 'use <base.scad>\n$*();' > $@
-    
-    %.stl: %.scad
-        openscad -m make -o $@ -d $@.deps $<
-
-All objects that are supposed to be exported automatically have to be
-defined in `base.scad` in an own module with their future file name
-(without the ".stl"), and have a comment like "`// make me`" in the line
-of the module definition. The "`TARGETS=`" line picks these out of the
-base file and creates the file names. These are built when `make all`
-(or `make`, for short) is called.
-
-As the convention from the last example is to create the .stl files from
-.scad files of the same base name, for each of these files, an .scad
-file must be generated. This is done in the "`%.scad:`" paragraph;
-`my_example.scad` is a simple OpenSCAD file:
-
-    use <base.scad>
-    my_example();
-
-The "`.SECONDARY`" line is there to keep `make` from deleting the
-generated .scad files. Its presence helps determine which files no
-longer need to be rebuilt; please post ideas about what exactly goes
-wrong there (or how to fix it better) on the
-[talk](/wiki/Talk:OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment "Talk:OpenSCAD User Manual/Using OpenSCAD in a command line environment")
-page\!
-
-<div class="mw-heading mw-heading3">
-
-### Windows notes
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-9 "Edit section: Windows notes")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-9 "Edit section's source code: Windows notes")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-On Windows, openscad.com should be called from the command line as a
-wrapper for openscad.exe. This is because Openscad uses the 'devenv'
-solution to the Command-Line/GUI output issue. Typing 'openscad' at the
-cmd.exe prompt calls the .com program wrapper by default.
-
-<div class="mw-heading mw-heading3">
-
-### MacOS notes
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&veaction=edit&section=T-10 "Edit section: MacOS notes")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment&action=edit&section=T-10 "Edit section's source code: MacOS notes")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-On MacOS the binary is normally hidden inside the App folder. If
-OpenSCAD is installed in the global Applications folder, it can be
-called from command line like in the following example that just shows
-the OpenSCAD version:
-
-    macbook:/$ /Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD -v
-    OpenSCAD version 2013.06
-
-Alternatively, you may create a symbolic link to the binary to make
-calls from the command line easier:
-
-``` 
- macbook:/$ sudo ln -sf /Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD /usr/local/bin/openscad
+```openscad
+a = 1;
+b = a + 7;
 ```
 
-Now you can call `openscad` directly without having to type in the full
-path.
+## Operators
 
-``` 
- macbook:/$ openscad -v
- OpenSCAD version 2015.03-3
+Operators (transformations) modify location, color, and other properties. Braces {} group multiple actions. Multiple operators are processed right-to-left (closest to the action applies first). Operators do not end with semicolons; actions inside them do.
+
+```openscad
+cube(5);
+x = 4 + y;
+
+rotate(40) square(5, 10);
+
+translate([10, 5]) {
+  circle(5);
+  square(4);
+}
+
+rotate(60) color("red") {
+  circle(5);
+  square(4);
+}
+
+color("blue") {
+  translate([5, 3, 0]) sphere(5);
+  rotate([45, 0, 45]) {
+    cylinder(10);
+    cube([5, 6, 7]);
+  }
+}
 ```
 
-On some versions of MacOS, you might get the following error when
-attempting to run openscad via that link:
+## Comments
 
-``` 
- This application failed to start because it could not find or load the Qt platform plugin "cocoa".
+Comments are ignored by the compiler.
+
+```openscad
+// This is a comment
+myvar = 10;  // The rest of the line is a comment
+
+/* Multi-line comments
+   can span multiple lines. */
 ```
 
-``` 
- Reinstalling the application may fix this problem.
- Abort trap: 6
+## Values and Data Types
+
+A value in OpenSCAD is one of:
+- Number (e.g., 42)
+- Boolean (true, false)
+- String (e.g., "foo")
+- Range (e.g., [0: 1: 10])
+- Vector (e.g., [1, 2, 3])
+- Undefined (undef)
+
+OpenSCAD is dynamically typed. No user-defined types.
+
+### Numbers
+
+Numbers are written in decimal (e.g., -1, 42, 0.5, 2.99792458e+8). Hexadecimal constants use C-style 0x... (no octal).
+
+OpenSCAD uses a single numeric type: 64-bit IEEE floating-point.
+
+Implications:
+- Binary floating-point cannot represent most decimals exactly. 0.25 (1/4) and 0.375 (3/8) are exact; 0.2 (2/10) is not.
+- Largest magnitude is about 1e308 (inf on overflow). Smallest negative is about -1e308 (-inf on underflow).
+- Precision ~16 decimal digits.
+- Invalid operations can produce NaN (nan).
+- Zero and negative zero (-0) are distinct in some math operations and echoed differently, but compare equal.
+- inf and nan are not literal constants; they can be computed:
+
+```openscad
+inf = 1e200 * 1e200;
+nan = 0 / 0;
+echo(inf, nan);  // ECHO: inf, nan
 ```
 
-You can fix this by creating a wrapper script to invoke the executable
-directly:
+nan is not equal to any value, including itself. To test for nan:
 
-``` 
- sudo rm -f /usr/local/bin/openscad
- echo '#!/bin/sh' > test
- echo '/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD "$@"' >> test
- chmod +x test ; sudo mv test /usr/local/bin/openscad
+```openscad
+x = 0/0;
+echo(x != x);  // true if x is nan
 ```
 
-<div class="mw-heading mw-heading1">
-
-# Chapter 7 -- Path locations
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=9 "Edit section: Chapter 7 -- Path locations")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=9 "Edit section's source code: Chapter 7 -- Path locations")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-<span class="noprint"></span>
-
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><div class="mbox-image-div">
-<span typeof="mw:File"><span><img src="openscad_user_manual_media/6154d5fac35dbeeb51921a74aa5727db2f1e48f2.png" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/60px-Information_icon4.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Information_icon4.svg/120px-Information_icon4.svg.png 2x" width="40" height="40" /></span></span>
-</div></td>
-<td><div class="mbox-text-span">
-<strong>The text in its current form is incomplete.</strong>
-</div></td>
-</tr>
-</tbody>
-</table>
-
-OpenSCAD looks for and saves resources to various paths. This is an
-overview.
-
-This page describes the patterns used for all systems and all platforms.
-For the paths used on your particular installation, look at "Library
-info" on the "Help" menu.
-
-<div class="mw-heading mw-heading2">
-
-## Env variables
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&veaction=edit&section=T-1 "Edit section: Env variables")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&action=edit&section=T-1 "Edit section's source code: Env variables")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - HOME
-  - XDG\_CONFIG\_HOME
-  - OPENSCAD\_FONT\_PATH
-  - OPENSCADPATH
-
-<div class="mw-heading mw-heading2">
-
-## Per platform roots
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&veaction=edit&section=T-2 "Edit section: Per platform roots")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&action=edit&section=T-2 "Edit section's source code: Per platform roots")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - **ResourcesPath**
-      - UNIX-like:
-      - Mac OS X: OpenSCAD.app/Contents/Resources
-      - Windows: installation directory, typical default C:\\Program
-        Files\\OpenSCAD
-  - **DocumentsPath**
-      - UNIX-like: $HOME/.local/share
-      - Mac OS X: \[NSDocumentDirectory\], typically $HOME/Documents
-      - Windows: \[FOLDERID\_Documents\]\\OpenSCAD, often
-        C:\\Users\\*username*\\Documents\\OpenSCAD
-  - **UserConfigPath**
-      - UNIX-like: $XDG\_CONFIG\_HOME/OpenSCAD or $HOME/.config/OpenSCAD
-      - Mac: \[NSApplicationSupportDirectory\], typically
-        $HOME/Library/Application Support/OpenSCAD
-      - Windows: \[FOLDERID\_LocalAppData\]\\OpenSCAD, typically
-        C:\\Users\\*username*\\AppData\\Local\\OpenSCAD
-
-Note: the UserConfigPath directory is not created by default; if
-desired, the user must create it.
-
-Windows note: FOLDERID\_Documents and FOLDERID\_LocalAppData were
-formerly known as CSIDL\_PERSONAL and CSIDL\_LOCAL\_APPDATA.
-
-<div class="mw-heading mw-heading2">
-
-## Read-only Resources
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&veaction=edit&section=T-3 "Edit section: Read-only Resources")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&action=edit&section=T-3 "Edit section's source code: Read-only Resources")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - libraries: **\[ResourcesPath\]**/libraries
-  - fonts: **\[ResourcesPath\]**/fonts
-  - render color schemes: **\[ResourcesPath\]**/color-schemes/render
-  - editor color schemes: **\[ResourcesPath\]**/color-schemes/editor
-
-<div class="mw-heading mw-heading2">
-
-## User Resources
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&veaction=edit&section=T-4 "Edit section: User Resources")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&action=edit&section=T-4 "Edit section's source code: User Resources")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - libraries: $OPENSCADPATH, **\[DocumentsPath\]**/OpenSCAD/libraries
-  - fonts
-      - $HOME/.fonts
-      - $HOME/.local/share/fonts
-
-<!-- end list -->
-
-  - render color schemes: **\[UserConfigPath\]**/color-schemes/render
-  - editor color schemes: **\[UserConfigPath\]**/color-schemes/editor
-
-<div class="mw-heading mw-heading2">
-
-## Misc Resources
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&veaction=edit&section=T-5 "Edit section: Misc Resources")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Paths&action=edit&section=T-5 "Edit section's source code: Misc Resources")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - GUI preferences (Uses QSettings):
-      - UNIX-like: $HOME/.config/OpenSCAD.conf
-      - Windows: Registry:
-        HKEY\_CURRENT\_USER\\SOFTWARE\\OpenSCAD\\OpenSCAD
-      - Mac OS X: $HOME/Library/Preferences/org.openscad.OpenSCAD.plist
-
-<!-- end list -->
-
-  - backups: **\[DocumentsPath\]**/OpenSCAD/backups
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 8 -- Building OpenSCAD from Sources
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=10 "Edit section: Chapter 8 -- Building OpenSCAD from Sources")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=10 "Edit section's source code: Chapter 8 -- Building OpenSCAD from Sources")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-<div class="mw-heading mw-heading2">
-
-## Prebuilt binary packages
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-1 "Edit section: Prebuilt binary packages")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-1 "Edit section's source code: Prebuilt binary packages")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-If you are lucky, you won't have to build it. Many Linux and BSD systems
-have pre-built OpenSCAD packages including Debian, Ubuntu, Fedora, Arch,
-NetBSD and OpenBSD. Check your system's package manager for details.
-
-<div class="mw-heading mw-heading3">
-
-### generic linux binary package
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-2 "Edit section: generic linux binary package")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-2 "Edit section's source code: generic linux binary package")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-There is also a generic linux binary package at
-<http://www.openscad.org> that can be unpacked and run from within most
-linux systems. It is self contained and includes the required libraries.
-
-<div class="mw-heading mw-heading3">
-
-### nightly builds
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-3 "Edit section: nightly builds")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-3 "Edit section's source code: nightly builds")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-see <https://build.opensuse.org/package/show/home:t-paul/OpenSCAD>
-
-<div class="mw-heading mw-heading3">
-
-### <span id="chrysn.27s_Ubuntu_packages"></span>chrysn's Ubuntu packages
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-4 "Edit section: chrysn's Ubuntu packages")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-4 "Edit section's source code: chrysn's Ubuntu packages")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-For Ubuntu systems you can also try chrysn's Ubuntu packages at his
-[launchpad PPA](https://launchpad.net/~chrysn/+archive/openscad), or you
-can just copy/paste the following onto the command line:
-
-    sudo add-apt-repository ppa:chrysn/openscad
-    sudo apt-get update
-    sudo apt-get install openscad
-
-His repositories for OpenSCAD and OpenCSG are
-[here](http://archive.amsuess.com/pool/contrib/o/openscad/) and
-[here](http://archive.amsuess.com/pool/main/o/opencsg/).
-
-<div class="mw-heading mw-heading2">
-
-## Building OpenSCAD yourself
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-5 "Edit section: Building OpenSCAD yourself")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-5 "Edit section's source code: Building OpenSCAD yourself")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-If you wish to build OpenSCAD for yourself, start by installing
-***git*** on your system using your package manager. Git is sometimes
-packaged under the name 'scmgit' or 'git-core'. Then, use git to
-download the OpenSCAD source code
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    cd ~/
-    git clone https://github.com/openscad/openscad.git
-    cd openscad
-
-</div>
-
-  
-Then get the MCAD library, which is now included with OpenSCAD binary
-distributions
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    git submodule init
-    git submodule update
-
-</div>
-
-<div class="mw-heading mw-heading3">
-
-### Installing dependencies
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-6 "Edit section: Installing dependencies")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-6 "Edit section's source code: Installing dependencies")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD uses a large number of third-party libraries and tools. These
-are called dependencies. An up to date list of dependencies can usually
-be found in the README.md in openscad's main directory, here:
-<https://github.com/openscad/openscad/> A brief list follows:
-
-*Eigen, GCC or Clang, Bison, Flex, CGAL, Qt, GMP, MPFR, boost, cmake,
-OpenCSG, GLEW, QScintilla, glib2, harfbuzz, freetype2, pkg-config,
-fontconfig*
-
-<div class="mw-heading mw-heading4">
-
-#### Prepackaged dependencies
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-7 "Edit section: Prepackaged dependencies")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-7 "Edit section's source code: Prepackaged dependencies")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Most systems are set up to install pre-built dependencies using a
-'package manager', such as ***apt*** on ubuntu or ***pacman*** on Arch
-Linux. OpenSCAD comes with a 'helper script' that attempts to
-automatically run your package manager for you and download and install
-these pre-built packages if they exist. Note you must be running as root
-and/or using *sudo* to try this. Note that these scripts are likely to
-fail on Sun, Solaris, AIX, IRIX, etc (skip to the 'building
-dependencies' section below).
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    ./scripts/uni-get-dependencies.sh
-
-</div>
-
-<div class="mw-heading mw-heading4">
-
-#### Verifying dependencies
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-8 "Edit section: Verifying dependencies")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-8 "Edit section's source code: Verifying dependencies")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-After attempting to install dependencies, you should double check them.
-Exit any shells and perhaps reboot.
-
-Now verify that the version numbers are up to those listed in
-openscad/README.md file. Also verify that no packages were accidentally
-missed. For example open a shell and run 'flex --version' or 'gcc
---version'. These are good sanity checks to make sure your environment
-is proper.
-
-OpenSCAD comes with another helper script that attempts to automate this
-process on many Linux and BSD systems (Again, it won't work on
-Sun/Solaris/Irix/AIX/etc).
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    ./scripts/check-dependencies.sh
-
-</div>
-
-If you cannot verify that your dependencies are installed properly and
-of a sufficient version, then you may have to install some 'by hand'
-(see the section below on building your own dependencies).
-
-If your system has all the proper versions of dependencies, then
-continue to the 'Building OpenSCAD' section.
-
-<div class="mw-heading mw-heading3">
-
-### Building the dependencies yourself
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-9 "Edit section: Building the dependencies yourself")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-9 "Edit section's source code: Building the dependencies yourself")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-On systems that lack updated dependency libraries or tools, you must to
-download each and build it and install it by hand. You can do this by
-downloading and following installation instructions for each package
-separately. However OpenSCAD comes with scripts that attempt to automate
-this process on Linux and BSD systems, by installing everything into a
-folder created under $HOME/openscad\_deps. This script does not build
-typical development dependencies like X11, Qt4, gcc, bash etc. But it
-attempts things like OpenCSG, CGAL, boost, etc.
-
-To run the automated script, first set up the environment variables (if
-you don't use bash, replace "source" with a single ".")
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    source scripts/setenv-unibuild.sh
-
-</div>
-
-Then, run a second script to download and build.
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    ./scripts/uni-build-dependencies.sh
-
-</div>
-
-(If you only need CGAL or OpenCSG, you can just run '
-./scripts/uni-build-dependencies.sh cgal' or opencsg and it builds only
-a single library.)
-
-The complete download and build process can take several hours,
-depending on your network connection speed and system speed. It is
-recommended to have at least 2 Gigabyte of free disk space to do the
-full dependency build. Each time you log into a new shell and wish to
-re-compile OpenSCAD you need to re-run the 'source
-scripts/setenv-unibuild.sh' script.
-
-After completion, return to the section above on 'verifying
-dependencies' to see if they installed correctly.
-
-<div class="mw-heading mw-heading3">
-
-### Build the OpenSCAD binary
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-10 "Edit section: Build the OpenSCAD binary")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-10 "Edit section's source code: Build the OpenSCAD binary")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Once you have installed your dependencies, you can build OpenSCAD.
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    qmake       # or qmake-qt4, depending on your distribution
-    make
-
-</div>
-
-  
-You can also install OpenSCAD to /usr/local/ if you wish. The 'openscad'
-binary is put under /usr/local/bin, the libraries and examples reside
-under something like /usr/local/share/openscad possibly depending on
-your system. Note that if you have previously installed a binary linux
-package of openscad, you should take care to delete
-/usr/local/lib/openscad and /usr/local/share/openscad because they are
-not the same paths as what the standard qmake-built 'install' target
-uses.
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    sudo make install
-
-</div>
-
-  
-
-> 
-> 
-> <table>
-> <colgroup>
-> <col style="width: 100%" />
-> </colgroup>
-> <tbody>
-> <tr class="odd">
-> <td><strong>Note:</strong> on Debian-based systems create a package and install OpenSCAD using:
-> <div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-> <pre><code>sudo checkinstall -D make install</code></pre>
-> </div></td>
-> </tr>
-> </tbody>
-> </table>
-
-  
-If you prefer not to install you can run "`./openscad`" directly whilst
-still in the `~/openscad` directory.
-
-<div class="mw-heading mw-heading3">
-
-### Experimental
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-11 "Edit section: Experimental")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-11 "Edit section's source code: Experimental")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![OpenSCAD 2017-01-06 experimental-build,  
-all experimental features
-enabled](openscad_user_manual_media/495086412f0903bac4a97478c0ceeebe02bf65f4.png)
-
-To enable the experimental features, remake the project with
-*CONFIG+=experimental*:
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    qmake CONFIG+=experimental
-    make -B
-
-</div>
-
-The -B is only required once (when you have changed the config).
-
-The experimental features are disabled by default, even when explicitly
-build as experimental build.
-
-When you successfully build, you find a "features" tab in the
-preferences, where you can enable individual experimental features.
-
-  
-*Alternatively,* you may add
-
-    CONFIG+=experimental
-
-as the first line of **openscad.pro**.
-
-<div class="mw-heading mw-heading2">
-
-## Compiling the test suite
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-12 "Edit section: Compiling the test suite")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-12 "Edit section's source code: Compiling the test suite")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD comes with over 740 regression tests. To build and run them, it
-is recommended to first build the GUI version of OpenSCAD by following
-the steps above, including the downloading of MCAD. Then, from the same
-login, run these commands:
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-``` 
- cd tests
- mkdir build && cd build
- cmake .. 
- make
- ctest -C All
+To test for undefined:
+
+```openscad
+x = undef;
+echo(x == undef);  // true
 ```
 
-</div>
+### Boolean values
 
-The file 'openscad/doc/testing.txt' has more information. Full test logs
-are under `tests/build/Testing/Temporary`. A pretty-printed index.html
-web view of the tests can be found under a machine-specific subdirectory
-thereof and opened with a browser.
+Booleans are true or false. Non-Boolean values are converted to Boolean in contexts like if(), ?:, and logical operators.
 
-<div class="mw-heading mw-heading2">
+Values that count as false:
+- false
+- 0 and -0
+- ""
+- []
+- undef
 
-## Troubleshooting
+Examples that count as true:
+- "false"
+- [0]
+- [[]]
+- [false]
+- 0/0 (nan)
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-13 "Edit section: Troubleshooting")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-13 "Edit section's source code: Troubleshooting")<span class="mw-editsection-bracket">\]</span></span>
+### Strings
 
-</div>
+Strings are sequences of unicode characters. Used for filenames, echo debugging, and with text().
 
-If you encounter any errors when building, please file an issue report
-at <https://github.com/openscad/openscad/issues/> .
+String literal escapes:
+- \" → "
+- \\ → \
+- \t → tab
+- \n → newline
+- \r → carriage return
+- \xNN → ASCII (01–7F); \x00 produces a space
+- \uNNNN → 4-digit Unicode
+- \UNNNNNN → 6-digit Unicode
 
-<div class="mw-heading mw-heading3">
-
-### Errors about incompatible library versions
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-14 "Edit section: Errors about incompatible library versions")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-14 "Edit section's source code: Errors about incompatible library versions")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-This may be caused by old libraries living in /usr/local/lib like boost,
-CGAL, OpenCSG, etc, (often left over from previous experiments with
-OpenSCAD). You are advised to remove them. To remove, for example, CGAL,
-run rm -rf /usr/local/include/CGAL && rm -rf /usr/local/lib/\*CGAL\*.
-Then erase $HOME/openscad\_deps, remove your openscad source tree, and
-restart fresh. As of 2013 OpenSCAD's build process does not advise nor
-require anything to be installed in /usr/local/lib nor
-/usr/local/include.
-
-Note that CGAL depends on Boost and OpenCSG depends on GLEW -
-interdependencies like this can really cause issues if there are stray
-libraries in unusual places.
-
-Another source of confusion can come from running from within an
-'unclean shell'. Make sure that you don't have LD\_LIBRARY\_PATH set to
-point to any old libraries in any strange places. Also don't mix a Mingw
-windows cross build with your linux build process - they use different
-environment variables and may conflict.
-
-<div class="mw-heading mw-heading3">
-
-### <span id="OpenCSG_didn.27t_automatically_build"></span>OpenCSG didn't automatically build
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-15 "Edit section: OpenCSG didn't automatically build")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-15 "Edit section's source code: OpenCSG didn't automatically build")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-If for some reason the recommended build process above fails to work
-with OpenCSG, please file an issue on the OpenSCAD github. In the
-meantime, you can try building it yourself.
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-``` 
-  wget http://www.opencsg.org/OpenCSG-1.3.2.tar.gz
-  sudo apt-get purge libopencsg-dev libopencsg1 # or your system's equivalent
-  tar -xvf OpenCSG-1.3.2.tar.gz
-  cd OpenCSG-1.3.2
-  # edit the Makefile and remove 'example'
-  make
-  sudo cp -d lib/lib* $HOME/openscad_deps/lib/
-  sudo cp include/opencsg.h $HOME/openscad_deps/include/
+```openscad
+echo("The quick brown fox \tjumps \"over\" the lazy dog.\rThe quick brown fox.\nThe \\lazy\\ dog.");
+// ECHO: "The quick brown fox jumps "over" the lazy dog. The quick brown fox. The \lazy\ dog."
 ```
 
-</div>
+### Ranges
 
-> 
-> 
-> <table>
-> <colgroup>
-> <col style="width: 100%" />
-> </colgroup>
-> <tbody>
-> <tr class="odd">
-> <td><strong>Note:</strong> on Debian-based systems (such as Ubuntu), you can add the 'install' target to the OpenCSG Makefile, and then use checkinstall to create a clean .deb package for install/removal/upgrade. Add this target to Makefile:
-> <div class="mw-highlight mw-highlight-lang-make mw-content-ltr" dir="ltr">
-> <pre><code> install:
->     # !! THESE LINES PREFIXED WITH ONE TAB, NOT SPACES !!
->     cp -d lib/lib* /usr/local/lib/
->     cp include/opencsg.h /usr/local/include/
->     ldconfig</code></pre>
-> </div>
-> <p>Then:</p>
-> <div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-> <pre><code> sudo checkinstall -D make install</code></pre>
-> </div>
-> <p>.. to create and install a clean package.</p></td>
-> </tr>
-> </tbody>
-> </table>
+Ranges are used by for() and children(). They are not vectors.
 
-<div class="mw-heading mw-heading3">
+Forms:
+- [start:end]
+- [start:step:end]  (step defaults to 1)
 
-### <span id="CGAL_didn.27t_automatically_build"></span>CGAL didn't automatically build
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-16 "Edit section: CGAL didn't automatically build")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-16 "Edit section's source code: CGAL didn't automatically build")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-If this happens, you can try to [compile CGAL
-yourself](/wiki/OpenSCAD_User_Manual/CGAL_From_Source "OpenSCAD User Manual/CGAL From Source").
-It is recommended to install to $HOME/openscad\_deps and otherwise
-follow the build process as outlined above.
-
-<div class="mw-heading mw-heading3">
-
-### Compiling fails with an Internal compiler error from GCC or GAS
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-17 "Edit section: Compiling fails with an Internal compiler error from GCC or GAS")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-17 "Edit section's source code: Compiling fails with an Internal compiler error from GCC or GAS")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-This can happen if you run out of virtual memory, which means all of
-physical RAM as well as virtual swap space from the disk. See below
-under "horribly slow" for reasons. If you are non-root, there are a few
-things you can try. The first is to use the 'clang' compiler, as it uses
-much less RAM than gcc. The second thing is to edit the Makefile and
-remove the '-g' and '-pipe' flags from the compiler flags section.
-
-If, on the other hand, you are root, then you can expand your swap
-space. On Linux this is pretty standard procedure and easily found in a
-web search. Basically you do these steps (after verifying you have no
-file named /swapfile already):
-
-``` 
-   sudo dd if=/dev/zero of=/swapfile bs=1M count=2000  # create a roughly 2 gig swapfile 
-   sudo chmod 0600 /swapfile # set proper permissions for security
-   sudo mkswap /swapfile  # format as a swapfile 
-   sudo swapon /swapfile  # turn on swap
+```openscad
+r1 = [0:10];
+r2 = [0.5:2.5:20];
+echo(r1);  // ECHO: [0: 1: 10]
+echo(r2);  // ECHO: [0.5: 2.5: 20]
 ```
 
-For permanent swap setup in /etc/fstab, instructions are easily found
-through web search. If you are building on an SSD (solid state drive)
-machine the speed of a swapfile allows a reasonable build time.
+Notes:
+- [start:end] with start > end (versions ≤ 2021.01) issues a warning and is equivalent to [end:1:start]. [start:1:end] with start > end is equivalent to [] without warning. This also applies when the increment is omitted (development snapshots).
+- Step may be negative (versions after 2014). If the sign of step prevents progression, the result is [] without warning.
+- Use steps exactly representable in binary (integers or fractions with power-of-two denominator) to avoid off-by-one effects.
 
-<div class="mw-heading mw-heading3">
+### The Undefined Value
 
-### <span id="Compiling_is_horribly_slow_and.2For_grinds_the_disk"></span>Compiling is horribly slow and/or grinds the disk
+undef is the initial value of unassigned variables and a common return for invalid operations. In logic, undef behaves as false. Relational operators return false on illegal arguments, except undef == undef is true.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-18 "Edit section: Compiling is horribly slow and/or grinds the disk")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-18 "Edit section's source code: Compiling is horribly slow and/or grinds the disk")<span class="mw-editsection-bracket">\]</span></span>
+Note: some numeric errors return nan (not a language value). For example:
+- 0 / false → undef
+- 0 / 0 → nan
 
-</div>
+## Variables
 
-It is recommended to have at least 1.5 Gbyte of RAM to compile OpenSCAD.
-There are a few workarounds in case you don't. The first is to use the
-experimental support for the Clang Compiler (described below) as Clang
-uses much less RAM than GCC. Another workaround is to edit the Makefile
-generated by qmake and search/replace the optimization flags (-O2) with
--O1 or blank, and to remove any '-g' debug flags from the compiler line,
-as well as '-pipe'.
+Variables bind names to expressions. Identifiers use [a-zA-Z0-9_] (development snapshots treat names starting with digits specially: 0x... is hex, others warn).
 
-If you have plenty of RAM and just want to speed up the build, you can
-try a paralell multicore build with
+```openscad
+var = 25;
+xx = 1.25 * cos(50);
+y  = 2 * xx + var;
+logic = true;
+MyString = "This is a string";
+a_vector = [1, 2, 3];
+rr = a_vector[2];      // 3
 
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-``` 
-  make -jx
+range1 = [-1.5:0.5:3]; // for() range
+xx = [0:5];            // alternate for() range
 ```
 
-</div>
+OpenSCAD is functional: variables are effectively constants within a scope. Assigning a name multiple times in the same scope does not mutate; only the last assignment is used in that scope (see below).
 
-Where 'x' is the number of cores you want to use. Remember you need x
-times the amount of RAM to avoid possible disk thrashing.
+Since 2015.03, assignments are allowed in any scope, but values cannot leak to outer scopes.
 
-The reason the build is slow is because OpenSCAD uses template libraries
-like CGAL, Boost, and Eigen, which use large amounts of RAM to compile -
-especially CGAL. GCC may take up 1.5 Gigabytes of RAM on some systems
-during the build of certain CGAL modules. There is [more information at
-StackOverflow.com](http://stackoverflow.com/questions/3634203/why-are-templates-so-slow-to-compile).
-
-<div class="mw-heading mw-heading3">
-
-### BSD issues
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-19 "Edit section: BSD issues")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-19 "Edit section's source code: BSD issues")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The build instructions above are designed to work unchanged on FreeBSD
-and NetBSD. However the BSDs typically require special environment
-variables set up to build any QT project - you can set them up
-automatically by running
-
-``` 
-   source ./scripts/setenv-unibuild.sh
+```openscad
+a = 0;
+if (a == 0) {
+  a = 1;  // since 2015.03 allowed; value confined to this block
+}
 ```
 
-NetBSD 5.x, requires a [patched version of
-CGAL](/wiki/User:Dbright/patch_cgal_for_netbsd "User:Dbright/patch cgal for netbsd").
-It is recommended to upgrade to NetBSD 6 instead as it has all
-dependencies available from pkgin. NetBSD also requires the X Sets to be
-installed when the system was created ([or added
-later](http://ghantoos.org/2009/05/12/my-first-shot-of-netbsd/)).
+### Undefined variable
 
-On OpenBSD it may fail to build after running out of RAM. OpenSCAD
-requires at least 1 Gigabyte to build with GCC. You may have need to be
-a user with 'staff' level access or otherwise alter required system
-parameters. The 'dependency build' sequence has also not been ported to
-OpenBSD so you must rely on the standard OpenBSD system package tools
-(in other words you have to have root).
+Referring to an undefined variable triggers a warning and yields undef. Use is_undef() to test without warnings.
 
-<div class="mw-heading mw-heading3">
+```openscad
+echo("Variable a is ", a);  // Triggers a warning; a is undef
 
-### <span id="Sun_.2F_Solaris_.2F_IllumOS_.2F_AIX_.2F_IRIX_.2F_Minix_.2F_etc"></span>Sun / Solaris / IllumOS / AIX / IRIX / Minix / etc
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-20 "Edit section: Sun / Solaris / IllumOS / AIX / IRIX / Minix / etc")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-20 "Edit section's source code: Sun / Solaris / IllumOS / AIX / IRIX / Minix / etc")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The OpenSCAD dependency builds have been mainly focused on Linux and BSD
-systems like Debian or FreeBSD. The 'helper scripts' are likely to fail
-on other types of Un\*x. Furthermore the OpenSCAD build system files
-(qmake .pro files for the GUI, cmake CMakeFiles.txt for the test suite)
-have not been tested thoroughly on non-Linux non-BSD systems. Extensive
-work may be required to get a working build on such systems.
-
-<div class="mw-heading mw-heading3">
-
-### Test suite problems
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-21 "Edit section: Test suite problems")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-21 "Edit section's source code: Test suite problems")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-**Headless server**
-
-The test suite tries to automatically detect if you have an X11 DISPLAY
-environment variable set. If not, it tries to automatically start Xvfb
-or Xvnc (virtual X framebuffers) if they are available.
-
-If you want to run these servers manually, you can attempt the
-following:
-
-    $ Xvfb :5 -screen 0 800x600x24 &
-    $ DISPLAY=:5 ctest
-
-Alternatively:
-
-    $ xvfb-run --server-args='-screen 0 800x600x24' ctest
-
-There are some cases where Xvfb/Xvnc won't work. Some older versions of
-Xvfb may fail and crash without warning. Sometimes Xvfb/Xvnc have been
-built without GLX (OpenGL) support and OpenSCAD won't be able to
-generate any images.
-
-**Image-based tests takes a long time, they fail, and the log says
-'return -11'**
-
-Imagemagick may have crashed while comparing the expected images to the
-test-run generated (actual) images. You can try using the alternate
-ImageMagick comparison method by by erasing CMakeCache, and re-running
-cmake with `-DCOMPARATOR=ncc`. This enables the Normalized Cross
-Comparison method which is more stable, but possibly less accurate and
-may give false positives or negatives.
-
-**Testing images fails with 'morphology not found" for ImageMagick in
-the log**
-
-Your version of imagemagick is old. Upgrade imagemagick, or pass
--DCOMPARATOR=old to cmake, otherwise the comparison reliability is
-reduced.
-
-<div class="mw-heading mw-heading3">
-
-### <span id="I_moved_the_dependencies_I_built_and_now_openscad_won.27t_run"></span>I moved the dependencies I built and now openscad won't run
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-22 "Edit section: I moved the dependencies I built and now openscad won't run")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-22 "Edit section's source code: I moved the dependencies I built and now openscad won't run")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-It isn't advised to move them because the build is using RPATH hard
-coded into the openscad binary. You may try to workaround by setting the
-LD\_LIBRARY\_PATH environment variable to place yourpath/lib first in
-the list of paths it searches. If all else fails, you can re-run the
-entire dependency build process but export the BASEDIR environment
-variable to your desired location, before you run the script to set
-environment variables.
-
-<div class="mw-heading mw-heading2">
-
-## Tricks and tips
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-23 "Edit section: Tricks and tips")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-23 "Edit section's source code: Tricks and tips")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading3">
-
-### Reduce space of dependency build
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-24 "Edit section: Reduce space of dependency build")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-24 "Edit section's source code: Reduce space of dependency build")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-After you have built the dependencies you can free up space by removing
-the $BASEDIR/src directory - where $BASEDIR defaults to
-$HOME/openscad\_deps.
-
-<div class="mw-heading mw-heading3">
-
-### Preferences
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-25 "Edit section: Preferences")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-25 "Edit section's source code: Preferences")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD's config file is kept in \~/.config/OpenSCAD/OpenSCAD.conf.
-
-<div class="mw-heading mw-heading3">
-
-### Setup environment to start developing OpenSCAD in Ubuntu 11.04
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-26 "Edit section: Setup environment to start developing OpenSCAD in Ubuntu 11.04")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-26 "Edit section's source code: Setup environment to start developing OpenSCAD in Ubuntu 11.04")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The following paragraph describes an easy way to setup a development
-environment for OpenSCAD in Ubuntu 11.04. After executing the following
-steps QT Creator can be used to graphically start developing/debugging
-OpenSCAD.
-
-  - Add required PPA repositories:
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    # sudo add-apt-repository ppa:chrysn/openscad
-
-</div>
-
-  - Update and install required packages:
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    # sudo apt-get update
-    # sudo apt-get install git build-essential qtcreator libglew1.5-dev libopencsg-dev libcgal-dev libeigen2-dev bison flex
-
-</div>
-
-  - Get the OpenSCAD sources:
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    # mkdir ~/src
-    # cd ~/src
-    # git clone https://github.com/openscad/openscad.git
-
-</div>
-
-  - Build OpenSCAD using the command line:
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-    # cd ~/src/openscad
-    # qmake
-    # make
-
-</div>
-
-  - Build OpenSCAD using QT Creator:
-
-Just open the project file openscad.pro (CTRL+O) in QT Creator and hit
-the build all (CTRL+SHIFT+B) and run button (CTRL+R).
-
-<div class="mw-heading mw-heading3">
-
-### The Clang Compiler
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&veaction=edit&section=T-27 "Edit section: The Clang Compiler")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Linux/UNIX&action=edit&section=T-27 "Edit section's source code: The Clang Compiler")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-There is experimental support for building with the Clang compiler under
-linux. Clang is faster, uses less RAM, and has different error messages
-than GCC. To use it, first of all you need CGAL of at least version
-4.0.2, as prior versions have a bug that makes clang unusable. Then, run
-this script before you build OpenSCAD.
-
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
-
-``` 
- source scripts/setenv-unibuild.sh clang
+if (is_undef(a)) {
+  echo("Variable a is tested undefined");
+}
 ```
 
-</div>
+### Scope of variables
 
-Clang support depends on your system's QT installation having a clang
-enabled qmake.conf file. For example, on Ubuntu, this is under
-/usr/share/qt4/mkspecs/unsupported/linux-clang/qmake.conf. BSD
-clang-building may require a good deal of fiddling and is untested,
-although eventually it is planned to move in this direction as the BSDs
-(not to mention OSX) are moving towards favoring clang as their main
-compiler. OpenSCAD includes convenience scripts to cross-build Windows
-installer binaries using the MXE system (<http://mxe.cc>). If you wish
-to use them, you can first install the [MXE Requirements such as cmake,
-perl, scons, using your system's package manager (click to view a
-complete list of requirements)](http://mxe.cc/#requirements). Then you
-can perform the following commands to download OpenSCAD source and build
-a windows installer:
+Each brace pair {} creates a new inner scope. Variables defined/overridden in an inner scope are visible to deeper inner scopes but not to outer scopes.
 
-``` 
- git clone https://github.com/openscad/openscad.git
- cd openscad
- source ./scripts/setenv-mingw-xbuild.sh
- ./scripts/mingw-x-build-dependencies.sh
- ./scripts/release-common.sh mingw32
+```openscad
+// scope 1
+a = 6;               // create a
+echo(a, b);          // 6, undef
+
+translate([5, 0, 0]) {     // scope 1.1
+  a = 10;
+  b = 16;                  // create b
+  echo(a, b);              // 10, 16
+  a = 10;
+  // ...
+  color("blue") {          // scope 1.1.1
+    echo(a, b);            // 10, 16
+    cube();
+    b = 20;
+  }
+  // back to 1.1
+  echo(a, b);              // 10, 16
+  a = 100;                 // override a in 1.1
+}
+// back to 1
+echo(a, b);                // 6, undef
+
+color("red") {             // scope 1.2
+  cube();
+  echo(a, b);              // 6, undef
+}
+// back to 1
+echo(a, b);                // 6, undef
 ```
 
-The x-build-dependencies process takes several hours, mostly to
-cross-build QT. It also requires several gigabytes of disk space. If you
-have multiple CPUs you can speed up things by running **export
-NUMCPU=x** before running the dependency build script. By default it
-builds the dependencies in $HOME/openscad\_deps/mxe. You can override
-the mxe installation path by setting the BASEDIR environment variable
-before running the scripts. The OpenSCAD binaries are built into a
-separate build path, openscad/mingw32.
-
-Note that if you want to then build linux binaries, you should log out
-of your shell, and log back in. The 'setenv' scripts, as of early 2013,
-required a 'clean' shell environment to work.
-
-If you wish to cross-build manually, please follow the steps below
-and/or consult the release-common.sh source code.
-
-<div class="mw-heading mw-heading2">
-
-## Setup
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X&veaction=edit&section=T-1 "Edit section: Setup")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X&action=edit&section=T-1 "Edit section's source code: Setup")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The easiest way to cross-compile OpenSCAD for Windows on Linux or Mac is
-to use mxe (M cross environment). You must install git to get it. Once
-you have git, navigate to where you want to keep the mxe files in a
-terminal window and run:
-
-    git clone git://github.com/mxe/mxe.git
-
-Add the following line to your `~/.bashrc` file:
-
-    export PATH=/<where mxe is installed>/usr/bin:$PATH
-
-replacing `<where mxe is installed>` with the appropriate path.
-
-<div class="mw-heading mw-heading2">
-
-## Requirements
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X&veaction=edit&section=T-2 "Edit section: Requirements")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X&action=edit&section=T-2 "Edit section's source code: Requirements")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The requirements to cross-compile for Windows are just the requirements
-of mxe. They are listed, along with a command for installing them
-[here](http://mxe.cc/#requirements). You don't need to type 'make'; this
-makes everything and take up \>10 GB of diskspace. You can instead
-follow the next step to compile only what's needed for openscad.
-
-Now that you have the requirements for mxe installed, you can build
-OpenSCAD's dependencies (CGAL, Opencsg, MPFR, and Eigen2). Just open a
-terminal window, navigate to your mxe installation and run:
-
-    make mpfr eigen opencsg cgal qt
-
-This can take a few hours, because it has to build things like gcc, qt,
-and boost. Just go calibrate your printer or something while you wait.
-To speed things up, you might want do something like "make -j 4 JOBS=2"
-for parallel building. See the [mxe tutorial](http://mxe.cc/#tutorial)
-for more details.
-
-Optional: If you want to build an installer, you need to install the
-nullsoft installer system. It should be in your package manager, called
-"nsis".
-
-<div class="mw-heading mw-heading2">
-
-## Build OpenSCAD
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X&veaction=edit&section=T-3 "Edit section: Build OpenSCAD")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X&action=edit&section=T-3 "Edit section's source code: Build OpenSCAD")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Now that all the requirements have been met, all that remains is to
-build OpenSCAD itself. Open a terminal window and enter:
-
-    git clone git://github.com/openscad/openscad.git
-    cd openscad
-
-Then get MCAD:
-
-    git submodule init
-    git submodule update
-
-You need to create a symbolic link here for the build system to find the
-libraries:
-
-    ln -s /<where mxe is installed>/usr/i686-pc-mingw32/ mingw-cross-env
-
-again replacing `<where mxe is installed>` with the appropriate path
-
-Now to build OpenSCAD run:
-
-    i686-pc-mingw32-qmake CONFIG+=mingw-cross-env openscad.pro
-    make
-
-This creates openscad.exe in ./release and you can build an installer
-with it as described in the instructions for building with Microsoft
-Visual C++, [described
-here](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Building_on_Windows#Building_an_installer).
-
-The difference is that instead of right-clicking on the \*.nsi file you
-run:
-
-    makensis installer.nsis
-
-Note that as of early 2013, OpenSCAD's 'scripts/release-common.sh'
-automatically uses the version of nsis that comes with the MXE cross
-build system, so you may wish to investigate the release-common.sh
-source code to see how it works, if you have troubles. This is a set of
-instructions for building OpenSCAD with the Microsoft Visual C++
-compilers. It has not been used since circa 2012 and is unlikely to work
-properly. It is maintained here for historical reference purposes.
-
-A newer build is being attempted with the Msys2 system, please see
-[http://en.wikibooks.org/wiki/OpenSCAD\_User\_Manual/Building\_on\_Microsoft\_Windows](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Building_on_Microsoft_Windows)
-
-\---
-
-This MSVC build is as static as reasonable, with no external DLL
-dependencies that are not shipped with Windows
-
-Note: It was last tested on the Dec 2011 build. Newer checkouts of
-OpenSCAD may not build correctly or require extensive modification to
-compile under MSVC. OpenSCAD releases of 2012 were typically
-cross-compiled from linux using the Mingw & MXE system. See
-[Cross-compiling for Windows on Linux or Mac OS
-X](/wiki/OpenSCAD_User_Manual/Cross-compiling_for_Windows_on_Linux_or_Mac_OS_X "OpenSCAD User Manual/Cross-compiling for Windows on Linux or Mac OS X").
-
-<div class="mw-heading mw-heading2">
-
-## Downloads
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-1 "Edit section: Downloads")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-1 "Edit section's source code: Downloads")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-start by downloading:
-
-  - Visual Studio Express
-    <http://download.microsoft.com/download/E/8/E/E8EEB394-7F42-4963-A2D8-29559B738298/VS2008ExpressWithSP1ENUX1504728.iso>
-  - QT (for vs2008)
-    <http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.2-vs2008.exe>
-  - git
-    <http://msysgit.googlecode.com/files/Git-1.7.4-preview20110204.exe>
-  - glew
-    <https://sourceforge.net/projects/glew/files/glew/1.5.8/glew-1.5.8-win32.zip/download>
-  - cmake <http://www.cmake.org/files/v2.8/cmake-2.8.4-win32-x86.exe>
-  - boost <http://www.boostpro.com/download/boost_1_46_1_setup.exe>
-  - cgal
-    <https://gforge.inria.fr/frs/download.php/27647/CGAL-3.7-Setup.exe>
-  - OpenCSG <http://www.opencsg.org/OpenCSG-1.3.2.tar.gz>
-  - eigen2
-    [http://bitbucket.org/eigen/eigen/get/2.0.15.zip](https://bitbucket.org/eigen/eigen/get/2.0.15.zip)
-  - gmp/mpfr <http://holoborodko.com/pavel/downloads/win32_gmp_mpfr.zip>
-  - MinGW
-    <http://netcologne.dl.sourceforge.net/project/mingw/Automated%20MinGW%20Installer/mingw-get-inst/mingw-get-inst-20110316/mingw-get-inst-20110316.exe>
-
-<div class="mw-heading mw-heading2">
-
-## Installing
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-2 "Edit section: Installing")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-2 "Edit section's source code: Installing")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - Install Visual Studio
-      - No need for siverlight or mssql express
-      - You can use a virtual-CD program like MagicDisc to mount the ISO
-        file and install without using a CD
-  - Install QT
-      - Install to default location `C:\Qt\4.7.2\`
-  - Install Git
-      - Click `Run Git and included Unix tools from the Windows Command
-        Prompt` despite the big red letters warning you not to.
-  - Install Cmake
-      - Check the 'Add cmake to the system path for the current user'
-        checkbox
-      - Install to default location `C:\Program Files\CMake 2.8`
-  - Install Boost
-      - Select the VC++ 9.0 vs2008 radio
-      - Check the 'multithreaded static runtime' checkbox only
-      - Install into `C:\boost_1_46_1\`
-  - Install CGAL
-      - Note - CGAL 3.9 fixes several bugs in earlier versions of CGAL,
-        but CGAL 3.9 does not compile under MSVC without extensive
-        patching. Please keep that in mind when compiling OpenSCAD with
-        MSVC - there may be bugs due to the outdated version of CGAL
-        required to use MSVC.
-      - Note its not a binary distribution, just an installer that
-        installs the source.
-      - No need for CGAL Examples and Demos
-      - Make sure mpfr and gmp precompiled libs is checked
-      - The installer wants you to put this in `C:\Program
-        Files\CGAL-3.7\` I used `C:\CGAL-3.7\`
-      - Make sure CGAL\_DIR environment checked.
-  - Install MinGW
-      - Make sure you select the MSYS Basic System under components
-  - Extract downloaded win32\_gmp\_mpfr.zip file to `C:\win32_gmp_mpfr\`
-  - Replace the mpfr and gmp .h files in CGAL with the ones from
-    win32\_gmp\_mpfr
-      - Delete, or move to a temp folder, all files in
-        `CGAL-3.7\auxiliary\gmp\include` folder
-      - Copy all the .h files in `C:\win32_gmp_mpfr\gmp\Win32\Release`
-        to `CGAL-3.7\auxiliary\gmp\include`
-      - Copy all the .h files in `C:\win32_gmp_mpfr\mpfr\Win32\Release`
-        to `CGAL-3.7\auxiliary\gmp\include`
-  - Replace the mpfr and gmp libs in CGAL with the ones from
-    win32\_gmp\_mpfr
-      - Delete, or move to a temp folder, all (06/20/2011 libmpfr-4.lib
-        is needed 7/19/11 - i didnt need it) files in
-        `CGAL-3.7\auxiliary\gmp\lib` folder.
-      - Copy `C:\win32_gmp_mpfr\gmp\Win32\Release\gmp.lib` to
-        `CGAL-3.7\auxiliary\gmp\lib`
-      - Copy `C:\win32_gmp_mpfr\mpfr\Win32\Release\mpfr.lib` to
-        `CGAL-3.7\auxiliary\gmp\lib`
-      - Go into `CGAL-3.7\auxiliary\gmp\lib` and copy `gmp.lib` to
-        `gmp-vc90-mt-s.lib`, and `mpfr.lib` to `mpfr-vc90-mt-s.lib` (so
-        the linker can find them in the final link of openscad.exe)
-
-To get OpenSCAD source code:
-
-  - Open "Git Bash" (or MingW Shell) (the installer may have put a
-    shortcut on your desktop). This launches a command line window.
-  - Type **cd c:** to change the current directory.
-  - Type **git clone <git://github.com/openscad/openscad.git>** This
-    puts OpenSCAD source into C:\\openscad\\
-
-Where to put other files:
-
-I put all the dependencies in C:\\ so for example,
-
-  - C:\\eigen2\\
-  - C:\\glew-1.5.8\\
-  - C:\\OpenCSG-1.3.2\\
-
-.tgz can be extracted with `tar -zxvf` from the MingW shell, or Windows
-tools like 7-zip. Rename and move sub-directories if needed. I.e
-eigen-eigen-0938af7840b0 should become c:\\eigen2, with the files like
-COPYING and CMakeLists.txt directly under it. c:\\glew-1.5.8 should have
-'include' and 'lib' directly under it.
-
-<div class="mw-heading mw-heading2">
-
-## Compiling Dependencies
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-3 "Edit section: Compiling Dependencies")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-3 "Edit section's source code: Compiling Dependencies")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-For compilation I use the QT Development Command Prompt
-
-Start-\>Program Files-\>Qt by Nokia v4.7.2 (VS2008 OpenSource)-\>QT
-4.7.2 Command Prompt
-
-<div class="mw-heading mw-heading3">
-
-### Qt
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-4 "Edit section: Qt")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-4 "Edit section's source code: Qt")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Qt needs to be recompiled to get a static C runtime build. To do so,
-open the command prompt and do:
-
-    configure -static -platform win32-msvc2008 -no-webkit
-
-Configure takes several minutes to finish processing. After it is done,
-open up the file Qt\\4.7.2\\mkspecs\\win32-msvc2008\\qmake.conf and
-replace every instance of -MD with -MT. Then:
-
-    nmake
-
-This takes a very, very long time. Have a nap. Get something to eat. On
-a Pentium 4, 2.8 GHz CPU with 1 Gigabyte RAM, Windows XP, it took more
-than 7 hours, (that was with -O2 turned off)
-
-<div class="mw-heading mw-heading3">
-
-### CGAL
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-5 "Edit section: CGAL")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-5 "Edit section's source code: CGAL")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    cd C:\CGAL-3.7\
-    set BOOST_ROOT=C:\boost_1_46_1\
-    cmake .
-
-Now edit the `CMakeCache.txt` file. Replace every instance of `/MD` with
-`/MT` . Now, look for a line like this:
-
-`CMAKE_BUILD_TYPE:STRING=Debug`
-
-Change `Debug` to `Release`. Now *re-run* cmake
-
-    cmake .
-
-It should scroll by, watch for lines saying `"--Building static
-libraries"` and `"--Build type: Release"` to confirm the proper
-settings. Also look for `/MT` in the `CXXFLAGS` line. When it's done,
-you can do the build:
-
-    nmake
-
-You should now have a `CGAL-vc90-mt-s.lib` file under ` C:\CGAL-3.7\lib
- `. If not, see Troubleshooting, below.
-
-<div class="mw-heading mw-heading3">
-
-### OpenCSG
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-6 "Edit section: OpenCSG")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-6 "Edit section's source code: OpenCSG")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Launch Visual Express.
-
-    cd C:\OpenCSG-1.3.2
-    vcexpress OpenCSG.sln
-    Substitute devenv for vcexpress if you are not using the express version
-
-  - Manually step through project upgrade wizard
-  - Make sure the runtime library settings for all projects is for
-    Release (not Debug)
-      - Click Build/Configuration Manager
-      - Select "Release" from "Configuration:" drop down menu
-      - Hit Close
-  - Make sure the runtime library setting for OpenCSG project is set to
-    multi-threaded static
-      - Open the OpenCSG project properties by clicking menu item
-        "Project-\>OpenCSG Properties" (might be just "Properties")
-      - Make sure it says "Active(Release)" in the "Configuration:" drop
-        down menu
-      - Click 'Configuration Properties -\> C/C++ -\> Code Generation'
-      - Make sure "Runtime Library" is set to "Multi-threaded (/MT)"
-      - Click hit OK
-  - Make sure the runtime library setting for glew\_static project is
-    set to multi-threaded static
-      - In "Solution Explorer - OpenCSG" pane click "glew\_static"
-        project
-      - Open the OpenCSG project properties by clicking menu item
-        "Project-\>OpenCSG Properties" (might be just "Properties")
-      - Make sure it says "Active(Release)" in the "Configuration:" drop
-        down menu
-      - Click C/C++ -\> Code Generation
-      - Make sure "Runtime Library" is set to "Multi-threaded (/MT)"
-      - Click hit OK
-  - Close Visual Express saving changes
-
-Build OpenCSG library. You can use the GUI Build/Build menu (the
-Examples project might fail, but glew and OpenCSG should succeed).
-Alternatively you can use the command line:
-
-    cmd /c vcexpress OpenCSG.sln /build
-    Again, substitute devenv if you have the full visual studio
-
-The `cmd /c` bit is needed otherwise you return to the shell immediately
-and must wait for the build process to complete (there is no indication
-that this is happening apart from viewing in task manager).
-
-<div class="mw-heading mw-heading3">
-
-### OpenSCAD
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-7 "Edit section: OpenSCAD")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-7 "Edit section's source code: OpenSCAD")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - Bison/Flex: Open the mingw shell and type `mingw-get install
-    msys-bison`. Then do the same for flex: `mingw-get install
-    msys-flex`
-
-<!-- end list -->
-
-  - Open the QT Shell, and copy/paste the following commands
-
-<!-- end list -->
-
-    cd C:\openscad
-    set INCLUDE=%INCLUDE%C:\CGAL-3.7\include;C:\CGAL-3.7\auxiliary\gmp\include;
-    set INCLUDE=%INCLUDE%C:\boost_1_46_1;C:\glew-1.5.8\include;C:\OpenCSG-1.3.2\include;C:\eigen2
-    set LIB=%LIB%C:\CGAL-3.7\lib;C:\CGAL-3.7\auxiliary\gmp\lib;
-    set LIB=%LIB%C:\boost_1_46_1\lib;C:\glew-1.5.8\lib;C:\OpenCSG-1.3.2\lib
-    qmake
-    nmake -f Makefile.Release
-
-Wait for the nmake to end. There are usually a lot of non-fatal warnings
-about the linker. On success, an openscad.exe file appears in the
-release folder. Enjoy.
-
-<div class="mw-heading mw-heading2">
-
-## Building an installer
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-8 "Edit section: Building an installer")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-8 "Edit section's source code: Building an installer")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - Download and install NSIS from
-    <http://nsis.sourceforge.net/Download>
-  - Put the FileAssociation.nsh macro from
-    <http://nsis.sourceforge.net/File_Association> in the NSIS Include
-    directory, C:\\Program Files\\NSIS\\Include
-  - Run 'git submodule init' and 'git submodule update' to download the
-    MCAD system (<https://github.com/elmom/MCAD>) into the
-    openscad/libraries folder.
-  - Copy the OpenSCAD "libraries" and "examples" directory into the
-    "release" directory
-  - Copy OpenSCAD's "scripts/installer.nsi" to the "release" directory.
-  - Right-click on the file and compile it with NSIS. It produces a
-    nice, easy installer. Enjoy.
-
-<div class="mw-heading mw-heading2">
-
-## Compiling the regression tests
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-9 "Edit section: Compiling the regression tests")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-9 "Edit section's source code: Compiling the regression tests")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - Follow all the above steps, build openscad, run it, and test that it
-    basically works.
-  - Install Python 2.x (not 3.x) from
-    [http://www.python.org](https://www.python.org)
-  - Install Imagemagick from <http://www.imagemagick.org>
-  - read openscad\\docs\\testing.txt
-  - Go into your QT shell
-
-<!-- end list -->
-
-    set PATH=%PATH%;C:\Python27 (or your version of python)
-    cd c:\openscad\tests\
-    cmake . -DCMAKE_BUILD_TYPE=Release
-    Edit the CMakeCache.txt file, search/replace /MD to /MT
-    cmake .
-    nmake -f Makefile
-
-  - This should produce a number of test .exe files in your directory.
-    Now run
-
-<!-- end list -->
-
-    ctest
-
-If you have link problems, see Troubleshooting, below.
-
-<div class="mw-heading mw-heading2">
-
-## Troubleshooting
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-10 "Edit section: Troubleshooting")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-10 "Edit section's source code: Troubleshooting")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-**Linker errors**
-
-If you have errors during linking, the first step is to improve debug
-logging, and redirect to a file. Open Openscad.pro and uncomment this
-line:
-
-``` 
- QMAKE_LFLAGS   += -VERBOSE
+Anonymous braces alone do not create a persistent scope:
+
+```openscad
+{ angle = 45; }
+rotate(angle) square(10);  // angle must be defined in a visible scope
 ```
 
-Now rerun
+for() loops create a separate scope per iteration. You still cannot write a = a + 1; to mutate a variable.
 
-``` 
- nmake -f Makefile.Release > log.txt
+### Variables cannot be changed
+
+Assigning the same name twice in the same scope triggers a warning; the later assignment effectively replaces the earlier at its position. The earlier assignment never executes.
+
+```openscad
+a = 1;         // never executed
+echo(a);       // 2
+a = 2;         // executed at the position of the original assignment
+echo(a);       // 2
 ```
 
-You can use a program like 'less' (search with '/') or wordpad to review
-the log.
-
-To debug these errors, you must understand basics about Windows linking.
-Windows links to its standard C library with basic C functions like
-malloc(). But there are four different ways to do this, as follows:
-
-    compiler switch - type - linked runtime C library
-    /MT - Multithreaded static Release - link to LIBCMT.lib 
-    /MTd - Multithreaded static Debug - link to LIBCMTD.lib 
-    /MD - Multithreaded DLL Release - link to MSVCRT.lib (which itself helps link to the DLL)
-    /MDd - Multithreaded DLL Debug - link to MSVCRTD.lib (which itself helps link to the DLL)
+Two special non-warning cases:
+- First assignment at top level of an included file, second in the including file.
+- First assignment at program top level, second from -D or the Customizer.
+
+This allows overriding defaults from libraries:
+
+```openscad
+// main.scad
+include <lib.scad>
+a = 2;
+echo(b);  // 3
+
+// lib.scad
+a = 1;
+b = a + 1;
+```
+
+### Special variables
+
+Variables starting with $ are special (dynamic) and provide an alternate way to pass arguments to modules/functions.
 
-All of the libraries that are link together in a final executable must
-be compiled with the same type of linking to the standard C library.
-Otherwise, you get link errors like, "LNK2005 - XXX is already defined
-in YYY". But how can you track down which library wasn't linked
-properly? 1. Look at the log, and 2. dumpbin.exe
+## Vectors
+
+A vector (list) is a sequence of zero or more values (numbers, booleans, strings, vectors, etc.).
+
+Examples:
+
+```openscad
+[1, 2, 3]
+[a, 5, b]
+[]
+[5.643]
+["a", "b", "string"]
+[[1, r], [x, y, z, 4, 5]]
+[3, 5, [6, 7], [[8, 9], [10, [11, 12], 13], c, "string"]]
+[4/3, 6*1.5, cos(60)]
 
-**dumpbin.exe**
+// Usage:
+cube([width, depth, height]);
+translate([x, y, z])
+polygon([[x0, y0], [x1, y1], [x2, y2]]);
+```
 
-dumpbin.exe can help you determine what type of linking your .lib or
-.obj files were created with. For example, ` dumpbin.exe /all CGAL.lib |
-find /i "DEFAULTLIB"  ` gives you a list of DEFAULTLIB symbols inside of
-CGAL.lib. Look for LIBCMT, LIBCMTD, MSVCRT, or MSVCRTD. That tells you,
-according to the above table, whether it was built Static Release,
-Static Debug, DLL Release, or DLL Debug. (DLL, of course means Dynamic
-Link Library in this conversation.) This can help you track down, for
-example, linker errors about conflicting symbols in LIBCMT and LIBCMTD.
+### Creation
 
-dumpbin.exe can also help you understand errors involving unresolved
-external symbols. For example, if you get an error about unresolved
-external symbol `___GLEW_NV_occlusion_query`, but your VERBOSE error log
-says the program linked in glew32.lib, then you can `dumpbin.exe /all
-glew32.lib | find /i "occlusion"` to see if the symbol is actually
-there. You may see a mangled symbol, with \_\_impl, which gives you
-another clue with which you can google. In this particular example,
-glew32s.lib (s=static) should have been linked instead of glew32.lib.
+```openscad
+cube([10, 15, 20]);
 
-<div class="mw-heading mw-heading3">
+a1 = [1, 2, 3];
+a2 = [4, 5];
+a3 = [6, 7, 8, 9];
+b  = [a1, a2, a3];  // [[1,2,3], [4,5], [6,7,8,9]]
+```
 
-### CGAL
+Vector comprehensions:
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-11 "Edit section: CGAL")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-11 "Edit section's source code: CGAL")<span class="mw-editsection-bracket">\]</span></span>
+```openscad
+n = 10;
+a = 0;
+result = [ for (i = [0 : n-1]) a ];
+echo(result);  // ECHO: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-</div>
+n = 10;
+a = 0;
+b = 1;
+result = [ for (i = [0 : n-1]) (i % 2 == 0) ? a : b ];
+echo(result);  // ECHO: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
+```
 
-**CGAL-vc90-mt-s.lib**
+### Indexing elements within vectors
 
-After compilation, it is possible that you might get a file named
-`CGAL-vc90-mt.lib` or `CGAL-vc90-mt-gd.lib` instead of
-`CGAL-vc90-mt-s.lib`. There are many possibilities: you accidentally
-built the wrong version, or you may have built the right version and
-VCExpress named it wrong. To double check, and fix the problem, you can
-do the following:
+Elements are indexed from 0 to len(v)-1.
 
-    cd C:\CGAL-3.7\lib
-    dumpbin /all CGAL-vc90-mt.lib | find /i "DEFAULTLIB"
-    (if you have mt-gd, use that name instead)
+```openscad
+e[5]            // element #5 at top level
+e[5][2]         // element 2 of element 5
+e[5][2][0]      // element 0 of the above
+e[5][2][0][1]   // and so on
+```
 
-If this shows lines referencing `LIBCMTD, MSVCRT, or MSVCRTD` then you
-accidentally built the debug and/or dynamic version, and you need to
-clean the build, and try to build again with proper settings to get the
-*multi-threaded static release* version. However, if it just says
-`LIBCMT`, then you are probably OK. Look for another line saying
-`DEFAULTLIB:CGAL-vc90-mt-s`. If it is there, then you can probably just
-rename the file and have it work.
+Example dataset:
 
-    move CGAL-vc90-mt.lib CGAL-vc90-mt-s.lib
+```openscad
+e = [ [1], [], [3,4,5], "string", "x", [[10,11],[12,13,14],[[15,16],[17]]] ];  // length 6
+```
 
-**Visual Studio build**
+Address | len() | Element/Value
+---|---:|---
+e[0] | 1 | [1]
+e[1] | 0 | []
+e[5] | 3 | [[10,11], [12,13,14], [[15,16],[17]]]
+e[5][1] | 3 | [12, 13, 14]
+e[5][2] | 2 | [[15,16], [17]]
+e[5][2][0] | 2 | [15, 16]
+e[5][2][0][1] | undef | 16
+e[3] | 6 | "string"
+e[3][2] | 1 | "r"
 
-You can build CGAL using the GUI of visual studio, as an alternative to
-nmake. You have to use an alternate cmake syntax. Type 'cmake' by itself
-and it gives you a list of 'generators' that are valid for your machine;
-for example Visual Studio Express is `cmake -G"Visual Studio 9 2008" .`.
-That should get you a working `.sln` (solution) file.
+Additional indexing expressions:
 
-Then run this:
+```openscad
+s = [2, 0, 5];
+a = 2;
+```
 
-    vcexpress CGAL.sln 
+Address | len() | Element/Value
+---|---:|---
+s[a] | undef | 5
+e[s[a]] | 3 | [[10,11], [12,13,14], [[15,16],[17]]]
 
-Modify the build configure target to Release (not Debug) and change the
-properties of the projects to be '/MT' multithreaded static builds. This
-is the similar procedure used to build OpenCSG, so refer to those
-instructions above for more detail.
+### String indexing
 
-**Note for Unix users**
+```openscad
+"string"[2];  // "r"
+```
 
-The 'MingW Shell' (Start/Programs) provide tools like bash, sed, grep,
-vi, tar, \&c. The C:\\ drive is under '/c/'. MingW has packages, for
-example: `mingw-get install msys-unzip` downloads and installs the
-'unzip' program. Git contains some programs by default, like perl. The
-windows command shell has cut/paste - hit `alt-space`. You can also
-change the scrollback buffer settings.
+### Dot notation indexing
 
-<div class="mw-heading mw-heading3">
+The first three elements of a vector can be accessed with dot notation:
 
-### References
+```openscad
+e.x;  // e[0]
+e.y;  // e[1]
+e.z;  // e[2]
+```
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&veaction=edit&section=T-12 "Edit section: References")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Building_on_Windows&action=edit&section=T-12 "Edit section's source code: References")<span class="mw-editsection-bracket">\]</span></span>
+### Vector operators
 
-</div>
+#### concat
 
-  - [Windows Building, OpenSCAD mailing list, 2011
-    May](http://rocklinux.net/pipermail/openscad/2011-May/thread.html).
+(Requires version 2015.03)
 
-<!-- end list -->
+concat() flattens and joins vectors (no change in nesting level).
 
-  - [C Run-Time Libraries
-    linking](http://msdn.microsoft.com/en-us/library/abx4dbyh\(v=vs.80\).aspx),
-    Microsoft.com for Visual Studio 8 (The older manual is good too,
-    [here](http://msdn.microsoft.com/en-us/library/aa278396\(VS.60\).aspx))
+```openscad
+vector1 = [1, 2, 3];
+vector2 = [4];
+vector3 = [5, 6];
 
-<!-- end list -->
+new_vector = concat(vector1, vector2, vector3);  // [1,2,3,4,5,6]
 
-  - [old
-    nabble](http://old.nabble.com/flex-2.5.35-1:-isatty\(\)-problem-\(and-solution\)-td17659695.html)
-    on \_isatty, flex
+string_vector = concat("abc", "def");            // ["abc", "def"]
+one_string    = str(string_vector[0], string_vector[1]);  // "abcdef"
+```
 
-<!-- end list -->
+#### len
 
-  - [Windows vs. Unix: Linking dynamic load
-    modules](http://xenophilia.org/winvunix.html) by Chris Phoenix
+len() returns the length of a vector or string. Single non-vector values raise an error.
 
-<!-- end list -->
+```openscad
+a = [1, 2, 3];
+echo(len(a));  // 3
+```
 
-  - [Static linking in CMAKE under MS Visual
-    C](http://www.cmake.org/Wiki/CMake_FAQ#How_can_I_build_my_MSVC_application_with_a_static_runtime.3F)
-    (cmake.org)
+### Matrix
 
-<!-- end list -->
+A matrix is a vector of vectors.
 
-  - [\_\_imp , declspec(dllimport), and unresolved
-    references](http://stackoverflow.com/questions/3704374/linking-error-lnk2019-in-msvc-unresolved-symbols-with-imp-prefix-but-should)
-    (stackoverflow.com)
+```openscad
+mr = [
+  [ cos(angle), -sin(angle)],
+  [ sin(angle),  cos(angle)]
+];
+```
 
-For building OpenSCAD, see
-<https://github.com/openscad/openscad/blob/master/README.md>
+## Objects (associative maps)
 
-<div class="mw-heading mw-heading1">
+(Requires development snapshot)
 
-# Chapter 9 -- Frequently Asked Questions
+Objects store collections of named values, analogous to JavaScript objects or Python dictionaries. Creation is currently not available in OpenSCAD; functions may return objects.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=11 "Edit section: Chapter 9 -- Frequently Asked Questions")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=11 "Edit section's source code: Chapter 9 -- Frequently Asked Questions")<span class="mw-editsection-bracket">\]</span></span>
+### Retrieving a value from an object
 
-</div>
+```openscad
+obj.name     // for identifier-like names
+obj["name"]  // for arbitrary string keys
+```
 
-OpenSCAD User Manual
+### Iterating over object members
 
-<div class="mw-heading mw-heading1">
+```openscad
+for (name = obj) {
+  // name is the member name
+  value = obj[name];
+  // ...
+}
+```
 
-# General
+Works with flow-control for, intersection_for(), and list comprehensions.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-1 "Edit section: General")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-1 "Edit section's source code: General")<span class="mw-editsection-bracket">\]</span></span>
+## Getting input
 
-</div>
+There is no interactive input during script execution. Variables can be set via:
+- Assignments in the script
+- Customizer
+- -D variable=value at the command line
+- Limited file-based data access (e.g., dxf, stl, png)
 
-<div class="mw-heading mw-heading2">
+### Getting a point from a drawing
 
-## <span id="How_is_OpenSCAD_pronounced.3F"></span>How is OpenSCAD pronounced?
+dxf_cross reads the intersection of two lines (on a specified layer) and returns the point. The DXF must contain two lines that intersect (not point entities).
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-2 "Edit section: How is OpenSCAD pronounced?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-2 "Edit section's source code: How is OpenSCAD pronounced?")<span class="mw-editsection-bracket">\]</span></span>
+```openscad
+OriginPoint = dxf_cross(
+  file   = "drawing.dxf",
+  layer  = "SCAD.Origin",
+  origin = [0, 0],
+  scale  = 1
+);
+```
 
-</div>
+### Getting a dimension value
 
-The intended pronunciation is: **Oh** - **Pen** - **Ess** - **CAD**
+dxf_dim reads a named dimension (using an identifier in the drawing instead of the numeric value).
 
-<div class="mw-heading mw-heading2">
+```openscad
+TotalWidth = dxf_dim(
+  file   = "drawing.dxf",
+  name   = "TotalWidth",
+  layer  = "SCAD.Origin",
+  origin = [0, 0],
+  scale  = 1
+);
+```
 
-## <span id="What_is_the_meaning_of_the_S_in_OpenSCAD.3F"></span>What is the meaning of the S in OpenSCAD?
+---
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-3 "Edit section: What is the meaning of the S in OpenSCAD?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-3 "Edit section's source code: What is the meaning of the S in OpenSCAD?")<span class="mw-editsection-bracket">\]</span></span>
+# En.Wikibooks.Org Wiki Openscad User Manual Importing Geometry Import
 
-</div>
+# OpenSCAD User Manual: Importing Geometry
 
-The S stands for **Solid** as [Solid
-modeling](https://en.wikipedia.org/wiki/Solid_modeling "wikipedia:Solid modeling").
+Importing is achieved by the import() command.
+Note: Requires version 2015.03-2 or later for most features noted below.
 
-<div class="mw-heading mw-heading2">
+The File → Open command may be used to insert an import() command. The file type filter may show only OpenSCAD files, but the file name can be replaced with a wildcard (e.g. *.stl) to browse additional file types.
 
-## <span id="Why_Is_There_No_Preview_on_Windows_in_a_Virtual_Machine.3F"></span>Why Is There No Preview on Windows in a Virtual Machine?
+## Supported file types
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-4 "Edit section: Why Is There No Preview on Windows in a Virtual Machine?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-4 "Edit section's source code: Why Is There No Preview on Windows in a Virtual Machine?")<span class="mw-editsection-bracket">\]</span></span>
+- 3D geometry formats
+  - STL (ASCII and Binary)
+  - OFF
+  - OBJ
+  - AMF (deprecated)
+  - 3MF
+- 2D geometry formats
+  - DXF
+  - PDF
+  - SVG
+- Data formats
+  - JSON
+  - CSV
+    - Note: Treated as JSON input by import(); not the same as spreadsheet CSV.
+- Other
+  - CSG: import via include<> or loaded like an .scad file
+  - PNG: import via surface()
 
-</div>
+## import
 
-It is likely that your VM or session does not support the required
-version of OpenCSG/OpenGL for correct preview rendering.
+Imports a file for use in the current OpenSCAD model. The file extension determines the type.
 
-**Note**: Also applies when working via Remote desktop using RDP
-(Windows) or XfreeRDP (Linux )
+### Parameters
 
-A solution is to use software rendering via the Mesa driver from the
-MSYS2 package. Download the repository for the version for your version
-of Windows:
+- file
+  - String path to file. If not absolute, it is resolved relative to the importing script.
+  - Note: When using include<> with a script that calls import(), the path is resolved relative to the including script.
+- center
+  - Boolean. If true, places the center of the object at the origin.
+  - Note: Development snapshot.
+- convexity
+  - Integer. Maximum number of front or back faces a ray may penetrate. Used only for correct OpenCSG preview and has no effect on final CGAL render.
+- id
+  - String. SVG import only; the element or group ID to import. Labels do not work here.
+  - Note: Development snapshot.
+- layer
+  - String. DXF and SVG import only; layer name to import.
+- $fn
+  - Number. Segments used when converting circles/arcs/curves to polygons.
+  - Note: Development snapshot.
+- $fa
+  - Number. Minimum angle step for polygon conversion of circles/arcs.
+  - Note: Development snapshot.
+- $fs
+  - Number. Minimum segment length for polygon conversion of circles/arcs.
+  - Note: Development snapshot.
 
-  - 64bit - [mingw64
-    repository](https://packages.msys2.org/package/mingw-w64-x86_64-mesa?repo=mingw64)
-  - ~~32bit - mingw32 repository~~
+### Examples
 
-<span style="font-weight: bold;">\[<span style="color: var( --color-link-red, #A00000 );">Deprecated:</span>
-Windows as a 32-bit Operating System</span> is deprecated after now and
-will be removed in a future release. Use a 64 bit version of Windows
-instead. **\]**
+```openscad
+import("example012.stl", convexity = 3);
+```
 
-An decompression app like 7-zip or WinRAR will be needed to extract the
-contents of the \*pkg.tar.xz file.
+```openscad
+// Windows: escape backslashes or use forward slashes
+import("D:/Documents and Settings/User/My Documents/Gear.stl", convexity = 3);
+```
 
-Find the file `mingw64\bin\opengl32.dll` in the extracted folder. Note
-that even in a 64 bit system the name of the .dll still has "32" in it.
+```openscad
+// For data formats, the imported content is assigned to a variable
+data = import("data.json");
+```
 
-Copy opengl32.dll to the OpenSCAD installation directory, which is
-normally `c:\program files` \[for 64bits\] or `c:\program files(x86)`
-\[for 32bits\].
+Read a layer of a 2D DXF file and create a 3D shape:
 
-Restart OpenSCAD and preview should function normally.
+```openscad
+linear_extrude(height = 5, center = true, convexity = 10)
+    import_dxf(file = "example009.dxf", layer = "plate");
+```
 
-<div class="mw-heading mw-heading1">
+## Convexity
 
-# Display
+Convexity is the maximum number of times a ray may intersect the front or back faces of the shape. For most models, setting convexity to 10 is sufficient for correct OpenCSG preview. It does not affect final CGAL rendering.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-5 "Edit section: Display")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-5 "Edit section's source code: Display")<span class="mw-editsection-bracket">\]</span></span>
+## Notes
 
-</div>
+In recent versions, import() is used for both 2D (e.g., DXF for extrusion) and 3D (e.g., STL) files.
 
-<div class="mw-heading mw-heading2">
+## CGAL ERROR: assertion violation!
 
-## <span id="What_is_the_Convexity_Parameter_.3F"></span>What is the Convexity Parameter ?
+If you plan to render imported STL files, ensure the STL is “clean” (manifold, no holes, no self-intersections). A non-manifold STL may preview but fail on render with warnings or errors such as:
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-6 "Edit section: What is the Convexity Parameter ?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-6 "Edit section's source code: What is the Convexity Parameter ?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<span typeof="mw:File">[![](openscad_user_manual_media/c80fdf56f87d28c247fc9220328d485767b14b53.jpg)](/wiki/File:Openscad_convexity.jpg)</span>
-
-This image shows a 2D shape with a convexity of 2, as the ray indicated
-in red intersects with the 2D shape in at most two sections. The
-convexity of a 3D shape would be determined in a similar way. Setting it
-to 10 should work fine for most cases.
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Why_Isn.27t_Preview_Working.3F"></span>Why Isn't Preview Working?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-7 "Edit section: Why Isn't Preview Working?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-7 "Edit section's source code: Why Isn't Preview Working?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![Force
-Goldfeather](openscad_user_manual_media/a406a94a0d085b81f80b38d955be26bd85170582.png)
-
-Some systems, in particular Intel GPUs on Windows, tend to have old or
-broken OpenGL drivers. This affects preview rendering when using
-difference or intersection operators.
-
-The following tends to improve the situation:
-Edit-\>Preferences-\>Advanced-\>Force Goldfeather (see screenshot).
-
-<div class="mw-heading mw-heading2">
-
-## <span id="What_are_those_strange_flickering_artifacts_in_the_preview.3F"></span>What are those strange flickering artifacts in the preview?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-8 "Edit section: What are those strange flickering artifacts in the preview?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-8 "Edit section's source code: What are those strange flickering artifacts in the preview?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![OpenSCAD display issue with coincident
-faces](openscad_user_manual_media/aad6d8d0a7a7abbdd3a2f012e1d11ec79365e0be.png)
-
-This is typically caused by differencing objects that share one or more
-faces, e.g.:
-
-<div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-
-    cube_size = 20;
-    difference() {
-      cube(cube_size, center = true);
-      cylinder(r = 10, h = cube_size, center = true);
-    }
-
-</div>
-
-In some cases the final render works fine, but designs with coincident
-resulting faces should be considered a design with undefined behavior,
-as a proper render result is not guaranteed. The fundamental source of
-the issue is not a bug, but an intrinsic property of the inability to
-rigorously compare floating point values which might have undergone
-trigonometric operations (like rotations) resulting in irrational values
-that simply cannot be represented exactly in any manner. Because of this
-you can get near-coincident surfaces where part of the surface is inside
-and part of the surface is outside, or zero-volume regions, resulting in
-a render error that the output is not manifold. In simple tests like
-this example, the render will typically be okay giving false confidence
-in this approach, but if both pieces were subject to an equal rotation
-it can fail to render in a manner which is slightly dependent on the
-platform the program is running on. This will typically result in a
-warning at render, and a rendered piece being removed from the final
-output.
-
-The solution to this is to always provide a clear overlap for surfaces
-which are to be removed, such as by adding a small value called an
-epsilon:
-
-<div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-
-    cube_size = 20;
-    difference() {
-      cube(cube_size, center = true);
-      cylinder(r = 10, h = cube_size+0.01, center = true);
-    }
-
-</div>
-
-Note that a similar issue occurs with unions, where coincident faces to
-be merged must also be given an epsilon value to guarantee they are
-always inside.
-
-There is a second preview-only flickering result which can also occur
-with faces that are not even supposed to be visible in the final result,
-for example because they're were negative faces used for removal by a
-`difference()` operation. This second case impact of fully properly
-removed faces (or negative faces) is an artifact of the library used for
-drawing the preview, and will not affect the render. If a clean preview
-result is desired such as for imaging output, these can be adjusted by
-an epsilon value in the same manner. See [this
-discussion](https://github.com/openscad/openscad/issues/1793) for other
-details.
-
-<span class="noprint">*See also:
-[w:Z-fighting](https://en.wikipedia.org/wiki/Z-fighting "w:Z-fighting")*</span>
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Why_are_some_parts_.28e.g._holes.29_of_the_model_not_rendered_correctly.3F"></span>Why are some parts (e.g. holes) of the model not rendered correctly? <span id="preview-convexity" class="anchor"></span>
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-9 "Edit section: Why are some parts (e.g. holes) of the model not rendered correctly?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-9 "Edit section's source code: Why are some parts (e.g. holes) of the model not rendered correctly?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![OpenSCAD display issue with convexity setting too
-low](openscad_user_manual_media/ad3048684642a6d104bf13d3e3f1fcd9e07fec1f.png)
-
-This can happen when using features like `linear_extrude()` or when
-importing objects. The convexity of the objects is not known. For more
-complex objects, the `convexity` parameter can be used to specify the
-value. Note that higher values cause a slowdown in preview.
-
-<div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-
-    difference() {
-        linear_extrude(height = 15 /* , convexity = 2 */) {
-            difference() {
-                square([50, 50]);
-                translate([10, 10]) circle(5);
-            }
-        }
-        translate([25, 25]) cube([5, 5, 40], center = true);
-    }
-
-</div>
-
-The user manual (section [Extrude parameters for all extrusion
-modes](/wiki/OpenSCAD_User_Manual/2D_to_3D_Extrusion#Extrude_parameters_for_all_extrusion_modes "OpenSCAD User Manual/2D to 3D Extrusion"))
-describes how to calculate the number that should be given to the
-convexity parameter.
-
-And other workaround might be to use
-[render()](/wiki/OpenSCAD_User_Manual/Other_Language_Features#Render "OpenSCAD User Manual/Other Language Features")
-to forces the generation of a mesh even in preview mode.
-
-<span class="noprint">*See also:
-[w:Convexity\_(mathematics)](https://en.wikipedia.org/wiki/Convexity_\(mathematics\) "w:Convexity (mathematics)")*</span>
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Why_does_difference_.28or_intersection.29_sometimes_not_work_in_preview.3F"></span>Why does difference (or intersection) sometimes not work in preview?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-10 "Edit section: Why does difference (or intersection) sometimes not work in preview?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-10 "Edit section's source code: Why does difference (or intersection) sometimes not work in preview?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![Sphere with cube subtracted, with camera outside the invisible
-cube.](openscad_user_manual_media/1f4c4730a4bb85a6526568de691d528ca58c214e.png)
-
-![The same model, with the view rotated slightly so the camera is inside
-the invisible
-cube.](openscad_user_manual_media/1e8c76350ed9b8d3f99ff3bd553e15be70946a91.png)
-
-<div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-
-    difference() {
-        sphere(10);
-        cube(100);
-    }
-
-</div>
-
-In perspective mode, the previewer does not process differences or
-intersections where the camera is inside the invisible object. This is
-most commonly seen when using a large object to cut away significant
-parts of the model.
-
-Workarounds:
-
-  - Keep the camera outside the invisible objects.
-  - Keep the invisible objects modest-sized so that it is easier to keep
-    the camera outside them.
-  - Wrap
-    [render()](/wiki/OpenSCAD_User_Manual/Other_Language_Features#render "OpenSCAD User Manual/Other Language Features")
-    around the difference or intersection.
-  - Use orthogonal mode.
-
-  
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Why_is_my_model_appearing_with_F5_but_not_F6.3F"></span>Why is my model appearing with F5 but not F6?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-11 "Edit section: Why is my model appearing with F5 but not F6?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-11 "Edit section's source code: Why is my model appearing with F5 but not F6?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-![OpenSCAD polyhedron with flipped
-face](openscad_user_manual_media/fb482cf91038a327d464134b1d1dfa63905b3d3e.png)
-
-This can be caused by
-[polyhedrons](/wiki/OpenSCAD_User_Manual/Primitive_Solids#polyhedron "OpenSCAD User Manual/Primitive Solids")
-with flipped faces.
-
-This can be visualized in "Thrown Together" display mode. See
-[misordered
-faces](/wiki/OpenSCAD_User_Manual/Primitive_Solids#Mis-ordered_faces "OpenSCAD User Manual/Primitive Solids")
-for details.
-
-<div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
-
-    points = [[5,5,0],[5,-5,0],[-5,-5,0],[-5,5,0],[0,0,3]];
-    faces = [[0,1,4],[1,2,4],[2,3,4],[3,4,0],[1,0,3],[2,1,3]];
-    polyhedron(points, faces);
-
-</div>
-
-If the model imports external STL files, see also [import related
-question](#Why_is_my_imported_STL_file_only_showing_up_with_F5_but_not_F6.3F).
-It is confusing that the error only occurs if there is more than one
-object involved, ie it "works" until you add another item.
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Why_is_the_preview_so_slow.3F"></span>Why is the preview so slow?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-12 "Edit section: Why is the preview so slow?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-12 "Edit section's source code: Why is the preview so slow?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Intersections or difference operations that use objects to cut holes,
-chamfer, or generally remove part of a solid are expensive. The preview
-rendering expects to have only primitive objects used as negatives so
-anything more complex has to be unpacked.
-
-For example (using `A+B` = `union()` / `A-B` = `difference()` / `A*B` =
-`intersection()`):
-
-`A - B*C - D*E`
-
-becomes: `A-B-D + A-B-E + A-C-D + A-C-E`
-
-..and if A is more complex:
-
-`A+B - C*D - E*F`
-
-becomes: `A-C-E + A-C-F + A-D-E + A-D-F + B-C-E + B-C-F + B-D-E + B-D-F`
-
-All combinations have to be rendered, which can take some time,
-especially on older GPUs, and especially on low-end Intel GPUs.
-
-<div class="mw-heading mw-heading1">
-
-# Import
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-13 "Edit section: Import")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-13 "Edit section's source code: Import")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading2">
-
-## <span id="How_can_I_Clean_Up_STL_Issues_.3F"></span>How can I Clean Up STL Issues ?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-14 "Edit section: How can I Clean Up STL Issues ?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-14 "Edit section's source code: How can I Clean Up STL Issues ?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-To work well the meshes in an STL file should be be
-[manifold](https://en.wikipedia.org/wiki/Manifold "w:Manifold"), not
-contain holes, nor intersect itself. Even with such issues the import
-process may well succeed and show something in the preview panel.
-However, operating on that object, or doing a full render, will likely
-
-  - emit warnings about it not being manifold
-  - cause it to disappear
-  - to emit CGAL errors like:
-
-<!-- end list -->
-
-``` 
- CGAL error in CGAL_Build_PolySet: CGAL ERROR: assertion violation!
- Expr: check_protocoll == 0
- File: /user/openscad_deps/../CGAL/Polyhedron_incremental_builder_3.h
+```
+CGAL error in CGAL_Build_PolySet: CGAL ERROR: assertion violation!
+Expr: check_protocoll == 0
+File: .../include/CGAL/Polyhedron_incremental_builder_3.h
+Line: 199
 ```
 
 or
 
-``` 
- CGAL error in CGAL_Nef_polyhedron3(): CGAL ERROR: assertion violation!
- Expr: pe_prev->is_border() || !internal::Plane_constructor<Plane>::get_plane(pe_prev->facet(),pe_prev->facet()->plane()).is_degenerate()
+```
+CGAL error in CGAL_Nef_polyhedron3(): CGAL ERROR: assertion violation!
+Expr: pe_prev->is_border() || !internal::Plane_constructor<Plane>::get_plane(pe_prev->facet(),pe_prev->facet()->plane()).is_degenerate()
+File: .../include/CGAL/Nef_3/polyhedron_3_to_nef_3.h
+Line: 253
 ```
 
-There are several ways to clean an STL file:
+Ways to clean STL files:
 
-  - MeshLab  
-    This free software can fix all issues.
+- netfabb (repair holes; not self-intersections in some editions)
+- MeshLab (can fix manifold issues and fill holes)
+  - Render → Show non Manif Edges
+  - Render → Show non Manif Vertices
+  - Filters → Selection → Select non Manifold Edges (or Vertices), Apply, Close
+  - Delete the selected vertices/edges
+  - Use Fill Holes tool; repeat until all holes are filled
+  - Export mesh as STL
+- Blender (if MeshLab cannot fill the last hole)
+  - Remove default object: X, 1
+  - File → Import → STL
+  - Enter Edit mode: Tab
+  - Deselect all: A
+  - Select non-manifold: Alt+Ctrl+Shift+M
+  - Navigate: MMB to rotate, Shift+MMB to pan, wheel to zoom
+  - Circle select: C (Esc to finish)
+  - Merge vertices: Alt+M → At Center (or press Space and search “merge”)
 
-Using MeshLab, you can do:
+Merging nearby vertices can be an effective way to close tiny gaps that are below typical 3D printer tolerances.
 
-  - Render \> Show non Manif Edges
-  - Render \> Show non Manif Vertices
+## Importing JSON
 
-If bad edges or verticies are found, use menu:
+Requires enabling the import-function feature in a development build.
 
-    Filters > Selection > Select non Manifold Edges
-    or
-    Filters > Selection > Select non Manifold Vertices
+If you import a file with suffix .json or .csv, import() returns a JSON object datatype which cannot be expressed as a literal in OpenSCAD; it must be imported from a file. Note: .csv files are treated as JSON here and must contain JSON, not spreadsheet CSV.
 
-and then `Apply` and `Close`. IF there are bad items a button, "Delete
-the current set of selected vertices..." should be used to remove them.
-Otherwise the screen will show "0 non manifold edges" and "0 non
-manifold vertices"
-
-There is a [useful explanation on
-YouTube](https://www.youtube.com/watch?v=oDx0Tgy0UHo) in the Meshlab
-Channel.
-
-Now all of the holes you made have to be filled back in. Select a hole,
-click Fill, and then Accept, and repeat until the mesh is correct.
-
-Use menu `File > Export Mesh` to export to STL.
-
-Using Blender is a possible alternative to Meshlab:
-
-1.  Start Blender
-2.  'X, 1' to remove the default object
-3.  File \> Import \> STL
-4.  'Tab' to edit the mesh
-5.  'A' to de-select all vertices
-6.  'Alt+Ctrl+Shift+M' to select all non-manifold vertices
-7.  'MMB' to rotate, 'Shift+MMB' to pan, 'wheel' to zoom
-8.  'C' for "circle" select, 'Esc' to finish
-9.  'Alt+M, 1' to merge or 'Space' and search for "merge" as alternative
-
-This instruction is showing the Key stroke shortcuts ('X' etc) to
-Blender operations and MMB is Middle Mouse Button.
-
-Merging vertices is a useful way of filling holes where the vertices are
-so closely packed that the slight change in geometry is unimportant
-compared to the precision of a typical 3D printer
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Why_is_my_imported_STL_file_appearing_with_F5_but_not_F6.3F"></span>Why is my imported STL file appearing with F5 but not F6?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-15 "Edit section: Why is my imported STL file appearing with F5 but not F6?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-15 "Edit section's source code: Why is my imported STL file appearing with F5 but not F6?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-This is mostly caused by bad geometry in the STL file. Use an app like
-Blender, MeshLab, NetFabb, or Prusa Slicer to import, repair and
-re-export the clean version. In essence the model needs to be
-[manifold](https://en.wikipedia.org/wiki/Manifold "w:Manifold") to be
-processed in OpenSCAD.
-
-Even a bad model may appear in preview mode as there is no real geometry
-yet. The preview actually painting pixels based on a view of the model.
-
-A specific issue are the so called "Zero faces" where the 3 points of a
-triangle are co-linear, which is currently not handled well in OpenSCAD.
-
-**Using MeshLab**
-
-MeshLab has a filter to remove zero faces by flipping edges of polygons
-
-    Filters -> Cleaning and Repairing -> Remove T-Vertices by Edge-Flip
-
-Set the Ratio to a high value (e.g. 1000000), otherwise it's possible
-the model gets distorted.
-
-**Using Blender**
-
-Blender has a 3D-Printing-Toolbox Plug-in (needs to be enabled in the
-UserSettings) that can show issues with the STL file. See
-<http://wiki.blender.org/index.php/Extensions:2.6/Py/Scripts/Modeling/PrintToolbox>
-
-**Prusa Slicer**
-
-In the menu `File > Repair STL` will take a file and make it acceptable
-to Slicer, if it can.
-
-<div class="mw-heading mw-heading2">
-
-## <span id="What_are_.22Unsupported_DXF_Entity.22_warnings.3F"></span>What are "Unsupported DXF Entity" warnings?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-16 "Edit section: What are \"Unsupported DXF Entity\" warnings?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-16 "Edit section's source code: What are \"Unsupported DXF Entity\" warnings?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Warning messages like `Unsupported DXF Entity 'SPLINE' (1c1) in
-"file.dxf"` mean that the DXF file was written using features that the
-our import processor does not support. The importer will still import
-the parts it can, but your model may be incomplete .
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Can_I_Use_Inkscape_to_Make_2D_Drawings_.3F"></span>Can I Use Inkscape to Make 2D Drawings ?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-17 "Edit section: Can I Use Inkscape to Make 2D Drawings ?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-17 "Edit section's source code: Can I Use Inkscape to Make 2D Drawings ?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-When using Inkscape to draw a design it is good practice to convert all
-Bezier curves to short line segments using
-
-    Extensions > Modify Path > Flatten Beziers ...
-
-which pops up a dialog with a setting for the max length of the line
-segments to use. Shorter lines, thus more lines, produce smoother
-results at the cost of more processing and data. When exporting select
-format "AutoCAD DXF R14".
-
-Exporting to SVG or DXF will work with the import() module to bring your
-drawing into OpenSCAD.
-
-A more detailed tutorial is available at
-[RepRap](http://repraprip.blogspot.de/2011/05/inkscape-to-openscad-dxf-tutorial.html).
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Can_I_Import_Inkscape_2D_Models_to_OpenSCAD_.3F"></span>Can I Import Inkscape 2D Models to OpenSCAD ?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-18 "Edit section: Can I Import Inkscape 2D Models to OpenSCAD ?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-18 "Edit section's source code: Can I Import Inkscape 2D Models to OpenSCAD ?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Inkscape is an open source drawing program. Tutorials for transferring
-2d DXF drawings from Inkscape to OpenSCAD are available here:
-
-  - [Simple drawing using only straight line path segments on
-    RepRap](http://repraprip.blogspot.com/2011/05/inkscape-to-openscad-dxf-tutorial.html)
-  - A complicated process for [using text in OpenSCAD using conversion
-    to
-    Postscript](http://web.archive.org/web/20130318112610/http://tonybuser.com/?tag=inkscape%20http://tonybuser.com/?tag=inkscape).
-    Obsolete since version 2021.01 added the `text()` module.
-  - [Extension for DXF Export w native support of
-    Beziers](http://bobcookdev.com/inkscape/inkscape-dxf.html)
-  - [Convert any 2D image to a 3D object using OpenSCAD on
-    Instructables](http://www.instructables.com/id/Convert-any-2D-image-to-a-3D-object-using-OpenSCAD/)
-  - [directly exports OpenSCAD
-    file](https://cyberweb.cite-sciences.fr/wiki/doku.php?id=projets:de_inkscape_a_openscad)
-    (French)
-
-<table>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><p><strong>Note:</strong><br />
-The original FabLab site is being renovated. This should be a link to the same page, now located in the cyberweb.cite-sciences-fr site</p></td>
-</tr>
-</tbody>
-</table>
-
-  
-
-<div class="mw-heading mw-heading1">
-
-# Export
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-19 "Edit section: Export")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-19 "Edit section's source code: Export")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading2">
-
-## <span id="How_can_I_export_multiple_parts_from_one_script.3F"></span>How can I export multiple parts from one script?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-20 "Edit section: How can I export multiple parts from one script?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-20 "Edit section's source code: How can I export multiple parts from one script?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Answer based on comments in related issue on github
-<https://github.com/openscad/openscad/pull/1534#issuecomment-227024209>
-
-There is a way to generate a bunch of geometric primitives and export
-them as STL files from a single script, without commenting/uncommenting
-code.
-
-The variable PARTNO indicates which part is being exported in the
-current run. If PARTNO is 'undef', then nothing is exported.
-
-![Image exported with
-PARTNO=0](openscad_user_manual_media/83e4498fc4ba06487a834ba3127560620a985a73.png)
-
-``` 
- PARTNO = undef; // default part number
- 
- module tree() {
-   color("green") cylinder(r1 = 12, r2 = 1, h = 30);
-   // ...
- }
- 
- module trunk() {
-   color("brown") cylinder(r = 3, h = 10);
-   // ...
- }
- 
- module base() {
-   color("white") translate([-10, -10, 0]) cube([20, 20, 5]);
-   // ...
- }
- 
- if (PARTNO == 1) tree();
- if (PARTNO == 2) trunk();
- if (PARTNO == 3) base();
- 
- // optionally use 0 for whole object
- if (PARTNO == 0) {
-   base();
-   translate([0, 0, 5]) trunk();
-   translate([0, 0, 15]) tree();
- }
+Example input file contents:
+```
+{"people":[{"name":"Helen", "age":19}, {"name":"Chris", "age":32}]}
 ```
 
-When working interactively, the PARTNO variable at the top of the file
-can be set to the number of the part to be shown/exported from the GUI.
+Example usage:
+```openscad
+/* people.json as shown above */
+t = import("people.json");
+echo(t);
+people = t.people;
 
-It's possible to automate the process of exporting all of the parts by
-writing a shell script on MacOS or Linux, or a batch file on Windows.
-The shell script would look something like this:
-
-``` 
- # export parts as STL
- openscad -DPARTNO=1 -o tree.stl model.scad
- openscad -DPARTNO=2 -o trunk.stl model.scad
- openscad -DPARTNO=3 -o base.stl model.scad
- 
- # export image of all the parts combined
- openscad -DPARTNO=0 -o model.png model.scad
+for (i = [0 : len(people) - 1]) {
+    person = people[i];
+    echo(str(person.name, ": ", person.age));
+}
 ```
 
-Running this script once from the command line exports all of the parts
-to separate files.
-
-<div class="mw-heading mw-heading2">
-
-## How can I export screenshots with higher resolution than the current window
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-21 "Edit section: How can I export screenshots with higher resolution than the current window")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-21 "Edit section's source code: How can I export screenshots with higher resolution than the current window")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Right now that is not possible from the GUI, as the images are
-restricted to the actual display context. Using the
-*File-\>Export-\>Export As Image* menu always exports at viewport
-resolution.
-
-It is however possible to generate higher resolution images via command
-line using the `--imgsize` parameter. This uses a separate drawing
-context, size-limited by memory and the graphics driver, to generate the
-image. For example, on Linux, the Mesa driver for Intel UHD Graphics 620
-(Kabylake GT2) seems to max out at an image resolution of about
-16000×16000.
-
-``` 
- $ openscad --imgsize 16000,16000 -o CSG.png CSG.scad
- ECHO: version = [2019, 1, 0]
- Compiling design (CSG Products normalization)...
- Normalized CSG tree has 6 elements
- $ file CSG.png 
- CSG.png: PNG image data, 16000 x 16000, 8-bit/color RGB, non-interlaced
+Result:
+```
+ECHO: { people = [{ age = 19; name = "Helen"; }, { age = 32; name = "Chris"; }]; }
+ECHO: "Helen: 19"
+ECHO: "Chris: 32"
 ```
 
-<div class="mw-heading mw-heading1">
+## import_dxf (Deprecated)
+
+Deprecated: import_dxf() will be removed in a future release. Use import() instead.
 
-# Language
+```openscad
+// Read a DXF layer and extrude
+linear_extrude(height = 5, center = true, convexity = 10)
+    import_dxf(file = "example009.dxf", layer = "plate");
+```
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-22 "Edit section: Language")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-22 "Edit section's source code: Language")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Why_am_I_getting_an_error_when_writing_a_.3D_a_.2B_1.3F"></span>Why am I getting an error when writing a = a + 1?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-23 "Edit section: Why am I getting an error when writing a = a + 1?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-23 "Edit section's source code: Why am I getting an error when writing a = a + 1?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The short answer is that in this language a variable may not appear on
-both sides of an assignment statement.
-
-When we add in the effect of block and FoC statements opening local
-scopes it is possible that an assignment may *look* like it is breaking
-this rule. But reusing a variable name, like "x", inside a block is
-defining a new, local variable so using the "x" from outside the block
-on the RHS of the "=" sign is correct and allowed.
-
-    x=12;
-    if(true) {
-      x=x+1;   // local = global + 1
-      echo(x); // ECHO: 13
-      }
-    echo(x); //ECHO: 12
-
-The deeper answer is based on this language being a [declarative
-functional
-language](/wiki/OpenSCAD_User_Manual/Functional_Descriptive_Language "OpenSCAD User Manual/Functional Descriptive Language").
-In a functional language a script is list of instructions (statements)
-that are compiled into a run-able form using a script's initial
-conditions as the basis for every calculation, decision, and loop
-carried out in strict order. Statements in the script are only ever
-visited once and every variable that receives the value of a calculation
-can only be set once, effectively making it a constant. Decisions,
-If-Then-Else statements, are made with the values extant when their
-statement is compiled and only the statements on the branch selected
-make it to the run-able code. Loops are unrolled so the body of the loop
-is copied as many times as the loop should run, and in each copy the
-loop control values are set as "constants" of the updated value by the
-compilation process.
+## import_stl (Deprecated)
 
-<div class="mw-heading mw-heading2">
-
-## <span id="How_can_i_fake_iteration_without_a_.3D_a_.2B_1_.3F"></span>How can i fake iteration without a = a + 1 ?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-24 "Edit section: How can i fake iteration without a = a + 1 ?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-24 "Edit section's source code: How can i fake iteration without a = a + 1 ?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The standard tactic to process a list, or an array of data, or even to
-repeat an action is to iterate. But in a function language the activity
-of updating a loop counter is not available.
-
-However, there are some useful alternative ways to process data in a
-Functional Language:
-
-  - Precalculate a list  
-    use one of the list comprehension tools.
-  - looping  
-    create a new value of the variable for each step in the loop.
-  - Use recursion  
-    iterative processing of values by using a function or module to
-    process just one, then call itself to handle the rest of the data.
-
-**Examples**
-
-Return the sum of the values in a vector:
-
-    function sum_vec(vec, from = 0, to = undef ) =
-       let( end = is_undef( to ) ? len(vec)-1 : to )
-       ( from == end ? vec[end] : vec[end] + sum_vec(vec, from, end-1 ) );
-
-Cumulative sum of values in vector valid
-
-    function cumsum_vec(v) =
-       let( lenv = len(v) )
-       [for(a = v[0], i = 1; i < lenv; 
-            a = a+v[i], i = i+1) if(i==lenv-1) a+v[i]
-       ][0];
-
-Notice that the return from the function is only the 0-ht element, the
-only element that is actually added to the vector.
-
-Return true when any of the elements of the given vector are true. The
-elements of the vector will be evaluated as boolean values according to
-the rules for the different types of the language.
-
-    function any(booleans, index=0) =
-       vec_is_empty( booleans) ?
-           undef
-       : index > len(booleans)?
-           false
-       : booleans[index]? true :
-           any(booleans, index+1)
-       ;
-
-A purely recursive solution for canvasing all the elements of a list.
-The return of `undef` is used to signal bad input.
-
-Set all letters in a strong to "lower case". This is the interface
-function that does all of the input checking
-
-    function lower(string) = 
-       is_not_string( string ) ?
-           undef
-       : str_is_empty( string ) ?
-           ""
-       : str_lower( string )
-       ;
-
-This is the processing function
-
-    function str_lower(string) = 
-       chr( [for (c = string)
-               _is_in_set( c, _STRING_UPPER ) ? ord(c)+_ASCII_CONVERT : ord(c)
-           ])
-       ;
+Deprecated: import_stl() will be removed in a future release. Use import() instead.
 
-This is taking advantage of the `chr()`'s ability to implicitly convert
-an vector of single character elements into a string. Note that
-\_is\_in\_set() is a self made function that does what it says.
+```openscad
+import_stl("body.stl", convexity = 5);
+```
 
-<div class="mw-heading mw-heading2">
+## surface
 
-## <span id="Are_measures_being_considered_to_help_procedural_programmers_.3F"></span>Are measures being considered to help procedural programmers ?
+surface() reads heightmap information from text or image files. It can read PNG files.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-25 "Edit section: Are measures being considered to help procedural programmers ?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-25 "Edit section's source code: Are measures being considered to help procedural programmers ?")<span class="mw-editsection-bracket">\]</span></span>
+### Parameters
 
-</div>
+- file
+  - String. Path to the heightmap data file.
+- center
+  - Boolean. If true, center the object in X and Y; otherwise place in positive quadrant. Default: false.
+- invert
+  - Boolean. Inverts mapping of image color values to height values. No effect for text data files. Default: false.
+  - Note: Requires version 2015.03.
+- convexity
+  - Integer. As with import(), affects OpenCSG preview only.
 
-The view that "variables may not be changed" is a limitation can
-hopefully be changed by showing how to better exploit the opportunities.
+### Text file format
 
-  - [A "reduce"
-    function](/wiki/OpenSCAD_User_Manual/Suggest_Reduce_Function "OpenSCAD User Manual/Suggest Reduce Function")  
-    to help with collecting information depending on a list of input.
-    Anyone who knows what the function should do could use the undefined
-    link to start a new page to capture the design
-  - Recursion is fine  
-    we already detect and handle Tail-End Recursion now, but additional
-    help features are possible
-  - Disallow Reassignment  
-    The editor could be enhanced to fail with an error when x=x+1 is
-    detected.
-  - Command-Line Variable Override  
-    a new syntax or other mechanism for achieving this would be part of
-    implementing Disallow Reassignment.
+- A matrix of numbers representing heights.
+- Rows map to Y-axis; columns map to X-axis.
+- Numbers separated by spaces or tabs.
+- Empty lines and lines starting with # are ignored.
 
-**Aspects of the Zen of Functional Language Processing**
+### Images
 
-  - Imagine that all the expressions in a script are executed in
-    parallel. Any dependency of one expression on another must be made
-    explicit by hierarchical grouping. This view makes iterating to
-    accumulating information unnecessary.
+Requires version 2015.03.
 
-<!-- end list -->
+- Currently only PNG is supported.
+- Alpha channel is ignored.
+- Height is derived from grayscale using linear luminance for sRGB: Y = 0.2126 R + 0.7152 G + 0.0722 B.
+- Grayscale values are scaled to range 0 to 100.
 
-  - OpenSCAD functions operate the way that a spreadsheet cell does. A
-    spreadsheet formula cannot increment itself as that would be
-    circular reference.
+### Examples
 
-It might be possible to create features to help programmers apply their
-procedural programming skills in OpenSCAD. But the team is working in
-alignment with the technology .
+Example 1:
 
-Learning something from plethora of HTML generators out there all trying
-to create web pages we note that they are used to make a script that
-make snapshot "images" every time a web page is refreshed. In this vein
-there are OpenSCAD "generators" in other programming languages (python,
-ruby, C++, haskell, clojure are known) just as there are tools offering
-Javascript interfaces for similar purposes (OpenJSCAD, CoffeeSCAD).
+```openscad
+// surface.scad
+surface(file = "surface.dat", center = true, convexity = 5);
+%translate([0, 0, 5]) cube([10, 10, 10], center = true);
+```
 
-However until the need for such a solution becomes overwhelming, and a
-good candidate for the language to use, it's better to keep these things
-separate.
+surface.dat:
+```
+10 9 8 7 6 5 5 5 5 5
+9 8 7 6 6 4 3 2 1 0
+8 7 6 6 4 3 2 1 0 0
+7 6 6 4 3 2 1 0 0 0
+6 6 4 3 2 1 1 0 0 0
+6 6 3 2 1 1 1 0 0 0
+6 6 2 1 1 1 1 0 0 0
+6 6 1 0 0 0 0 0 0 0
+3 1 0 0 0 0 0 0 0 0
+3 0 0 0 0 0 0 0 0 0
+```
 
-See also for help: [List
-Comprehension](/wiki/OpenSCAD_User_Manual/List_Comprehensions "OpenSCAD User Manual/List Comprehensions"),
-[Tips &
-Tricks](/wiki/OpenSCAD_User_Manual/Tips_and_Tricks "OpenSCAD User Manual/Tips and Tricks"),
-[Recursive
-Functions](/wiki/OpenSCAD_User_Manual/User-Defined_Functions_and_Modules#Recursive_functions "OpenSCAD User Manual/User-Defined Functions and Modules")
+Example 2:
 
-<div class="mw-heading mw-heading1">
+```openscad
+// example010.dat generated using octave:
+// d = (sin(1:0.2:10)' * cos(1:0.2:10)) * 10;
+// save("example010.dat", "d");
+intersection() {
+    surface(file = "example010.dat", center = true, convexity = 5);
+    rotate(45, [0, 0, 1])
+        surface(file = "example010.dat", center = true, convexity = 5);
+}
+```
 
-# User Interface
+Example 3 (Requires version 2015.03):
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-26 "Edit section: User Interface")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-26 "Edit section's source code: User Interface")<span class="mw-editsection-bracket">\]</span></span>
+```openscad
+// Example 3a
+scale([1, 1, 0.1])
+    surface(file = "smiley.png", center = true);
 
-</div>
+// Example 3b
+scale([1, 1, 0.1])
+    surface(file = "smiley.png", center = true, invert = true);
+```
 
-<div class="mw-heading mw-heading2">
+Example 3 demonstrates using surface() with a PNG image as a heightmap input.
 
-## <span id="OpenSCAD_isn.27t_adhering_to_my_GTK_desktop_theme"></span>OpenSCAD isn't adhering to my GTK desktop theme
+---
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-27 "Edit section: OpenSCAD isn't adhering to my GTK desktop theme")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-27 "Edit section's source code: OpenSCAD isn't adhering to my GTK desktop theme")<span class="mw-editsection-bracket">\]</span></span>
+# En.Wikibooks.Org Wiki Openscad User Manual Using The 2D Subsystem 3D To 2D Projection
 
-</div>
+# OpenSCAD User Manual — Using the 2D Subsystem
 
-You may need to install package "qt5-style-plugins" on Debian-based
-systems and "qt5-qtstyleplugins" on Fedora-based systems, then set
-environment variable when calling openscad `QT_QPA_PLATFORMTHEME=gtk2
-openscad`
+All 2D primitives can be transformed with 3D transformations. They are usually used as part of a 3D extrusion. Although 2D shapes are infinitely thin, they are rendered with a 1-unit thickness for preview.
 
-To make the setting permanent, add `export QT_QPA_PLATFORMTHEME=gtk2` to
-your user's `~/.profile`
+Note: Subtracting 2D shapes from 3D objects with difference() can lead to unexpected results in preview; use proper 2D-to-3D extrusion first.
 
-<div class="mw-heading mw-heading2">
+## 2D Primitives
 
-## <span id="OpenSCAD_GUI_is_not_scaled_in_Gnome_on_a_4K_.2F_HIDPI_Monitor"></span>OpenSCAD GUI is not scaled in Gnome on a 4K / HIDPI Monitor
+### square
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-28 "Edit section: OpenSCAD GUI is not scaled in Gnome on a 4K / HIDPI Monitor")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-28 "Edit section's source code: OpenSCAD GUI is not scaled in Gnome on a 4K / HIDPI Monitor")<span class="mw-editsection-bracket">\]</span></span>
+Creates a square or rectangle in the first quadrant. When center is true the square is centered on the origin.
 
-</div>
+Signatures:
+- square(size = [x, y], center = true/false);
+- square(size = x, center = true/false);
 
-The GUI Framework Qt used by OpenSCAD seems to need an extra hint to
-automatically scale correctly for 4K / HIDPI Monitors on Gnome/X11 (e.g.
-reported on Ubuntu 22.10 with fractional scaling set to 125%).
+Parameters:
+- size:
+  - single value: a square with both sides this length
+  - 2-value array [x, y]: a rectangle with dimensions x and y
+- center:
+  - false (default): 1st (positive) quadrant, one corner at (0, 0)
+  - true: shape is centered at (0, 0)
 
-  - Copy `openscad.desktop` from `/usr/share/applications/` to
-    `~/.local/share/applications`
-  - Change `Exec=openscad` to `Exec=env QT_AUTO_SCREEN_SCALE_FACTOR=1
-    openscad`
+Defaults:
+- square(); yields: square(size = [1, 1], center = false);
 
-<div class="mw-heading mw-heading2">
-
-## <span id="I.27m_not_getting_any_menubar_when_running_OpenSCAD_in_Ubuntu.2C_how_can_I_get_it_back.3F"></span>I'm not getting any menubar when running OpenSCAD in Ubuntu, how can I get it back?
+Examples (equivalent scripts):
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-29 "Edit section: I'm not getting any menubar when running OpenSCAD in Ubuntu, how can I get it back?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-29 "Edit section's source code: I'm not getting any menubar when running OpenSCAD in Ubuntu, how can I get it back?")<span class="mw-editsection-bracket">\]</span></span>
+```openscad
+// Square 10×10
+square(size = 10);
+square(10);
+square([10, 10]);
 
-</div>
+// Centered control
+square(10, false);
+square([10, 10], false);
+square([10, 10], center = false);
+square(size = [10, 10], center = false);
+square(center = false, size = [10, 10]);
 
-This seems to be caused by Ubuntu messing with Qt to move the menubar
-somewhere else (e.g. top of the screen).
+// Rectangle 20×10, centered
+square([20, 10], true);
+a = [20, 10];
+square(a, true);
+```
 
-That problem hits other applications too, see
-<https://bugs.launchpad.net/ubuntu/+source/appmenu-qt5/+bug/1307619>
+### circle
 
-There are two things that could help:
+Creates a circle at the origin. All parameters, except r, must be named.
 
-  - Set the `QT_QPA_PLATFORMTHEME` environment variable to an empty
-    string (the default value is probably "appmenu-qt5") or simply run
-    OpenSCAD with `QT_QPA_PLATFORMTHEME= openscad`
-  - Remove the `appmenu-qt5` package to globally disable menubar changes
-    for all applications
+Signature:
+- circle(r = radius | d = diameter);
 
-<div class="mw-heading mw-heading2">
+Parameters:
+- r: circle radius. This is the only optional named parameter (you may call circle(10)).
+- d: circle diameter.
+- $fa: minimum angle (in degrees) of each fragment.
+- $fs: minimum circumferential length of each fragment.
+- $fn: fixed number of fragments in 360 degrees. Values of 3 or more override $fa and $fs.
 
-## <span id="Why_are_the_error_line_numbers_wrong.3F"></span>Why are the error line numbers wrong?
+Notes:
+- Circle resolution is based on size, using $fa or $fs. For small, high-resolution circles, either scale down a larger circle or set $fn.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-30 "Edit section: Why are the error line numbers wrong?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-30 "Edit section's source code: Why are the error line numbers wrong?")<span class="mw-editsection-bracket">\]</span></span>
+Examples:
 
-</div>
+```openscad
+// High-resolution small circle
+scale([1/100, 1/100, 1/100]) circle(200);  // radius 2 at high resolution
 
-That is a limitation/bug in the current parser that handles `include<>`
-basically as copy\&paste of content. In some cases it's possible to work
-around the issue by placing the `include<>` statements at the end of the
-file.
+// Another way
+circle(2, $fn = 50);
+```
 
-When depending on libraries, it's recommended to use `use<>` instead
-which does not have that problem and also automatically inhibits any
-top-level geometry of that file (which might be there as demo for the
-library).
+Defaults:
+- circle(); yields: circle($fn = 0, $fa = 12, $fs = 2, r = 1);
 
-<div class="mw-heading mw-heading2">
+Equivalent scripts:
 
-## <span id="I_don.27t_like_the_editor.2C_can_I_use_my_favourite_editor_instead.3F"></span>I don't like the editor, can I use my favourite editor instead?
+```openscad
+circle(10);
+circle(r = 10);
+circle(d = 20);
+circle(d = 2 + 9*2);
+```
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-31 "Edit section: I don't like the editor, can I use my favourite editor instead?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-31 "Edit section's source code: I don't like the editor, can I use my favourite editor instead?")<span class="mw-editsection-bracket">\]</span></span>
+#### Ellipses
 
-</div>
+Create an ellipse from a circle using scale() or resize() to make x and y unequal.
 
-Yes, OpenSCAD supports a special mode that reloads the files if they are
-modified externally. To enable this mode, check the Design -\> Automatic
-Reload and Preview option and just close the editor window (or use View
--\> Hide Editor).
+```openscad
+resize([30, 10]) circle(d = 20);
+scale([1.5, 0.5]) circle(d = 20);
+```
 
-See also the section in the user manual: [Using an external Editor with
-OpenSCAD](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Using_an_external_Editor_with_OpenSCAD)
+#### Regular Polygons
 
-As an example, here's a script that runs vim as editor and also starts
-OpenSCAD, which takes the model viewer role.
+A regular polygon of 3 or more sides can be created by using circle() with $fn set to the number of sides.
 
-It supports 3 modes
+```openscad
+// Square via circle with 4 fragments
+circle(r = 1, $fn = 4);
 
-  - Run with no parameters, it opens a temp file for quick testing,
-    which it deletes.
-  - Run with the name of a non-existent file, it starts the file with a
-    default license header.
-  - Run with the name of an existing file, it simply opens it.
+module regular_polygon(order = 4, r = 1) {
+  angles = [for (i = [0:order-1]) i*(360/order)];
+  coords = [for (th = angles) [r*cos(th), r*sin(th)]];
+  polygon(coords);
+}
+regular_polygon();
+```
 
-<div class="mw-highlight mw-highlight-lang-bash mw-content-ltr" dir="ltr">
+Example script producing several polygons:
 
-    #!/bin/bash
-      
-    FILE="$1"
-    AUTHOR="Your Name Here"
-    YEAR="$(date "+%Y")"
-    LICENSE="// Created in $YEAR by $AUTHOR.\n// This work is released with CC0 into the public domain.\n// https://creativecommons.org/publicdomain/zero/1.0/"
-    
-    # increase stack size to allow deeper recursion
-    ulimit -s 65536
-    
-    if [ "$FILE" == "" ]
-    then
-      TEMPF=`mktemp --suffix=.scad`
-      openscad "$TEMPF" >/dev/null 2>/dev/null &
-      vim "$TEMPF"
-      rm -f "$TEMPF"
-      exit
-    fi
-    
-    if [ ! -e "$FILE" ]
-    then
-      echo -e "$LICENSE" >> "$FILE"
-    fi
-    
-    openscad "$FILE" >/dev/null 2>/dev/null &
-    vim "$FILE"
+```openscad
+translate([-42,  0]) { circle(20, $fn = 3); %circle(20, $fn = 90); }
+translate([  0,  0])  circle(20, $fn = 4);
+translate([ 42,  0])  circle(20, $fn = 5);
+translate([-42, -42]) circle(20, $fn = 6);
+translate([  0, -42]) circle(20, $fn = 8);
+translate([ 42, -42]) circle(20, $fn = 12);
 
-</div>
+color("black") {
+  translate([-42,   0, 1]) text("3",  7, , center);
+  translate([  0,   0, 1]) text("4",  7, , center);
+  translate([ 42,   0, 1]) text("5",  7, , center);
+  translate([-42, -42, 1]) text("6",  7, , center);
+  translate([  0, -42, 1]) text("8",  7, , center);
+  translate([ 42, -42, 1]) text("12", 7, , center);
+}
+```
 
-<div class="mw-heading mw-heading1">
+### polygon
 
-# <span id="Errors_.2F_Problems"></span>Errors / Problems
+Creates a multi-sided 2D shape from a list of x, y coordinates. Supports concave/convex edges and holes.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-32 "Edit section: Errors / Problems")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-32 "Edit section's source code: Errors / Problems")<span class="mw-editsection-bracket">\]</span></span>
+Signature:
+- polygon(points = [[x, y], ...], paths = [[p1, p2, ...], ...], convexity = N);
 
-</div>
+Parameters:
+- points: list of [x, y] point coordinates (indices 0..n-1).
+- paths:
+  - default: if omitted, all points are used in listed order.
+  - single vector: order of point indices; can re-order and use a subset.
+  - multiple vectors: first is the outer boundary; subsequent paths are holes, subtracted from the primary shape.
+  - Each path closes automatically from last point back to the first.
+- convexity: integer maximum number of front/back face crossings a ray might intersect (affects OpenCSG preview only).
 
-<div class="mw-heading mw-heading2">
+Defaults:
+- polygon(); yields: polygon(points = undef, paths = undef, convexity = 1);
 
-## <span id="Why_am_I_getting_.22no_top_level_geometry_to_render.22.3F"></span>Why am I getting "no top level geometry to render"?
+#### Without holes
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-33 "Edit section: Why am I getting \"no top level geometry to render\"?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-33 "Edit section's source code: Why am I getting \"no top level geometry to render\"?")<span class="mw-editsection-bracket">\]</span></span>
+```openscad
+polygon(points = [[0,0], [100,0], [130,50], [30,50]]);
+polygon([[0,0], [100,0], [130,50], [30,50]], paths = [[0,1,2,3]]);
+polygon([[0,0], [100,0], [130,50], [30,50]], [[3,2,1,0]]);
+polygon([[0,0], [100,0], [130,50], [30,50]], [[1,0,3,2]]);
 
-</div>
+a = [[0,0], [100,0], [130,50], [30,50]];
+b = [[3,0,1,2]];
+polygon(a);
+polygon(a, b);
+polygon(a, [[2,3,0,1,2]]);
+```
 
-This can have different reasons, some common ones include
+#### One hole
 
-Missing / Commented out module call
+```openscad
+polygon(
+  points = [[0,0], [100,0], [0,100], [10,10], [80,10], [10,80]],
+  paths  = [[0,1,2], [3,4,5]],
+  convexity = 10
+);
 
-<div class="mw-highlight mw-highlight-lang-javascript mw-content-ltr" dir="ltr">
+triangle_points = [[0,0], [100,0], [0,100], [10,10], [80,10], [10,80]];
+triangle_paths  = [[0,1,2], [3,4,5]];
+polygon(triangle_points, triangle_paths, 10);
+```
 
-    module model() {
-      cube(20);
+The first path [0,1,2] defines the outer boundary; the second [3,4,5] defines the hole and is subtracted.
+
+#### Multi hole
+
+Note: Requires version 2015.03 (for concat()).
+
+```openscad
+// Example polygon with multiple holes
+a0 = [[0,0], [100,0], [130,50], [30,50]];        // main
+b0 = [1,0,3,2];
+
+a1 = [[20,20], [40,20], [30,30]];                // hole 1
+b1 = [4,5,6];
+
+a2 = [[50,20], [60,20], [40,30]];                // hole 2
+b2 = [7,8,9];
+
+a3 = [[65,10], [80,10], [80,40], [65,40]];       // hole 3
+b3 = [10,11,12,13];
+
+a4 = [[98,10], [115,40], [85,40], [85,10]];      // hole 4
+b4 = [14,15,16,17];
+
+a = concat(a0, a1, a2, a3, a4);
+b = [b0, b1, b2, b3, b4];
+
+polygon(a, b);
+// Alternate
+polygon(a, [b0, b1, b2, b3, b4]);
+```
+
+#### Extruding a 3D shape from a polygon
+
+```openscad
+translate([0, -20, 10]) {
+  rotate([90, 180, 90]) {
+    linear_extrude(50) {
+      polygon(points = [
+        // x,y
+        /* O . */               [-2.8, 0],
+        /* O__X . */            [-7.8, 0],
+        /* O \ X__X . */        [-15.3633, 10.30],
+        /* X_______._____O \ X__X . */ [15.3633, 10.30],
+        /* X_______._______X \ / X__X . O */ [7.8, 0],
+        /* X_______._______X \ / X__X . O__X */ [2.8, 0],
+        /* X__________.__________X \ / \ O / \ / / \ / / X__X . X__X */ [5.48858, 5.3],
+        /* X__________.__________X \ / \ O__________X / \ / / \ / / X__X . X__X */ [-5.48858, 5.3],
+      ]);
     }
-    %model();
-
-</div>
-
-Using the `%` modifier does not only make the part transparent, it also
-causes the part to be excluded in the final render\!
-
-Difference / Intersection with wrong translated objects
-
-The easiest way to solve this type of issues is to highlight the objects
-using the `#` modifier and see if the objects are placed at the position
-where they should be.
-
-Importing broken STL files
-
-See [Why is my imported STL file appearing with F5 but not
-F6?](#Why_is_my_imported_STL_file_appearing_with_F5_but_not_F6.3F)
-
-<div class="mw-heading mw-heading2">
-
-## <span id="OpenSCAD_crashed.2Fwas_killed.2C_are_my_unsaved_changes_lost.3F"></span>OpenSCAD crashed/was killed, are my unsaved changes lost?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-34 "Edit section: OpenSCAD crashed/was killed, are my unsaved changes lost?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-34 "Edit section's source code: OpenSCAD crashed/was killed, are my unsaved changes lost?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Before starting a preview or render a backup file is made of the current
-.scad file. It is saved in the user's Documents folder in an "OpenSCAD"
-folder
-
-**ON Windows 11** : "C:\\Users\\xxxx\\Documents\\OpenSCAD\\backups"
-
-**ON Linux** : $HOME/.local/share/OpenSCAD/backups
-
-  
-The path can be seen in the app in the pop-up window shown by menu item
-`Help > Library Info` dialog titled "Backup Path".
-
-<div class="mw-heading mw-heading2">
-
-## <span id="OpenSCAD_crashes_when_clicking_.22New.22_or_loading_a_file_on_Windows"></span>OpenSCAD crashes when clicking "New" or loading a file on Windows
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-35 "Edit section: OpenSCAD crashes when clicking \"New\" or loading a file on Windows")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-35 "Edit section's source code: OpenSCAD crashes when clicking \"New\" or loading a file on Windows")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD crashes on some machines with Intel graphics drivers, for more
-details, see <https://github.com/openscad/openscad/issues/2442>
-
-<div class="mw-heading mw-heading2">
-
-## OpenSCAD fails to run due to missing DLLs
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-36 "Edit section: OpenSCAD fails to run due to missing DLLs")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-36 "Edit section's source code: OpenSCAD fails to run due to missing DLLs")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-This is an issue with the special Windows N (Europe) and KN (Korea)
-versions from which the Windows Media Framework was removed by a ruling
-against anti-competitive practices by the European Commission in 2004.
-
-The missing files are EVR.dll, MF.dll, or MFPlat.dll
-
-OpenSCAD, starting with release 2019.05, depends on some of the features
-so it fails to run on those systems.
-
-The missing Windows Media Framework can be added by installing the
-correct "Media Feature Pack for N versions" from the list Microsoft
-provides in
-[KB3145500](https://support.microsoft.com/en-us/help/3145500/media-feature-pack-list-for-windows-n-editions).
-For Windows 10 version N, there's a dedicated download page with Windows
-version selector at:
-<https://www.microsoft.com/en-us/software-download/mediafeaturepack>.
-
-Starting with Windows 10 1909 you can't download the Media Features from
-the Microsoft Website directly - instead you have to use Windows
-Settings \> Apps \> Apps and Features \> Optional Features \> Add a
-Feature and find the Media Feature Pack in the list of available
-Optional Features. Afterwards reboot and it should work.
-
-<div class="mw-heading mw-heading1">
-
-# <span id="Reporting_bugs.2C_Requesting_features"></span>Reporting bugs, Requesting features
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-37 "Edit section: Reporting bugs, Requesting features")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-37 "Edit section's source code: Reporting bugs, Requesting features")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-<div class="mw-heading mw-heading2">
-
-## <span id="How_do_I_report_bugs.3F"></span>How do I report bugs?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-38 "Edit section: How do I report bugs?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-38 "Edit section's source code: How do I report bugs?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-Bugs in OpenSCAD are best reported in the [github](https://github.com/)
-issue tracking system at . If you are not sure it's a bug ask about it
-in the IRC chat.
-
-Please [search existing
-issues](https://github.com/openscad/openscad/issues) if the bug was
-already reported. If you find something similar but are unsure of its
-relevance, create a new issue and mention the (possibly) related one.
-
-Make your report as complete as possible so that we can reproduce it and
-understand the cause. These are info items we like to see :
-
-  - The OpenSCAD version  
-    Menu Help \> About and Help \> Library Info or  
-    `Command line: openscad --info`
-
-  - The Operating System name and version
-
-<!-- end list -->
-
-    ON Windows : Settings > System > About : sections Device and Windows
-
-  - Describe your workflow that led to the problem  
-    graphics issues  
-    the OpenGL driver information
-  - your script (if relevant)  
-    if short paste it in, otherwise a link to it on something like
-    [pastbin](https://pastebin.com/) is better.
-
-<div class="mw-heading mw-heading2">
-
-## <span id="How_do_I_request_new_features.3F"></span>How do I request new features?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-39 "Edit section: How do I request new features?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-39 "Edit section's source code: How do I request new features?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-New features or changes/extensions to existing features can be requested
-in the [github](https://github.com/) issue tracking system at
-<https://github.com/openscad/openscad/issues> too.
-
-Please make an effort to clearly explain the new feature / change as
-detailed as possible. Including some background about why you think this
-feature would be useful to you and other people helps a lot and
-increases the chances of it being implemented.
-
-<div class="mw-heading mw-heading2">
-
-## <span id="Best_Way_to_Report_OS_Specific_Bugs_.3F"></span>Best Way to Report OS Specific Bugs ?
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&veaction=edit&section=T-40 "Edit section: Best Way to Report OS Specific Bugs ?")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/FAQ&action=edit&section=T-40 "Edit section's source code: Best Way to Report OS Specific Bugs ?")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-The versions for Windows and Mac OS X are currently maintained by the
-OpenSCAD team, so please use the [GitHub issue
-tracker](https://github.com/openscad/openscad/issues) to report issues.
-
-The [nightly
-builds](https://build.opensuse.org/package/show/home:t-paul/OpenSCAD)
-hosted on the [openSUSE build service](https://build.opensuse.org/) are
-also maintained by the OpenSCAD team, so please use the [github issue
-tracker](https://github.com/openscad/openscad/issues) for reporting
-issues with them.
-
-The OpenSCAD versions in the various Linux distributions are usually
-maintained by them. Bugs specific to an OS should be reported in their
-respective systems:
-
-  - Debian  
-    See "[please report it"
-    directions](https://bugs.debian.org/cgi-bin/pkgreport.cgi?package=openscad)
-  - Ubuntu  
-    See ["Report a bug"
-    directions](https://launchpad.net/ubuntu/+source/openscad)
-  - Fedora / Red Hat  
-    See the [current
-    list](https://apps.fedoraproject.org/packages/openscad/bugs) and use
-    [this page to
-    report](https://bugzilla.redhat.com/buglist.cgi?component=openscad).
-  - Arch Linux  
-    See ["reporting bug guidelines"
-    directions](https://bugs.archlinux.org/index.php?string=openscad&status%5B%5D=)
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 10 -- Libraries
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=12 "Edit section: Chapter 10 -- Libraries")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=12 "Edit section's source code: Chapter 10 -- Libraries")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-<div class="mw-heading mw-heading2">
-
-## Library locations
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&veaction=edit&section=T-1 "Edit section: Library locations")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&action=edit&section=T-1 "Edit section's source code: Library locations")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD uses three library *locations*, the installation library,
-built-in library, and user-defined libraries.
-
-1.  The *Installation* library location is the `libraries` directory
-    under the directory where OpenSCAD is installed.
-2.  The *Built-In* library location is O/S dependent. Since version
-    2014.03, it can be opened in the system specific file manager using
-    the "File-\>Show Library Folder..." menu entry.  
-      - Windows: `My Documents\OpenSCAD\libraries`
-      - Linux: `$HOME/.local/share/OpenSCAD/libraries`
-      - Mac OS X: `$HOME/Documents/OpenSCAD/libraries`
-3.  The *User-Defined* library path can be created using the
-    `OPENSCADPATH` Environment Variable to point to the library(s).
-    `OPENSCADPATH` can contain multiple directories in case you have
-    library collections in more than one place, separate directories
-    with a semi-colon for Windows, and a colon for Linux/Mac OS. For
-    example:
-
-Windows: `C:\Users\A_user\Documents\OpenSCAD\MyLib;C:\Thingiverse
-Stuff\OpenSCAD Things;D:\test_stuff`
-
-*<span class="small">(Note: For Windows, in versions prior to 2014.02.22
-there is a bug preventing multiple directories in `OPENSCADPATH` as
-described above, it uses a colon (:) to separate directories. A
-workaround, if your libraries are on C: is to leave off the drive letter
-& colon, e.g. `\Thingiverse Stuff\OpenSCAD Things:\stuff`.</span>* For
-more about setting Windows environment variables, see [User Environment
-Variables](https://msdn.microsoft.com/en-us/library/windows/desktop/bb776899\(v=vs.85\).aspx).
-
-Linux/Mac OS: `/usr/lib:/home/mylib:.`
-
-OpenSCAD must be restarted to recognize any change to the `OPENSCADPATH`
-Environment Variable.
-
-When you specify a *non-fully qualified* path and filename in the **`use
-<...>`** or **`include <...>`** statement OpenSCAD looks for the file in
-the following directories in the following order:
-
-  - the directory of the calling .scad file
-  - the *User-Defined* library paths (`OPENSCADPATH`)
-  - the *Built-In* library (i.e. the O/S dependent locations above)
-  - the *Installation* library
-
-In the case of a library file itself having **`use <...>`** or
-**`include <...>`** the directory of the library .scad file is the
-'calling' file, i.e. when looking for libraries within a library, it
-does not check the directory of the top level .scad file.
-
-For example, with the following locations and files defined: (with
-`OPENSCADPATH`=`/usr/lib:/home/lib_os:.`)
-
-<div class="mw-highlight mw-highlight-lang-text mw-content-ltr" dir="ltr">
-
-    1. <installation library>/lib1.scad
-    2. <built-in library>/lib2.scad
-    3. <built-in library>/sublib/lib2.scad
-    4. <built-in library>/sublib/lib3.scad
-    5. /usr/lib/lib2.scad
-    6. /home/lib_os/sublib/lib3.scad
-
-</div>
-
-The following **`include <...>`** statements match to the nominated
-library files
-
-<div class="mw-highlight mw-highlight-lang-text mw-content-ltr" dir="ltr">
-
-    include <lib1.scad>  // #1.
-    include <lib2.scad>  // #5.
-    include <sublib/lib2.scad>  // #3.
-    include <sublib/lib3.scad>  // #6.
-
-</div>
-
-Since 2014.03, the currently active list of locations can be verified in
-the "Help-\>Library Info" dialog.
-
-The details info shows both the content of the `OPENSCADPATH` variable
-and the list of all library locations. The locations are searched in the
-order they appear in this list. For example;
-
-<div class="mw-highlight mw-highlight-lang-text mw-content-ltr" dir="ltr">
-
-    OPENSCADPATH: /data/lib1:/data/lib2
-    OpenSCAD library path:
-      /data/lib1
-      /data/lib2
-      /home/user/.local/share/OpenSCAD/libraries
-      /opt/OpenSCAD/libraries
-
-</div>
-
-<div class="mw-heading mw-heading3">
-
-### Setting `OPENSCADPATH`
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&veaction=edit&section=T-2 "Edit section: Setting OPENSCADPATH")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&action=edit&section=T-2 "Edit section's source code: Setting OPENSCADPATH")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-In Windows, Environment Variables are set via the `Control panel`,
-select `System`, then `Advanced System Settings`, click `Environment
-Variables`. Create a new `User Variable`, or edit `OPENSCADPATH` if it
-exists.
-
-On Linux, to simply add the environment variable to all users, you can
-type in terminal:  
-`  sudo sh -c 'echo "OPENSCADPATH=$HOME/openscad/libraries"
->>/etc/profile' `  
-to set the `OPENSCADPATH` to `openscad/libraries` under each user's home
-directory. For more control on environment variables, you'll need to
-edit the configuration files; see for example [this
-page](http://unix.stackexchange.com/questions/117467/how-to-permanently-set-environmental-variables).
-
-On macOS, you can use `launchctl` to set the environment variable for
-the current logged in user:  
-`launchctl setenv OPENSCADPATH "/Users/myuser/my/own/path"`  
-The variable will be available the next time you launch OpenSCAD.  
-
-<div class="mw-heading mw-heading2">
-
-## [MCAD](/wiki/OpenSCAD_User_Manual/MCAD "OpenSCAD User Manual/MCAD")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&veaction=edit&section=T-3 "Edit section: MCAD")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&action=edit&section=T-3 "Edit section's source code: MCAD")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD bundles the [MCAD library](https://github.com/openscad/MCAD).
-
-There are many different forks floating around
-(e.g.[\[1\]](https://github.com/SolidCode/MCAD),
-[\[2\]](https://github.com/elmom/MCAD),
-[\[3\]](https://github.com/benhowes/MCAD)) many of them unmaintained.
-
-MCAD bundles a lot of stuff, of varying quality, including:
-
-  - Many common shapes like rounded boxes, regular polygons and
-    polyhedra in 2D and 3D
-  - Gear generator for involute gears and bevel gears.
-  - Stepper motor mount helpers, stepper and servo outlines
-  - Nuts, bolts and bearings
-  - Screws and augers
-  - Material definitions for common materials
-  - Mathematical constants, curves
-  - Teardrop holes and polyholes
-
-The git repo also contains python code to scrape OpenSCAD code, a
-testing framework and SolidPython, an external python library for solid
-cad.
-
-More details on using MCAD are in a later chapter, [OpenSCAD User
-Manual/MCAD](/wiki/OpenSCAD_User_Manual/MCAD "OpenSCAD User Manual/MCAD").
-
-<div class="mw-heading mw-heading2">
-
-## Other libraries
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&veaction=edit&section=T-4 "Edit section: Other libraries")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&action=edit&section=T-4 "Edit section's source code: Other libraries")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - **[Belfry OpenScad Library](https://github.com/revarbat/BOSL)** has
-    many shapes, masks, manipulators, and support for threading, gears,
-    polylines and beziers.
-  - **[Bevel library](https://www.thingiverse.com/thing:30336)** for
-    OpenScad
-  - **[BOLTS](https://github.com/boltsparts/boltsparts)** tries to build
-    a standard part and vitamin library that can be used with OpenSCAD
-    and other CAD tools.
-  - **[Celtic knot library](https://github.com/beanz/celtic-knot-scad)**
-    is used for the generation of celtic knots.
-  - **[Colorspace converter](http://www.thingiverse.com/thing:279951/)**
-    for working with colors in HSV and RGB:
-  - **[Dimensioned
-    Drawings](https://www.cannymachines.com/entries/9/openscad_dimensioned_drawings)**
-    provides tools to create proper 2D technical drawings of your 3D
-    objects.
-  - **[DotSCAD](https://github.com/JustinSDK/dotSCAD)** comprehensive
-    library of 2D and 3D operations and transforms including extrusion
-    along arbitrary paths, shape bending, etc.
-  - **[Fillets](https://github.com/StephS/i2_xends/blob/master/inc/fillets.scad)**,
-    a comprehensive fillets library by [Stephanie
-    Shaltes](https://plus.google.com/u/0/101448691399929440302).
-  - **[Local.scad](https://github.com/jreinhardt/local-scad)** provides
-    a flexible method for positioning parts of a design. Is also used in
-    BOLTS.
-  - **[Michigan Tech's Open Sustainability Technology Lab (MOST)
-    libraries](https://github.com/mtu-most/most-scad-libraries)**
-  - **[Obiscad](https://github.com/Obijuan/obiscad)** contains various
-    useful tools, notably a framework for attaching modules on other
-    modules in a simple and modular way.
-  - **[OpenSCAD threads](http://dkprojects.net/openscad-threads/)**
-    library: provides ISO conform metric and imperial threads and
-    support internal and external threads and multiple starts.
-  - **[Pinball
-    Library](https://code.google.com/p/how-to-build-a-pinball/source/browse/trunk/scad/pinball)**:
-    provides many components for pinball design work, including models
-    for 3d printing of the parts, 3d descriptions of mount holes for CNC
-    drilling and 2d descriptions of parts footprint
-  - **[Regular shapes
-    library](https://github.com/elmom/MCAD/blob/master/regular_shapes.scad)**
-    by Giles Bathgates\]: provides regular polygons and polyeders and is
-    included in MCAD.
-  - **[Roller Chain Sprockets OpenSCAD
-    Module](http://www.thingiverse.com/thing:197896)** lets you create
-    sprockets for ANSI chains and motorcycle chains. Contains hard coded
-    fudge factors, may require tweaking.
-  - **[SCADBoard](http://scadboard.wordpress.com/)** is a library for
-    designing 3D printed PCBs in OpenSCAD.
-  - **[Shapes
-    library](http://svn.clifford.at/openscad/trunk/libraries/shapes.scad)**
-    contains many shapes like rounded boxes, regular polygons. It is
-    also included in MCAD.
-  - The **[2D connection
-    library](https://www.youmagine.com/designs/openscad-2d-connection-library)**
-    helps with connections between 2D sheets, which is useful for laser
-    cut designs.
-  - **[Ruler](http://www.thingiverse.com/thing:30769)** helps in
-    determining the size of things in OpenSCAD.
-  - **[Knurled surface library](http://www.thingiverse.com/thing:9095)**
-    by aubenc
-  - **[Text module](https://github.com/thestumbler/alpha)** based on
-    technical lettering style.
-  - **[Round corners for
-    Openscad](https://www.makerbot.com/media-center/2011/05/26/script-for-rounded-corners-for-openscad-by-warrantyvoider)**,
-    also at <https://www.thingiverse.com/thing:8812>
-  - **[Unit test framework](https://github.com/oampo/testcard)**
-  - **[Utility function](https://github.com/oampo/missile)** collection.
-  - **[Workflow library](https://github.com/UBaer21/UB.scad)**: full
-    workflows, by Ulrich Bär
-
-There is also a list with more libraries here:
-<https://github.com/openscad/openscad/wiki/Libraries>
-
-<div class="mw-heading mw-heading2">
-
-## Other OpenSCAD tutorials and documentation
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&veaction=edit&section=T-5 "Edit section: Other OpenSCAD tutorials and documentation")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Libraries&action=edit&section=T-5 "Edit section's source code: Other OpenSCAD tutorials and documentation")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-  - "OpenSCAD User Manual" <http://www.openscad.org/documentation.html>
-  - "Know only 10 things to be dangerous in OpenSCAD"
-    <https://cubehero.com/2013/11/19/know-only-10-things-to-be-dangerous-in-openscad/>
-  - "OpenScad beginners tutorial"
-    <http://edutechwiki.unige.ch/en/OpenScad_beginners_tutorial>
-  - "How to use Openscad, tricks and tips to design a parametric 3D
-    object"
-    <http://www.tridimake.com/2014/09/how-to-use-openscad-tricks-and-tips-to.html>
-  - OpenSCAD discussion forum <http://forum.openscad.org>
-
-<div class="mw-heading mw-heading1">
-
-# Chapter 11 -- Command Glossary
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&veaction=edit&section=13 "Edit section: Chapter 11 -- Command Glossary")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Print_version&action=edit&section=13 "Edit section's source code: Chapter 11 -- Command Glossary")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-OpenSCAD User Manual
-
-This is a Quick Reference; a short summary of all the commands without
-examples, just the basic syntax. The headings are links to the full
-chapters.
-
-**Please be warned: The Command Glossary is presently outdated (03
-2015).**
-
-Please have a look at the Cheatsheet, instead:
-
-<http://www.openscad.org/cheatsheet/>
-
-  
-
-<div class="mw-heading mw-heading2">
-
-## [Mathematical Operators](/wiki/OpenSCAD_User_Manual/Mathematical_Operators "OpenSCAD User Manual/Mathematical Operators")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-1 "Edit section: Mathematical Operators")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-1 "Edit section's source code: Mathematical Operators")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    +
-    -   // also as unary negative
-    *
-    /
-    %  // this is mod
-
-    <
-    <=
-    ==
-    !=
-    >=
-    >
-
-    &&   // logical and
-    ||   // logical or
-    !    // logical not
-
-    <boolean> ? <valIfTrue> : <valIfFalse>
-
-<div class="mw-heading mw-heading2">
-
-## [Mathematical Functions](/wiki/OpenSCAD_User_Manual/Mathematical_Functions "OpenSCAD User Manual/Mathematical Functions")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-2 "Edit section: Mathematical Functions")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-2 "Edit section's source code: Mathematical Functions")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    abs ( <value> )
-
-    cos ( <degrees> )
-    sin ( <degrees> )
-    tan ( <degrees> )
-    asin ( <value> )
-    acos ( <value> )
-    atan ( <value> )
-    atan2 ( <y_value>, <x_value> )
-
-    pow( <base>, <exponent> )
-
-    len ( <string> )   len ( <vector> )   len ( <vector_of_vectors> ) 
-    min ( <value1>, <value2> ) 
-    max ( <value1>, <value2> )
-    sqrt ( <value> )
-    round ( <value> )
-    ceil ( <value> ) 
-    floor ( <value> ) 
-    lookup( <in_value>, <vector_of_vectors> )
-
-<div class="mw-heading mw-heading2">
-
-## [String Functions](/wiki/OpenSCAD_User_Manual/String_Functions "OpenSCAD User Manual/String Functions")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-3 "Edit section: String Functions")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-3 "Edit section's source code: String Functions")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    str(string, value, ...)
-
-<div class="mw-heading mw-heading2">
-
-## [Primitive Solids](/wiki/OpenSCAD_User_Manual/Primitive_Solids "OpenSCAD User Manual/Primitive Solids")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-4 "Edit section: Primitive Solids")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-4 "Edit section's source code: Primitive Solids")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    cube(size = <value or vector>, center = <boolean>);
-
-    sphere(r = <radius>);
-
-    cylinder(h = <height>, r1 = <bottomRadius>, r2 = <topRadius>, center = <boolean>);
-    cylinder(h = <height>, r = <radius>);
-
-    polyhedron(points = [[x, y, z], ... ], triangles = [[p1, p2, p3..], ... ], convexity = N);
-
-<div class="mw-heading mw-heading2">
-
-## [Transformations](/wiki/OpenSCAD_User_Manual/Transformations "OpenSCAD User Manual/Transformations")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-5 "Edit section: Transformations")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-5 "Edit section's source code: Transformations")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    scale(v = [x, y, z]) { ... }
-
-    (In versions > 2013.03)
-    resize(newsize=[x,y,z], auto=(true|false) { ... }        
-    resize(newsize=[x,y,z], auto=[xaxis,yaxis,zaxis]) { ... }  // #axis is true|false
-    resize([x,y,z],[xaxis,yaxis,zaxis]) { ... }
-    resize([x,y,z]) { ... }
-
-    rotate(a = deg, v = [x, y, z]) { ... }
-    rotate(a=[x_deg,y_deg,z_deg]) { ... }
-
-    translate(v = [x, y, z]) { ... }
-
-    mirror([ 0, 1, 0 ]) { ... }
-
-    multmatrix(m = [tranformationMatrix]) { ... }
-
-    color([r, g, b, a]) { ... }
-    color([ R/255, G/255, B/255, a]) { ... }
-    color("blue",a) { ... }
-
-<div class="mw-heading mw-heading2">
-
-## [Conditional and Iterator Functions](/wiki/OpenSCAD_User_Manual/Conditional_and_Iterator_Functions "OpenSCAD User Manual/Conditional and Iterator Functions")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-6 "Edit section: Conditional and Iterator Functions")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-6 "Edit section's source code: Conditional and Iterator Functions")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    for (<loop_variable_name> = <vector> ) {...}
-
-    intersection_for (<loop_variable_name> = <vector_of_vectors>) {...}
-
-    if (<boolean condition>) {...} else {...}
-
-    assign (<var1>= <val1>, <var2>= <val2>, ...) {...}
-
-<div class="mw-heading mw-heading2">
-
-## [CSG Modelling](/wiki/OpenSCAD_User_Manual/CSG_Modelling "OpenSCAD User Manual/CSG Modelling")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-7 "Edit section: CSG Modelling")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-7 "Edit section's source code: CSG Modelling")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    union() {...}
-
-    difference() {...}
-
-    intersection() {...}
-
-    render(convexity = <value>) { ... }
-
-<div class="mw-heading mw-heading2">
-
-## [Modifier Characters](/wiki/OpenSCAD_User_Manual/Modifier_Characters "OpenSCAD User Manual/Modifier Characters")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-8 "Edit section: Modifier Characters")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-8 "Edit section's source code: Modifier Characters")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    ! { ... } // Ignore the rest of the design and use this subtree as design root
-    * { ... } // Ignore this subtree
-    % { ... } // Ignore CSG of this subtree and draw it in transparent gray
-    # { ... } // Use this subtree as usual but draw it in transparent pink
-
-<div class="mw-heading mw-heading2">
-
-## [Modules](/wiki/OpenSCAD_User_Manual/Modules "OpenSCAD User Manual/Modules")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-9 "Edit section: Modules")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-9 "Edit section's source code: Modules")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    module name(<var1>, <var2>, ...) { ...<module code>...}
-
-Variables can be default initialized `<var1>=<defaultvalue>`
-
-In module you can use `children()` to refer to all child nodes, or
-`children(i)` where `i` is between `0` and `$children`.
-
-<div class="mw-heading mw-heading2">
-
-## [Include Statement](/wiki/OpenSCAD_User_Manual/Include_Statement "OpenSCAD User Manual/Include Statement")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-10 "Edit section: Include Statement")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-10 "Edit section's source code: Include Statement")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-After 2010.02
-
-    include <filename.scad> (appends whole file)
-
-    use <filename.scad>  (appends ONLY modules and functions)
-
-*filename* could use directory (with / char separator).
-
-Prior to 2010.02
-
-    <filename.scad>
-
-<div class="mw-heading mw-heading2">
-
-## [Other Language Features](/wiki/OpenSCAD_User_Manual/Other_Language_Features "OpenSCAD User Manual/Other Language Features")
-
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-11 "Edit section: Other Language Features")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-11 "Edit section's source code: Other Language Features")<span class="mw-editsection-bracket">\]</span></span>
-
-</div>
-
-    $fa is the minimum angle for a fragment. The default value is 12 (degrees)
-
-    $fs is the minimum size of a fragment. The default value is 1.
-
-    $fn is the number of fragments. The default value is 0.
-
-When $fa and $fs are used to determine the number of fragments for a
-circle, then OpenSCAD never uses less than 5 fragments.
-
-``` 
-$t
+  }
+}
 ```
 
-The $t variable is used for animation. If you enable the animation frame
-with view-\>animate and give a value for "FPS" and "Steps", the "Time"
-field shows the current value of $t.
+#### convexity (preview hint)
 
-    function name(<var>) = f(<var>);
+The convexity parameter specifies the maximum number of front/back faces a ray might intersect. It only affects OpenCSG preview and not final CGAL mesh generation. A value around 10 generally works well.
 
-    echo(<string>, <var>, ...);
+### import_dxf (deprecated)
 
-    render(convexity = <val>) {...}
+Deprecated: import_dxf() is deprecated and will be removed in a future release. Use import() instead.
 
-    surface(file = "filename.dat", center = <boolean>, convexity = <val>);
+```openscad
+linear_extrude(height = 5, center = true, convexity = 10)
+  import_dxf(file = "example009.dxf", layer = "plate");
+```
 
-<div class="mw-heading mw-heading2">
+## Text
 
-## [2D Primitives](/wiki/OpenSCAD_User_Manual/2D_Primitives "OpenSCAD User Manual/2D Primitives")
+The text() module creates text as a 2D object using fonts installed on the local system or provided as separate font files.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-12 "Edit section: 2D Primitives")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-12 "Edit section's source code: 2D Primitives")<span class="mw-editsection-bracket">\]</span></span>
+Parameters:
+- text: string to render.
+- size: approximate ascent (height above baseline). Default 10. Approx. points: pt = size / 3.937.
+- font: logical font name; may include style, e.g., "Liberation Sans:style=Bold Italic".
+- halign: "left" (default), "center", "right".
+- valign: "top", "center", "baseline" (default), "bottom".
+- spacing: character spacing factor (default 1).
+- direction: "ltr" (default), "rtl", "ttb", "btt".
+- language: language tag, e.g., "en" (default).
+- script: script tag, e.g., "latin" (default).
+- $fn: used for subdividing curved path segments.
 
-</div>
+Example 1:
 
-    square(size = <val>, center=<boolean>);
-    square(size = [x,y], center=<boolean>);
+```openscad
+text("OpenSCAD");
+```
 
-    circle(r = <val>);
+Notes:
+- Unicode escapes:
+  - \x03  — hex char value (01–7f)
+  - \u0123 — 4-hex-digit Unicode (lowercase \u)
+  - \U012345 — 6-hex-digit Unicode (uppercase \U)
+- The null character (NUL) maps to space (SP).
+
+```openscad
+assert(version() == [2019, 5, 0]);
+assert(ord(" ") == 32);
+assert(ord("\x00") == 32);
+assert(ord("\u0000") == 32);
+assert(ord("\U000000") == 32);
+
+t = "\u20AC10 \u263A";  // "€10 ☺"
+```
+
+### Using Fonts & Styles
+
+Fonts are specified by logical name; styles can be appended, e.g.:
+
+```openscad
+text("Styled", font = "Liberation Sans:style=Bold Italic");
+```
+
+Add project-specific font files (TrueType .ttf, OpenType .otf) with use<>:
+
+```openscad
+use <ttf/paratype-serif/PTF55F.ttf>
+```
+
+List system fonts (examples):
 
-    polygon(points = [[x, y], ... ], paths = [[p1, p2, p3..], ... ], convexity = N);
+```
+fc-list -f "%-60{{%{family[0]}%{:style[0]=}}}%{file}\n" | sort
+```
 
-<div class="mw-heading mw-heading2">
+On Windows, list fonts from the registry:
+
+```
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" /s > List_Fonts_Windows.txt
+```
+
+Example 2:
+
+```openscad
+square(10);
+
+translate([15, 15]) {
+  text("OpenSCAD", font = "Liberation Sans");
+}
+
+translate([15, 0]) {
+  text("OpenSCAD", font = "Liberation Sans:style=Bold Italic");
+}
+```
 
-## [3D to 2D Projection](/wiki/OpenSCAD_User_Manual/3D_to_2D_Projection "OpenSCAD User Manual/3D to 2D Projection")
+### Alignment
+
+#### Vertical alignment
+
+- top: top of tallest glyph at Y
+- center: vertical center of the text’s bounding box at Y
+- baseline: font baseline at Y (default)
+- bottom: bottom of lowest descender at Y
+
+```openscad
+text = "Align";
+font = "Liberation Sans";
+valign = [
+  [  0, "top"],
+  [ 40, "center"],
+  [ 75, "baseline"],
+  [110, "bottom"]
+];
+
+for (a = valign) {
+  translate([10, 120 - a[0], 0]) {
+    color("red")  cube([135, 1, 0.1]);
+    color("blue") cube([1, 20, 0.1]);
+    linear_extrude(height = 0.5) {
+      text(text = str(text, "_", a[1]), font = font, size = 20, valign = a[1]);
+    }
+  }
+}
+```
+
+Multi-line text is not directly supported; render each line with translate(). Use valign = "baseline" and about 1.6*size line spacing for typical single-spacing.
+
+#### Horizontal alignment
+
+- left (default): left of bounding box at X
+- center: center of bounding box at X
+- right: right of bounding box at X
+
+```openscad
+text = "Align";
+font = "Liberation Sans";
+halign = [
+  [10, "left"],
+  [50, "center"],
+  [90, "right"]
+];
+
+for (a = halign) {
+  translate([140, a[0], 0]) {
+    color("red")  cube([115, 2, 0.1]);
+    color("blue") cube([2, 20, 0.1]);
+    linear_extrude(height = 0.5) {
+      text(text = str(text, "_", a[1]), font = font, size = 20, halign = a[1]);
+    }
+  }
+}
+```
+
+### 3D text
+
+Convert 2D text to 3D using linear_extrude:
+
+```openscad
+// 3D Text Example
+linear_extrude(4)
+  text("Text");
+```
+
+### Metrics
+
+Note: Requires development snapshot for some metric functions.
+
+#### textmetrics()
+
+Returns metrics for how text() would render.
+
+Members:
+- position: lower-left corner of generated text
+- size: width/height of generated text
+- ascent: above baseline
+- descent: below baseline
+- offset: lower-left including any pre-glyph spacing
+- advance: point at which additional text should be positioned
+
+```openscad
+s = "Hello, World!";
+size = 20;
+font = "Liberation Serif";
+
+tm = textmetrics(s, size = size, font = font);
+echo(tm);
+
+translate([0, 0, 1]) text("Hello, World!", size = size, font = font);
+color("black") translate(tm.position) square(tm.size);
+```
+
+Example echo (reformatted):
+
+```
+ECHO: {
+  position = [0.7936, -4.2752];
+  size     = [149.306, 23.552];
+  ascent   = 19.2768;
+  descent  = -4.2752;
+  offset   = [0, 0];
+  advance  = [153.09, 0];
+}
+```
+
+#### fontmetrics()
+
+Returns global font characteristics.
+
+Parameters:
+- size: optional; as for text()
+- font: optional; as for text()
+
+Returns object:
+- nominal: ascent, descent (typical glyph)
+- max: ascent, descent (maximum)
+- interline: baseline-to-baseline spacing
+- font: family, style
+
+```openscad
+echo(fontmetrics(font = "Liberation Serif"));
+```
+
+Example echo (reformatted):
+
+```
+ECHO: {
+  nominal = { ascent = 12.3766; descent = -3.0043; };
+  max     = { ascent = 13.6312; descent = -4.2114; };
+  interline = 15.9709;
+  font = { family = "Liberation Serif"; style = "Regular"; };
+}
+```
+
+## 3D to 2D Projection
+
+Using projection(), you can create 2D drawings from 3D models, and export them to DXF. It projects a 3D model to the (x, y) plane at z = 0.
+
+- cut = true: only points with z = 0 are considered (slice)
+- cut = false (default): points above and below the plane contribute (shadow-like projection)
+
+Examples:
+
+```openscad
+// Cut projection: slice at z=0
+projection(cut = true)
+  example002();
+```
+
+```openscad
+// Ordinary projection: shadow onto XY
+projection(cut = false)
+  example002();
+```
+
+Side-view projection:
+
+```openscad
+// Move and orient out of XY plane
+translate([0, 0, 25])
+  rotate([90, 0, 0])
+  example002();
+
+// Project side view
+projection()
+  translate([0, 0, 25])
+  rotate([90, 0, 0])
+  example002();
+```
+
+## 2D to 3D Extrusion
+
+Extrusion creates a 3D object from a 2D cross-section. OpenSCAD provides:
+- linear_extrude()
+- rotate_extrude()
+
+Extrusions operate on the 2D shape’s projection onto the XY plane. Any prior Z transforms on 2D shapes are ignored during extrusion.
+
+### linear_extrude
+
+Linear extrusion moves the 2D shape along a vector V (default +Z). The shape can be twisted and scaled along the height.
+
+Usage:
+
+```openscad
+linear_extrude(
+  height   = 5,
+  v        = [0, 0, 1],   // Requires > 2021.01 for custom vectors
+  center   = true,
+  convexity= 10,
+  twist    = -fanrot,
+  slices   = 20,
+  scale    = 1.0,
+  $fn      = 16
+) {
+  // 2D child
+}
+```
+
+Notes:
+- Use named parameters.
+- height must be positive.
+- $fn sets resolution of the extrusion spine; higher is smoother.
+- If extrusion fails for complex shapes, increase convexity (e.g., 10).
+
+#### Twist
+
+Twist is degrees the shape rotates while extruding. twist = 360 turns one full revolution. Direction follows left-hand rule.
+
+```openscad
+// 0° twist
+linear_extrude(height = 10, center = true, convexity = 10, twist = 0)
+  translate([2, 0, 0]) circle(r = 1);
+
+// -100°
+linear_extrude(height = 10, center = true, convexity = 10, twist = -100)
+  translate([2, 0, 0]) circle(r = 1);
+
+// +100°
+linear_extrude(height = 10, center = true, convexity = 10, twist = 100)
+  translate([2, 0, 0]) circle(r = 1);
+
+// -500°
+linear_extrude(height = 10, center = true, convexity = 10, twist = -500)
+  translate([2, 0, 0]) circle(r = 1);
+```
+
+#### Center
+
+If center is false, Z range is [0, height]. If true, range is [-height/2, height/2].
+
+```openscad
+// center = true
+linear_extrude(height = 10, center = true, convexity = 10, twist = -500)
+  translate([2, 0, 0]) circle(r = 1);
+
+// center = false
+linear_extrude(height = 10, center = false, convexity = 10, twist = -500)
+  translate([2, 0, 0]) circle(r = 1);
+```
+
+#### Mesh Refinement
+
+- slices: number of intermediate layers along Z. Defaults increase with twist.
+- segments: adds vertices on the 2D polygon’s edges to smooth twisted geometry. Must be a multiple of the polygon’s fragment count (e.g., 6 or 9 for circle($fn=3), 8 or 12 for square()).
+- $fn, $fs, $fa also affect smoothness. If slices is not set, it may derive from $fn.
+
+```openscad
+linear_extrude(height = 10, center = false, convexity = 10, twist = 360, slices = 100)
+  translate([2, 0, 0]) circle(r = 1);
+```
+
+```openscad
+linear_extrude(height = 10, center = false, convexity = 10, twist = 360, $fn = 100)
+  translate([2, 0, 0]) circle(r = 1);
+```
+
+#### Scale
+
+Scale the 2D shape over the extrusion height. Can be scalar or vector.
+
+```openscad
+// Uniform scale
+linear_extrude(height = 10, center = true, convexity = 10, scale = 3)
+  translate([2, 0, 0]) circle(r = 1);
+
+// Non-uniform scale
+linear_extrude(height = 10, center = true, convexity = 10, scale = [1, 5], $fn = 100)
+  translate([2, 0, 0]) circle(r = 1);
+```
+
+Note: Vector scale plus twist may produce nonplanar side walls. Use twist = 0 and set slices to avoid asymmetry.
+
+```openscad
+linear_extrude(height = 10, scale = [1, 0.1], slices = 20, twist = 0)
+  polygon(points = [[0,0], [20,10], [20,-10]]);
+```
+
+#### Using with imported SVG
+
+```openscad
+linear_extrude(height = 10, center = true)
+  import("knight.svg");
+```
+
+### rotate_extrude
+
+Rotational extrusion spins a 2D shape around the Z axis to form a rotationally symmetric 3D solid. The 2D shape must lie entirely on one side of the Y axis (x >= 0 recommended). If the shape touches x = 0, it must be along a line, not a point.
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-13 "Edit section: 3D to 2D Projection")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-13 "Edit section's source code: 3D to 2D Projection")<span class="mw-editsection-bracket">\]</span></span>
+Notes:
+- Operates on the shape’s projection onto the XY plane.
+- translate in X changes resulting diameter; translate in Y shifts result in Z.
+- rotate about X or Y distorts the cross-section via the projection.
+- Cannot produce a helix or screw thread directly.
+- In older versions, shapes on x < 0 could have inverted faces.
 
-</div>
+Usage:
+
+```openscad
+rotate_extrude(angle = 360, start = 0, convexity = 2) {
+  // 2D child
+}
+```
 
-    projection(cut = <boolean>)
+Parameters:
+- Use named parameters (pre-2021.01).
+- convexity: increase if preview fails (e.g., 10).
+- angle (>= 2019.05): sweep degrees; negative sweeps clockwise (right-hand rule).
+- start (dev snapshots): starting angle counter-clockwise from +X.
+- $fa, $fs, $fn as usual.
 
-<div class="mw-heading mw-heading2">
+Examples:
 
-## [2D to 3D Extrusion](/wiki/OpenSCAD_User_Manual/2D_to_3D_Extrusion "OpenSCAD User Manual/2D to 3D Extrusion")
+```openscad
+// Simple torus-like shape
+rotate_extrude(convexity = 10)
+  translate([2, 0, 0]) circle(r = 1);
+```
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-14 "Edit section: 2D to 3D Extrusion")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-14 "Edit section's source code: 2D to 3D Extrusion")<span class="mw-editsection-bracket">\]</span></span>
+Mesh refinement:
 
-</div>
+```openscad
+// Increase 2D shape fragments
+rotate_extrude(convexity = 10)
+  translate([2, 0, 0]) circle(r = 1, $fn = 100);
 
-    linear_extrude(height = <val>, center = <boolean>, convexity = <val>, twist = <degrees>[, slices = <val>, $fn=...,$fs=...,$fa=...]){...}
+// Increase extrusion fragments, too
+rotate_extrude(convexity = 10, $fn = 100)
+  translate([2, 0, 0]) circle(r = 1, $fn = 100);
+```
 
-    rotate_extrude(convexity = <val>[, $fn = ...]){...}
+Hook using angle:
 
-<div class="mw-heading mw-heading2">
+```openscad
+eps = 0.01;
 
-## [DXF Extrusion](/wiki/OpenSCAD_User_Manual/DXF_Extrusion "OpenSCAD User Manual/DXF Extrusion")
+translate([eps, 60, 0])
+  rotate_extrude(angle = 270, convexity = 10)
+  translate([40, 0]) circle(10);
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-15 "Edit section: DXF Extrusion")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-15 "Edit section's source code: DXF Extrusion")<span class="mw-editsection-bracket">\]</span></span>
+rotate_extrude(angle = 90, convexity = 10)
+  translate([20, 0]) circle(10);
 
-</div>
+translate([20, eps, 0])
+  rotate([90, 0, 0]) cylinder(r = 10, h = 80 + eps);
+```
 
-    linear_extrude(height = <val>, center = <boolean>, convexity = <val>, twist = <degrees>[...])
-    import (file = "filename.dxf", layer = "layername")
+Extruding a polygon:
 
-    rotate_extrude(origin = [x,y], convexity = <val>[, $fn = ...])
-    import (file = "filename.dxf", layer = "layername")
+```openscad
+// 2D polygon (shown rotated to view cross-section)
+rotate([90, 0, 0])
+  polygon(points = [[0,0], [2,1], [1,2], [1,3], [3,4], [0,5]]);
 
-<div class="mw-heading mw-heading2">
+// Rotational extrusion
+rotate_extrude($fn = 200)
+  polygon(points = [[0,0], [2,1], [1,2], [1,3], [3,4], [0,5]]);
+```
 
-## [STL Import](/wiki/OpenSCAD_User_Manual/STL_Import "OpenSCAD User Manual/STL Import")
+#### Orientation
 
-<span class="mw-editsection"><span class="mw-editsection-bracket">\[</span>[<span>edit</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&veaction=edit&section=T-16 "Edit section: STL Import")<span class="mw-editsection-divider">
-| </span>[<span>edit
-source</span>](/w/index.php?title=OpenSCAD_User_Manual/Command_Glossary&action=edit&section=T-16 "Edit section's source code: STL Import")<span class="mw-editsection-bracket">\]</span></span>
+- With angle not specified (full 360 in older versions), the extrusion traditionally starts along the negative X axis.
+- With angle specified and not 360, starts at the positive X axis.
+- Some version differences exist for angle = 360; specifying angle = 360 yields consistent behavior starting at +X in recent development snapshots.
+- start (dev snapshots) directly controls start angle.
 
-</div>
+### Description of extrude parameters
 
-    import("filename.stl", convexity = <val>);
+#### For all extrusion modes
 
-![](openscad_user_manual_media/a812c79b0d125e4946b33446eae0353f518627e2.png)
+- convexity: integer. Max number of front/back intersections for a ray. Only affects OpenCSG preview; not mesh generation. Higher values may slow preview.
 
-<div class="printfooter" data-nosnippet="">
+#### For linear extrusion only
 
-Retrieved from
-"<https://en.wikibooks.org/w/index.php?title=OpenSCAD_User_Manual/Print_version&oldid=3674395>"
+- height: extrusion height
+- center: center the solid around the mid-plane if true
+- twist: degrees of rotation along height
+- scale: scale factor (scalar or [sx, sy]) across height
+- slices: like $fn for the extrusion spine; not passed to child shape
+- segments: adds points along polygon segments for smoother twisted results
 
-</div>
+## DXF Extrusion
 
-<div id="catlinks" class="catlinks" data-mw="interface">
+Using import() with extrusion to convert 2D DXF into 3D.
 
-<div id="mw-normal-catlinks" class="mw-normal-catlinks">
+### Linear Extrude
 
-[Category](/wiki/Special:Categories "Special:Categories"):
+```openscad
+linear_extrude(height = fanwidth, center = true, convexity = 10)
+  import(file = "example009.dxf", layer = "fan_top");
+```
 
-  - [Book:OpenSCAD User
-    Manual](/wiki/Category:Book:OpenSCAD_User_Manual "Category:Book:OpenSCAD User Manual")
+### Rotate Extrude
 
-</div>
+```openscad
+rotate_extrude(convexity = 10)
+  import(file = "example009.dxf", layer = "fan_side", origin = fan_side_center);
+```
 
-<div id="mw-hidden-catlinks" class="mw-hidden-catlinks mw-hidden-cats-hidden">
+### Getting Inkscape to work
 
-Hidden category:
+Inkscape (an open-source drawing program) can produce 2D DXF suitable for OpenSCAD. Use DXF export methods that preserve paths and curves as needed for your workflow.
 
-  - [Books with print
-    version](/wiki/Category:Books_with_print_version "Category:Books with print version")
+---
 
-</div>
+# En.Wikibooks.Org Wiki Openscad User Manual Transformations Color
 
-</div>
+# OpenSCAD User Manual — Transformations
 
-<div class="mw-footer-container">
+## Basic concept
 
-  - <span id="footer-info-lastmod">This page was last edited on 13 April
-    2020, at 01:03.</span>
-  - <span id="footer-info-copyright">Text is available under the
-    [Creative Commons Attribution-ShareAlike
-    License](//creativecommons.org/licenses/by-sa/4.0/); additional
-    terms may apply. By using this site, you agree to the [Terms of
-    Use](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use)
-    and [Privacy
-    Policy.](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy)</span>
+Transformations affect their child nodes by moving, rotating, or scaling them. Transformations are written before the object they affect.
 
-<!-- end list -->
+Example:
+```openscad
+translate([10,20,30]) cube(10);
+```
 
-  - <span id="footer-places-privacy">[Privacy
-    policy](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy)</span>
-  - <span id="footer-places-about">[About
-    Wikibooks](/wiki/Wikibooks:Welcome)</span>
-  - <span id="footer-places-disclaimers">[Disclaimers](/wiki/Wikibooks:General_disclaimer)</span>
-  - <span id="footer-places-wm-codeofconduct">[Code of
-    Conduct](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Universal_Code_of_Conduct)</span>
-  - <span id="footer-places-developers">[Developers](https://developer.wikimedia.org)</span>
-  - <span id="footer-places-statslink">[Statistics](https://stats.wikimedia.org/#/en.wikibooks.org)</span>
-  - <span id="footer-places-cookiestatement">[Cookie
-    statement](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement)</span>
-  - <span id="footer-places-mobileview">[Mobile
-    view](//en.m.wikibooks.org/w/index.php?title=OpenSCAD_User_Manual/Print_version&mobileaction=toggle_view_mobile)</span>
+There is no semicolon after the transformation.
 
-<!-- end list -->
+Apply to a group of child nodes by enclosing them in braces:
+```openscad
+translate([0,0,-5]) {
+  cube(10);
+  cylinder(r=5, h=10);
+}
+```
 
-  - <span id="footer-copyrightico">![Wikimedia
-    Foundation](openscad_user_manual_media/07433c06efa92563a4cf134c6ae7ffe3cd7b1621.svg)</span>
-  - <span id="footer-poweredbyico">![Powered by
-    MediaWiki](openscad_user_manual_media/cdd77ab1a4acad0cfc0bee5cf0f9374247462199.svg)</span>
+Cascading transformations are achieved by nesting:
+```openscad
+rotate([45,45,45])
+translate([10,20,30])
+cube(10);
+```
 
-</div>
+When combining transforms, order is important. Transformations are applied from right to left.
 
-<div class="vector-header-container vector-sticky-header-container no-font-mode-scale">
+```openscad
+// Rotates around origin, then moves, then colors red
+color("red")
+translate([0,10,0])
+rotate([45,0,0])
+cube(5);
 
-<div id="vector-sticky-header" class="vector-sticky-header">
+// Moves first, then rotates around origin, then colors green
+color("green")
+rotate([45,0,0])
+translate([0,10,0])
+cube(5);
+```
 
-<div class="vector-sticky-header-start">
+## Advanced concept
 
-<div class="vector-sticky-header-icon-start vector-button-flush-left vector-button-flush-right" aria-hidden="true">
+In preview (F5), traditional transforms (translate, rotate, scale, mirror, multmatrix) are performed using OpenGL, while others (e.g., resize) perform a CGAL operation, behaving like a CSG operation that affects the underlying geometry. This can impact modifier characters (“#” highlight and “%” disable), which may apply to pre- vs. post-transformed geometry depending on the operation.
 
-<span class="vector-icon mw-ui-icon-search mw-ui-icon-wikimedia-search"></span>
-<span>Search</span>
+## scale
 
-</div>
+Scales child elements multiplicatively by the specified vector.
 
-<div class="vector-search-box-vue vector-search-box-show-thumbnail vector-search-box" role="search">
+Usage:
+```openscad
+scale(v = [x, y, z]) { /* children */ }
+```
 
-<div class="vector-typeahead-search-container">
+Example:
+```openscad
+cube(10);
+translate([15,0,0])
+scale([0.5, 1, 2])
+cube(10);
+```
 
-<div class="cdx-typeahead-search cdx-typeahead-search--show-thumbnail">
+## resize
 
-<div class="cdx-search-input__input-wrapper" data-search-loc="header-moved">
+Modifies the size of the child object to match the given x, y, and z sizes. This is a CGAL operation and can be slower, even in preview.
 
-<div class="cdx-text-input cdx-text-input--has-start-icon">
+Usage:
+```openscad
+// resize the sphere to extend 30 in x, 60 in y, and 10 in z
+resize(newsize = [30,60,10]) sphere(r=10);
 
-<span class="cdx-text-input__icon cdx-text-input__start-icon"></span>
+// if x, y, or z is 0, that dimension is left as-is
+resize([2,2,0]) cube();
 
-</div>
+// auto scales 0-dimensions to match
+// resize the 1x2x0.5 cube to 7x14x3.5
+resize([7,0,0], auto=true) cube([1,2,0.5]);
 
-</div>
+// auto for specific dimensions only
+// resize to 10x8x1; z dimension left alone
+resize([10,0,0], auto=[true,true,false]) cube([5,4,1]);
+```
 
-Search
+## rotate
 
-</div>
+Rotates its child by ‘a’ degrees about an axis of the coordinate system or around an arbitrary axis.
 
-</div>
+Usage:
+```openscad
+// About arbitrary axis v
+rotate(a = deg_a, v = [x, y, z]) { /* children */ }
+// or
+rotate(deg_a, [x, y, z]) { /* children */ }
 
-</div>
+// Euler-like per-axis rotation (order x then y then z)
+rotate(a = [deg_x, deg_y, deg_z]) { /* children */ }
+// or
+rotate([deg_x, deg_y, deg_z]) { /* children */ }
+```
+
+When ‘a’ is an array, ‘v’ is ignored. Per-axis rotations apply in order x, then y, then z:
+```openscad
+// Equivalent expansions
+rotate(a=[ax,ay,az]) {...}
+
+// is equivalent to:
+rotate([0,0,az])
+rotate([0,ay,0])
+rotate([ax,0,0]) {...}
+```
+
+Examples:
+```openscad
+// Flip upside-down around Y
+rotate([0,180,0]) { /* children */ }
+
+// Equivalent single-axis form
+rotate(a=180, v=[0,1,0]) { /* children */ }
+
+// Rotate 45° around arbitrary axis [1,1,0]
+rotate(a=45, v=[1,1,0]) { /* children */ }
+
+// 2D convenience (around Z)
+rotate(45) square(10);
+```
+
+### Rotation rule help
+
+Right-hand rule:
+
+- For rotate([a, b, c]):
+  - a: rotation about X, from +Y toward +Z
+  - b: rotation about Y, from +Z toward +X
+  - c: rotation about Z, from +X toward +Y
+
+Construct a cylinder from origin to point (x, y, z) using spherical coordinates:
+```openscad
+x = 10;
+y = 10;
+z = 10;               // endpoint
+length = norm([x,y,z]);    // radial distance
+b = acos(z/length);   // inclination
+c = atan2(y,x);       // azimuth
+
+rotate([0, b, c])
+cylinder(h=length, r=0.5);
+
+%cube([x,y,z]);       // cube corner coincides with cylinder end
+```
+
+## translate
+
+Translates (moves) child elements by the specified vector.
+
+Usage:
+```openscad
+translate(v = [x, y, z]) { /* children */ }
+```
+
+Example:
+```openscad
+cube(2, center=true);
+translate([5,0,0]) sphere(1, center=true);
+```
+
+## mirror
+
+Transforms the child element as a mirror image through a plane intersecting the origin. The argument is the normal vector of the mirror plane.
+
+Function signature:
+```openscad
+mirror(v = [x, y, z]) { /* children */ }
+```
+
+Examples:
+```openscad
+// Original and mirrored hands (mirror changes the object; it does not duplicate)
+hand();                  // original
+mirror([1,0,0]) hand();
+
+hand();                  // original
+mirror([1,1,0]) hand();
+
+hand();                  // original
+mirror([1,1,1]) hand();
+```
+
+Mirroring a composite shape:
+```openscad
+// original
+rotate([0,0,-30]) {
+  cube([23,12,10]);
+  translate([0.5, 4.4, 9.9]) {
+    color("red", 1.0) {
+      linear_extrude(height=2) {
+        text("OpenSCAD", size=3);
+      }
+    }
+  }
+}
+
+// mirrored
+mirror([1,0,0]) {
+  rotate([0,0,-30]) {
+    cube([23,12,10]);
+    translate([0.5, 4.4, 9.9]) {
+      color("red", 1.0) {
+        linear_extrude(height=2) {
+          text("OpenSCAD", size=3);
+        }
+      }
+    }
+  }
+}
+```
+
+## multmatrix
+
+Multiplies the geometry of child elements by a 4×3 or 4×4 affine transformation matrix. The implicit 4th row is [0,0,0,1] if omitted.
+
+Usage:
+```openscad
+multmatrix(m = [
+  [m11, m12, m13, tx],
+  [m21, m22, m23, ty],
+  [m31, m32, m33, tz],
+  [  0,   0,   0,  1]  // optional in OpenSCAD
+]) {
+  /* children */
+}
+```
+
+The upper-left 3×3 handles scale, rotation, and shear; the last column is translation. Each vertex v=[x,y,z,1] is transformed as m*v.
+
+Example: rotate 45° in XY, then translate [10,20,30] (equivalent to translate([10,20,30]) rotate([0,0,45])):
+```openscad
+angle = 45;
+multmatrix(m = [
+  [cos(angle), -sin(angle), 0, 10],
+  [sin(angle),  cos(angle), 0, 20],
+  [0,           0,          1, 30],
+  [0,           0,          0,  1]
+])
+union() {
+  cylinder(r=10, h=10, center=false);
+  cube([10,10,10], center=false);
+}
+```
+
+Combining matrices (equivalent to rotate([0, -35, 0]) translate([40, 0, 0]) Obj();):
+```openscad
+module Obj() {
+  cylinder(r=10, h=10, center=false);
+  cube([10,10,10], center=false);
+}
+
+// iterate into the future 6 times and show how multmatrix moves around the center point
+for (time = [0 : 15 : 90]) {
+  y_ang = -time;
+
+  mrot_y = [
+    [ cos(y_ang), 0, sin(y_ang), 0],
+    [ 0,          1, 0,          0],
+    [-sin(y_ang), 0, cos(y_ang), 0],
+    [ 0,          0, 0,          1]
+  ];
+
+  mtrans_x = [
+    [1, 0, 0, 40],
+    [0, 1, 0,  0],
+    [0, 0, 1,  0],
+    [0, 0, 0,  1]
+  ];
+
+  echo(mrot_y * mtrans_x);
+
+  // at origin
+  Obj();
+
+  // starting object at [40,0,0]
+  multmatrix(mtrans_x) Obj();
+
+  // rotated instance, appears 6 times
+  multmatrix(mrot_y * mtrans_x) Obj();
+}
+```
+
+Skew example (shear Z into Y):
+```openscad
+M = [
+  [1, 0,   0, 0],
+  [0, 1, 0.7, 0],  // skew value along y as z changes
+  [0, 0,   1, 0],
+  [0, 0,   0, 1]
+];
+
+multmatrix(M) {
+  union() {
+    cylinder(r=10, h=10, center=false);
+    cube([10,10,10], center=false);
+  }
+}
+```
+
+Transforming a vector via matrix, then using it as a translation:
+```openscad
+angle = 45;
+m = [
+  [cos(angle), -sin(angle), 0, 0],
+  [sin(angle),  cos(angle), 0, 0],
+  [0,           0,          1, 0]
+];
+
+v = [10,0,0];
+vm = concat(v, [1]);   // make it [x,y,z,1]
+vtrans = m * vm;       // transformed vector
+
+echo(vtrans);
+translate(vtrans) cube();
+```
+
+## color
+
+Displays children with the specified RGB color and optional alpha. Used in F5 preview; CGAL/STL (F6) do not support color. Alpha defaults to 1.0 (opaque).
+
+Function signature:
+```openscad
+color(c = [r, g, b, a]) { /* children */ }
+color(c = [r, g, b], alpha = 1.0) { /* children */ }
+color("#hexvalue") { /* children */ }
+color("colorname", 1.0) { /* children */ }
+```
+
+Notes:
+- r, g, b, a are in [0,1]. For 0–255 sources, scale:
+```openscad
+color([R/255, G/255, B/255]) { /* children */ }
+```
+- Colors can be specified by name (case insensitive), e.g.:
+```openscad
+color("red") sphere(5);
+color("Blue", 0.5) cube(5);
+```
+- Hex formats: #rgb, #rgba, #rrggbb, #rrggbbaa. If both hex alpha and alpha parameter are given, the parameter wins.
+- Transparency is order-sensitive; list transparent objects after opaque ones for correct display. Some combinations of multiple transparent objects cannot be handled correctly.
+
+Color name categories (subset from SVG color list):
+- Purples: Lavender, Thistle, Plum, Violet, Orchid, Fuchsia, Magenta, MediumOrchid, MediumPurple, BlueViolet, DarkViolet, DarkOrchid, DarkMagenta, Purple, Indigo, DarkSlateBlue, SlateBlue, MediumSlateBlue
+- Reds: IndianRed, LightCoral, Salmon, DarkSalmon, LightSalmon, Red, Crimson, FireBrick, DarkRed
+- Blues: Aqua, Cyan, LightCyan, PaleTurquoise, Aquamarine, Turquoise, MediumTurquoise, DarkTurquoise, CadetBlue, SteelBlue, LightSteelBlue, PowderBlue, LightBlue, SkyBlue, LightSkyBlue, DeepSkyBlue, DodgerBlue, CornflowerBlue, RoyalBlue, Blue, MediumBlue, DarkBlue, Navy, MidnightBlue
+- Pinks: Pink, LightPink, HotPink, DeepPink, MediumVioletRed, PaleVioletRed
+- Greens: GreenYellow, Chartreuse, LawnGreen, Lime, LimeGreen, PaleGreen, LightGreen, MediumSpringGreen, SpringGreen, MediumSeaGreen, SeaGreen, ForestGreen, Green, DarkGreen, YellowGreen, OliveDrab, Olive, DarkOliveGreen, MediumAquamarine, DarkSeaGreen, LightSeaGreen, DarkCyan, Teal
+- Oranges: LightSalmon, Coral, Tomato, OrangeRed, DarkOrange, Orange
+- Yellows: Gold, Yellow, LightYellow, LemonChiffon, LightGoldenrodYellow, PapayaWhip, Moccasin, PeachPuff, PaleGoldenrod, Khaki, DarkKhaki
+- Browns: Cornsilk, BlanchedAlmond, Bisque, NavajoWhite, Wheat, BurlyWood, Tan, RosyBrown, SandyBrown, Goldenrod, DarkGoldenrod, Peru, Chocolate, SaddleBrown, Sienna, Brown, Maroon
+- Whites: White, Snow, Honeydew, MintCream, Azure, AliceBlue, GhostWhite, WhiteSmoke, Seashell, Beige, OldLace, FloralWhite, Ivory, AntiqueWhite, Linen, LavenderBlush, MistyRose
+- Grays: Gainsboro, LightGrey, Silver, DarkGray, Gray, DimGray, LightSlateGray, SlateGray, DarkSlateGray, Black
+
+Example: 3‑D multicolor sine wave
+```openscad
+for (i = [0:36]) {
+  for (j = [0:36]) {
+    color([ 0.5 + sin(10*i)/2,
+            0.5 + sin(10*j)/2,
+            0.5 + sin(10*(i+j))/2 ])
+    translate([i, j, 0])
+    cube(size = [1, 1, 11 + 10*cos(10*i)*sin(10*j)]);
+  }
+}
+```
+Since −1 ≤ sin(x) ≤ 1, each component 0.5 + sin(x)/2 remains within [0,1].
+
+Example 2: Optional coloring via parameter
+```openscad
+module myModule(withColors=false) {
+  c = withColors ? "red" : undef;
+  color(c) circle(r=10);
+}
+```
+Setting the color name to undef preserves default colors.
+
+## offset
+
+Note: Requires version 2015.03.
+
+Default with no arguments: r = 1, chamfer = false. If both r and delta are given, r takes precedence.
+
+Offset generates a new 2D outline from an existing outline. Two modes:
+- Radial (r): rounded corners by sweeping a circle of radius r outside (r > 0) or inside (r < 0) the outline.
+- Delta (delta): fixed-distance offset outside (delta > 0) or inside (delta < 0) with straight/angled corners. No inward perimeter is generated where it would self-intersect.
+
+Use cases:
+- Thin walls by subtracting a negative offset from the original (or vice versa).
+- Fillet (round inside corners):
+  - offset(r = -3) offset(delta = +3)
+- Round (round outside corners):
+  - offset(r = +3) offset(delta = -3)
+
+Parameters:
+| Name         | Type              | Description |
+|--------------|-------------------|-------------|
+| r            | Number            | Radius for radial mode (rounded corners). If unnamed first parameter, treated as r. Takes precedence over delta when both given. |
+| delta        | Number            | Distance for delta mode (straight/angled corners). Negative values offset inward. |
+| chamfer      | Boolean (false)   | Only for delta mode. If true, edges are chamfered (cut straight); otherwise edges extend to their intersection. |
+| $fa, $fs, $fn| Special variables | Control curve smoothness for radial offsets. No effect on delta offsets. |
+
+Examples:
+```openscad
+// Example 1
+linear_extrude(height=60, twist=90, slices=60) {
+  difference() {
+    offset(r=10)  square(20, center=true);
+    offset(r=8)   square(20, center=true);
+  }
+}
+
+// Example 2: fillet helper
+module fillet(r) {
+  offset(r = -r) offset(delta = r) children();
+}
+```
+
+## fill
+
+Note: Requires development snapshot.
+
+Fill removes holes from polygons without changing the outer outline. For convex polygons the result is identical to hull().
+
+Example:
+```openscad
+t = "OpenSCAD";
+
+linear_extrude(15) {
+  text(t, 50);
+}
+
+color("darkslategray") {
+  linear_extrude(2) {
+    offset(4) {
+      fill() {
+        text(t, 50);
+      }
+    }
+  }
+}
+```
+
+## minkowski
+
+Displays the Minkowski sum of child nodes.
+
+Rounded-edge plate example:
+```openscad
+$fn = 50;
+cube([10,10,1]);
+cylinder(r=2, h=1);
+
+$fn = 50;
+minkowski() {
+  cube([10,10,1]);
+  cylinder(r=2, h=1);
+}
+```
+
+Note: The origin of the second object affects the result.
+
+Different sums due to centering:
+```openscad
+minkowski() {
+  cube([10, 10, 1]);
+  cylinder(1, center=true);
+}
+
+minkowski() {
+  cube([10, 10, 1]);
+  cylinder(1);
+}
+```
+
+Warnings:
+- Complexity grows multiplicatively with facet counts. High $fn can consume significant CPU and memory.
+- If an input is compound (multiple separate shapes), it may be treated as multiple inputs and produce an oversized result. Use union() to combine before minkowski if needed.
+
+## hull
+
+Displays the convex hull of child nodes.
+
+2D example:
+```openscad
+hull() {
+  translate([15,10,0]) circle(10);
+  circle(10);
+}
+```
+
+Tip: For 3D-looking results like the hull of two cylinders, it can be more efficient to hull() their 2D circular bases and then linear_extrude, rather than hull() the 3D cylinders directly.
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual String Functions Chr
+
+# OpenSCAD User Manual: String Functions
+
+## str
+Convert all arguments to strings and concatenate.
+
+Usage examples:
+```openscad
+number = 2;
+echo("This is ", number, 3, " and that's it.");
+echo(str("This is ", number, 3, " and that's it."));
+
+// Results:
+// ECHO: "This is ", 2, 3, " and that's it."
+// ECHO: "This is 23 and that's it."
+```
+
+Simple conversion of a number to a string:
+```openscad
+s = str(n);
+```
+
+## chr
+[Note: Requires version 2015.03]
+
+Convert numbers to a string containing the character with the corresponding code point.
+
+- OpenSCAD uses Unicode; numbers are interpreted as Unicode code points.
+- Numbers outside the valid code point range produce an empty string.
+
+Parameters:
+- chr(Number) — Convert one code point to a string of length 1 (byte length depends on UTF-8 encoding) if valid.
+- chr(Vector) — Convert all code points in the vector to a string.
+- chr(Range) — Convert all code points produced by the range to a string.
+
+Examples:
+```openscad
+echo(chr(65), chr(97));              // ECHO: "A", "a"
+echo(chr(65, 97));                   // ECHO: "Aa"
+echo(chr([66, 98]));                 // ECHO: "Bb"
+echo(chr([97 : 2 : 102]));           // ECHO: "ace"
+echo(chr(-3));                       // ECHO: ""
+echo(chr(9786), chr(9788));          // ECHO: "☺", "☼"
+echo(len(chr(9788)));                // ECHO: 1
+```
+
+Note: When used with echo(), console output for character codes greater than 127 is platform dependent.
+
+## ord
+[Note: Requires version 2019.05]
+
+Convert a character to a number representing the Unicode code point. If the parameter is not a string, ord() returns undef.
+
+Parameters:
+- ord(String) — Convert the first character of the given string to its Unicode code point.
+
+Examples:
+```openscad
+echo(ord("a"));                // ECHO: 97
+echo(ord("BCD"));              // ECHO: 66
+echo([for (c = "Hello! 🙂") ord(c)]);
+// ECHO: [72, 101, 108, 108, 111, 33, 32, 128578]
+
+txt = "1";
+echo(ord(txt) - 48, txt);      // ECHO: 1, "1"  // only converts 1 character
+```
+
+## len
+Returns the number of characters in a text.
+
+```openscad
+echo(len("Hello world")); // 11
+```
+
+## Also See
+- search() for text searching.
+
+## is_string(value)
+The function is_string(value) returns true if the value is a string, false otherwise.
+
+```openscad
+echo(is_string("alpha")); // true
+echo(is_string(22));      // false
+```
+
+## User defined functions
+To complement native functions, you can define your own functions. Some suggestions:
+
+```openscad
+//-- Lower case all chars of a string -- does not work with accented characters
+function strtolower (string) =
+    chr([for (s = string) let(c = ord(s)) c < 91 && c > 64 ? c + 32 : c]);
+
+//-- Replace char (not string) in a string
+function char_replace (s, old = " ", new = "_") =
+    chr([for (i = [0 : len(s) - 1]) s[i] == old ? ord(new) : ord(s[i])]);
+
+//-- Replace last chars of a string (can be used for file extension replacement of same length)
+function str_rep_last (s, new = ".txt") =
+    str(chr([for (i = [0 : len(s) - len(new) - 1]) ord(s[i])]), new);
+
+//-- integer value from string ----------
+// Parameters ret and i are for function internal use (recursion)
+function strtoint (s, ret = 0, i = 0) =
+    i >= len(s) ? ret : strtoint(s, ret * 10 + ord(s[i]) - ord("0"), i + 1);
+```
+
+Note: The use of chr() recomposes a string from an unknown number of characters defined by their code points, avoiding recursive modules previously needed before list management was available.
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Conditional And Iterator Functions Assign Statement
+
+# OpenSCAD User Manual: Conditional and Iterator Functions
+
+## For loop
+
+Evaluate each value in a range or vector, or each name in an object, applying it to the following action.
+
+```openscad
+for (variable = [start : increment : end])
+for (variable = [start : end])
+for (variable = [vector])
+for (variable = object)
+```
+
+### For each value in a range
+
+```openscad
+for (variable = [start : increment : end])
+for (variable = [start : end])
+```
+
+Note: For ranges, values are separated by colons (:) rather than commas used in vectors.
+
+The action is evaluated for each value in the range.
+
+- start: initial value
+- increment (step): amount to increase/decrease the value, optional, default = 1
+- end: stop when next value would be past end
+
+Examples:
+
+```openscad
+for (a = [3 : 5]) echo(a);                  // 3 4 5
+for (a = [3 : 0]) { echo(a); }              // 0 1 2 3
+// start > end is invalid, deprecated by 2015.3
+
+for (a = [3 : 0.5 : 5]) echo(a);            // 3 3.5 4 4.5 5
+for (a = [0 : 2 : 5]) echo(a);              // 0 2 4  (a never equals end)
+for (a = [3 : -2 : -1]) echo(a);            // 3 1 -1
+// negative increment requires 2015.3; be sure end < start
+```
+
+### For each element of a vector
+
+The action is evaluated for each element of the vector.
+
+```openscad
+for (a = [3, 4, 1, 5]) echo(a);             // 3 4 1 5
+for (a = [0.3, PI, 1, 99]) { echo(a); }     // 0.3 3.14159 1 99
+
+x1 = 2; x2 = 8; x3 = 5.5;
+for (a = [x1, x2, x3]) { echo(a); }         // 2 8 5.5
+
+for (a = [[1,2], 6, "s", [[3,4], [5,6]]]) echo(a);
+// [1,2] 6 "s" [[3,4],[5,6]]
+```
+
+The vector can be described elsewhere, similar to “for each” in other languages.
+
+```openscad
+animals = ["elephants", "snakes", "tigers", "giraffes"];
+for (animal = animals)
+    echo(str("I've been to the zoo and saw ", animal));
+// "I've been to the zoo and saw elephants", for each animal
+```
+
+### For each element of an object
+
+Requires development snapshot. The action is evaluated for the name of each element of the object, in an unspecified order.
+
+```openscad
+tm = textmetrics("Hello, World!");
+for (name = tm)
+    echo(name, tm[name]);
+```
+
+### Notes
+
+- for() is an operator. Operators require braces {} if more than one action is within their scope.
+- Actions end with semicolons; operators do not.
+- for() does not break the rule about variables having only one value within a scope. Each evaluation is given its own scope, allowing variables to have unique values. You still cannot do a = a + 1 in place.
+- OpenSCAD is not iterative in the programmatic sense; for() builds a tree of objects—one branch per item—each with its own scope.
+
+Example:
+
+```openscad
+for (i = [0 : 3])
+    translate([i * 10, 0, 0]) cube(i + 1);
+```
+
+Produces a CSG tree like:
+
+```
+group() {
+  group() {
+    multmatrix([[1,0,0, 0], [0,1,0,0], [0,0,1,0], [0,0,0,1]]) { cube(size=[1,1,1], center=false); }
+    multmatrix([[1,0,0,10], [0,1,0,0], [0,0,1,0], [0,0,0,1]]) { cube(size=[2,2,2], center=false); }
+    multmatrix([[1,0,0,20], [0,1,0,0], [0,0,1,0], [0,0,0,1]]) { cube(size=[3,3,3], center=false); }
+    multmatrix([[1,0,0,30], [0,1,0,0], [0,0,1,0], [0,0,0,1]]) { cube(size=[4,4,4], center=false); }
+  }
+}
+```
+
+While the group() is built sequentially, all instances of the for() exist as separate entities; they do not iterate one piece of code sequentially.
+
+### Nested for()
+
+It is reasonable to nest multiple for() statements:
+
+```openscad
+for (z = [-180 : 45 : +180])
+for (x = [10 : 5 : 50])
+    rotate([0, 0, z]) translate([x, 0, 0]) cube(1);
+```
+
+Alternatively, include all ranges/vectors in the same for() operator:
+
+```openscad
+for (variable1 = <range or vector>,
+     variable2 = <range or vector>)
+    <do something using both variables>;
+```
+
+Nested 3-deep example:
+
+```openscad
+color_vec = ["black","red","blue","green","pink","purple"];
+
+for (x = [-20 : 10 : 20])
+for (y = [0 : 4]) color(color_vec[y])
+for (z = [0, 4, 10]) {
+    translate([x, y * 5 - 10, z]) cube();
+}
+```
+
+Shorthand nesting for the same result:
+
+```openscad
+color_vec = ["black","red","blue","green","pink","purple"];
+
+for (x = [-20 : 10 : 20], y = [0 : 4], z = [0, 4, 10])
+    translate([x, y * 5 - 10, z]) { color(color_vec[y]) cube(); }
+```
+
+Examples using vector of vectors:
+
+Example 1 (rotation):
+
+```openscad
+for (i = [
+    [  0,  0,   0],
+    [ 10, 20, 300],
+    [200, 40,  57],
+    [ 20, 88,  57]
+]) {
+    rotate(i) cube([100, 20, 20], center = true);
+}
+```
+
+Example 2 (translation):
+
+```openscad
+for (i = [
+    [ 0,  0,  0],
+    [10, 12, 10],
+    [20, 24, 20],
+    [30, 36, 30],
+    [20, 48, 40],
+    [10, 60, 50]
+]) {
+    translate(i) cube([50, 15, 10], center = true);
+}
+```
+
+Example 3:
+
+```openscad
+for (i = [
+    [[ 0,  0,  0], 20],
+    [[10, 12, 10], 50],
+    [[20, 24, 20], 70],
+    [[30, 36, 30], 10],
+    [[20, 48, 40], 30],
+    [[10, 60, 50], 40]
+]) {
+    translate([i[0][0], 2 * i[0][1], 0]) cube([10, 15, i[1]]);
+}
+```
+
+## Intersection For Loop
+
+Iterate over the values in a range or vector and create the intersection of objects created by each pass.
+
+Besides creating separate instances for each pass, the standard for() also groups all these instances creating an implicit union. intersection_for() replaces this implicit union with an intersection.
+
+intersection_for() uses the same parameters and works the same as a for loop, except for the intersection behavior.
+
+Example 1 – loop over a range:
+
+```openscad
+intersection_for (n = [1 : 6]) {
+    rotate([0, 0, n * 60]) {
+        translate([5, 0, 0]) sphere(r = 12);
+    }
+}
+```
+
+Example 2 – rotation over a vector of vectors:
+
+```openscad
+intersection_for (i = [
+    [  0,  0,   0],
+    [ 10, 20, 300],
+    [200, 40,  57],
+    [ 20, 88,  57]
+]) {
+    rotate(i) cube([100, 20, 20], center = true);
+}
+```
+
+## If Statement
+
+Performs a test to determine if the actions in a sub-scope should be performed or not.
+
+Really important: You cannot change the value of variables outside the current scope. If you assign inside braces, the new variable is lost when you exit that scope.
+
+```openscad
+if (test) scope1
+if (test) { scope1 }
+
+if (test) scope1 else scope2
+if (test) { scope1 } else { scope2 }
+```
+
+Parameters:
+
+- test: Usually a boolean expression, but can be any value or variable. Do not confuse assignment '=' with equality '=='.
+- scope1: Action(s) to take when test is true.
+- scope2: Action(s) to take when test is false.
+
+Examples:
+
+```openscad
+if (b == a) cube(4);
+if (b <  a) { cube(4); cylinder(6); }
+if (b && a) { cube(4); cylinder(6); }
+if (b != a) cube(4); else cylinder(3);
+if (b)      { cube(4); cylinder(6); } else { cylinder(10, 5, 5); }
+if (!true)  { cube(4); cylinder(6); } else cylinder(10, 5, 5);
+
+if (x > y) cube(1, center = false);
+else       { cube(size = 2, center = true); }
+
+if (a == 4) {} else echo("a is not 4");
+
+if ((b < 5) && (a > 8)) { cube(4); } else { cylinder(3); }
+if (b < 5 && a > 8) cube(4); else cylinder(3);
+```
+
+Since 2015.03, variables can be assigned in any scope. Assignments are only valid within the scope in which they are defined—you cannot leak values to an outer scope.
+
+### Nested if
+
+The scopes of both the if() portion and the else portion can contain if() statements. This nesting can be to any depth.
+
+```openscad
+if (test1) {
+    // scope1
+    if (test2) { /* scope2.1 */ }
+    else       { /* scope2.2 */ }
+} else {
+    // scope2
+    if (test3) { /* scope3.1 */ }
+    else       { /* scope3.2 */ }
+}
+```
+
+When scope1 and scope2 contain only the if() statement, the outer sets of braces can be removed.
+
+```openscad
+if (test1)
+    if (test2) { /* scope2.1 */ }
+    else       { /* scope2.2 */ }
+else if (test3) { /* scope3.1 */ }
+else            { /* scope3.2 */ }
+```
+
+### else if
+
+```openscad
+if      (test1) { /* scope1 */ }
+else if (test2) { /* scope2 */ }
+else if (test3) { /* scope3 */ }
+else if (test4) { /* scope4 */ }
+else            { /* scope5 */ }
+```
+
+When working down the chain of tests, the first true condition selects its scope; all further tests are skipped.
+
+Example:
+
+```openscad
+if ((k < 8) && (m > 1))      cube(10);
+else if (y == 6)            { sphere(6); cube(10); }
+else if (y == 7)             color("blue") sphere(5);
+else if (k + m != 8)        { cylinder(15, 5, 0); sphere(8); }
+else                         color("green") { cylinder(12, 5, 0); sphere(8); }
+```
+
+## Conditional ? :
+
+A ternary operator that uses a test to determine which of two values to return.
+
+```openscad
+a = test ? TrueValue : FalseValue;
+echo(test ? TrueValue : FalseValue);
+```
+
+Parameters:
+
+- test: Usually a boolean expression, but can be any value or variable. Do not confuse assignment '=' with equality '=='.
+- TrueValue: The value to return when test is true.
+- FalseValue: The value to return when test is false.
+
+A value in OpenSCAD is either:
+- Number (e.g., 42)
+- Boolean (e.g., true)
+- String (e.g., "foo")
+- Vector (e.g., [1, 2, 3])
+- Undefined (undef)
+
+This works like the ?: operator from C-like languages.
+
+Examples:
+
+```openscad
+a = 1; b = 2;
+c = (a == b) ? 4 : 5;                   // 5
+
+a = 1; b = 2;
+c = (a == b) ? "a==b" : "a!=b";         // "a!=b"
+
+TrueValue = true;
+FalseValue = false;
+a = 5;
+test = (a == 1);
+echo(test ? TrueValue : FalseValue);    // false
+
+L = 75;
+R = 2;
+test = (L / R) > 25;
+TrueValue  = [test, L, R, L / R, cos(30)];
+FalseValue = [test, L, R, sin(15)];
+a1 = test ? TrueValue : FalseValue;     // [true, 75, 2, 37.5, 0.866025]
+```
+
+Some forms of tail-recursion elimination are supported.
+
+### Recursive function calls
+
+Recursive function calls are supported. Using the conditional operator ensures the recursion is terminated.
+
+Note: There is a built-in recursion limit to prevent crashes. If the limit is hit, the function returns undef.
+
+Example:
+
+```openscad
+// Recursion: sum values in a vector from index s to index i (inclusive)
+function sumv(v, i, s = 0) = (i == s ? v[i] : v[i] + sumv(v, i - 1, s));
+
+vec = [10, 20, 30, 40];
+echo("sum vec=", sumv(vec, 2, 1));      // calculates 20 + 30 = 50
+```
+
+### Formatting complex usage
+
+Multiple nested conditionals can be hard to read. Formatting them like multi-line, indented if/else statements is clearer.
+
+```openscad
+// Find the maximum value in a vector
+function maxv(v, m = -999999999999, i = 0) =
+    (i == len(v)) ? m :
+    (m > v[i])    ? maxv(v, m, i + 1)
+                  ? maxv(v, v[i], i + 1);
+
+v = [7, 3, 9, 3, 5, 6];
+echo("max", maxv(v));                    // ECHO: "max", 9
+```
+
+## Assign Statement
+
+Deprecated: assign() is deprecated and will be removed in a future release. Variables can now be assigned anywhere. If you prefer this style of setting values, use the Let Statement instead.
+
+Set variables to a new value for a sub-tree.
+
+Parameters: The variables that should be (re-)assigned.
+
+Example:
+
+```openscad
+for (i = [10 : 50]) {
+    assign (angle = i * 360 / 20,
+            distance = i * 10,
+            r = i * 2) {
+        rotate(angle, [1, 0, 0])
+        translate([0, distance, 0])
+        sphere(r = r);
+    }
+}
+```
+
+Equivalent without assign():
+
+```openscad
+for (i = [10 : 50]) {
+    angle = i * 360 / 20;
+    distance = i * 10;
+    r = i * 2;
+    rotate(angle, [1, 0, 0])
+    translate([0, distance, 0])
+    sphere(r = r);
+}
+```
+
+## Let Statement
+
+Note: Requires version 2019.05.
+
+Set variables to a new value for a sub-tree. The parameters are evaluated sequentially and may depend on each other (unlike the deprecated assign()).
+
+Parameters: The variables that should be set.
+
+Example:
+
+```openscad
+for (i = [10 : 50]) {
+    let (angle = i * 360 / 20,
+         r = i * 2,
+         distance = r * 5) {
+        rotate(angle, [1, 0, 0])
+        translate([0, distance, 0])
+        sphere(r = r);
+    }
+}
+```
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Csg Modelling Difference
+
+# OpenSCAD User Manual: CSG Modelling
+
+This page describes Constructive Solid Geometry (CSG) operations in OpenSCAD and provides examples and usage notes.
+
+## Boolean Overview
+
+### 2D examples
+
+| Operation    | Logical meaning | Geometric expression             |
+|--------------|------------------|----------------------------------|
+| union        | or               | circle + square                  |
+| difference   | and not          | square - circle                  |
+| difference   | and not          | circle - square                  |
+| intersection | and              | circle - (circle - square)       |
+
+2D OpenSCAD examples:
+```openscad
+union() { square(10); circle(10); }           // square or circle
+difference() { square(10); circle(10); }      // square and not circle
+difference() { circle(10); square(10); }      // circle and not square
+intersection() { square(10); circle(10); }    // square and circle
+```
+
+### 3D examples
+
+| Operation    | Logical meaning | Geometric expression              |
+|--------------|------------------|-----------------------------------|
+| union        | or               | sphere + cube                     |
+| difference   | and not          | cube - sphere                     |
+| difference   | and not          | sphere - cube                     |
+| intersection | and              | sphere - (sphere - cube)          |
+
+3D OpenSCAD examples:
+```openscad
+union() { cube(12, center=true); sphere(8); }             // cube or sphere
+difference() { cube(12, center=true); sphere(8); }        // cube and not sphere
+difference() { sphere(8); cube(12, center=true); }        // sphere and not cube
+intersection() { cube(12, center=true); sphere(8); }      // cube and sphere
+```
+
+## union
+
+Creates a union of all its child nodes. This is the sum of all children (logical “or”). May be used with either 2D or 3D objects, but do not mix 2D and 3D in the same CSG node.
+
+Usage example:
+```openscad
+union() {
+  cylinder(h = 4, r = 1, center = true, $fn = 100);
+  rotate([90, 0, 0])
+    cylinder(h = 4, r = 0.9, center = true, $fn = 100);
+}
+```
+
+Remarks:
+- Union is implicit when multiple top-level objects are listed without a wrapper. However, it is mandatory when you need to explicitly group shapes, for example inside difference() to treat the first children as a single combined object.
+- It is mandatory, for all unions (explicit or implicit), that external faces to be merged not be coincident. Coincident faces can result in non-manifold geometry, warnings, missing pieces in render output, and flickering in preview. This stems from floating point comparisons and the inability to exactly represent many rotations.
+
+Invalid example (coincident faces):
+```openscad
+// Invalid!
+size = 10;
+rotation = 17;
+
+union() {
+  rotate([rotation, 0, 0]) cube(size);
+  rotate([rotation, 0, 0])
+    translate([0, 0, size])
+      cube([2, 3, 4]);
+}
+```
+
+Corrected with a small epsilon overlap:
+```openscad
+// Correct!
+size = 10;
+rotation = 17;
+eps = 0.01;
+
+union() {
+  rotate([rotation, 0, 0]) cube(size);
+  rotate([rotation, 0, 0])
+    translate([0, 0, size - eps])
+      cube([2, 3, 4 + eps]);
+}
+```
+
+## difference
+
+Subtracts the 2nd (and all further) child nodes from the first one (logical “and not”). May be used with either 2D or 3D objects, but do not mix 2D and 3D in the same CSG node.
+
+Usage example:
+```openscad
+difference() {
+  cylinder(h = 4, r = 1, center = true, $fn = 100);
+  rotate([90, 0, 0])
+    cylinder(h = 4, r = 0.9, center = true, $fn = 100);
+}
+```
+
+Notes:
+- Surfaces to be removed by a difference must overlap the volume, and the subtracting (negative) shape must extend fully outside the surface it is removing. Otherwise, preview artifacts and non-manifold render warnings can occur or pieces may disappear.
+- See the union section above for why a small epsilon overlap is often required.
+
+### difference with multiple children
+
+Usage example:
+```openscad
+$fn = 90;
+difference() {
+  cylinder(r = 5, h = 20, center = true);
+
+  rotate([0, 140, -45])
+    color("LightBlue")
+      cylinder(r = 2, h = 25, center = true);
+
+  rotate([0, 40, -50])
+    cylinder(r = 2, h = 30, center = true);
+
+  translate([0, 0, -10])
+    rotate([0, 40, -50])
+      cylinder(r = 1.4, h = 30, center = true);
+}
+```
+
+In the next instance, the first and second children are combined with a union before subtraction:
+```openscad
+translate([10, 10, 0]) {
+  difference() {
+    union() {  // combine 1st and 2nd children
+      cylinder(r = 5, h = 20, center = true);
+
+      rotate([0, 140, -45])
+        color("LightBlue")
+          cylinder(r = 2, h = 25, center = true);
+    }
+
+    rotate([0, 40, -50])
+      cylinder(r = 2, h = 30, center = true);
+
+    translate([0, 0, -10])
+      rotate([0, 40, -50])
+        cylinder(r = 1.4, h = 30, center = true);
+  }
+}
+```
+
+## intersection
+
+Creates the intersection of all child nodes, keeping only the overlapping portion (logical “and”). May be used with either 2D or 3D objects, but do not mix 2D and 3D in the same CSG node.
+
+Usage example:
+```openscad
+intersection() {
+  cylinder(h = 4, r = 1, center = true, $fn = 100);
+  rotate([90, 0, 0])
+    cylinder(h = 4, r = 0.9, center = true, $fn = 100);
+}
+```
+
+## render
+
+Warning: render() always computes the full CSG model for its subtree (even in OpenCSG preview mode), which can make previews very slow and appear to hang.
+
+Usage:
+```openscad
+render(convexity = 1) {
+  // geometry...
+}
+```
+
+convexity:
+- Integer specifying the maximum number of front/back faces a ray intersecting the object might penetrate.
+- Only affects correct display in OpenCSG preview mode; it does not affect final polyhedron rendering.
+- For example, a 2D shape with convexity 4 can be crossed by a ray up to 4 times. A similar interpretation applies to 3D shapes.
+- Setting convexity to around 10 generally works for most cases.
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Mathematical Functions Abs
+
+# OpenSCAD User Manual — Mathematical Functions
+
+Note: OpenSCAD math functions are implemented using C++ double precision floating point. Trigonometric functions use degrees (not radians). Results are subject to floating-point approximation.
+
+## Trigonometric functions
+
+### cos
+Mathematical cosine of an angle in degrees.
+
+Parameters:
+- degrees: Decimal. Angle in degrees.
+
+Usage:
+```openscad
+for (i = [0:36]) {
+  translate([i * 10, 0, 0])
+    cylinder(r = 5, h = cos(i * 10) * 50 + 60);
+}
+```
+
+### sin
+Mathematical sine of an angle in degrees.
+
+Parameters:
+- degrees: Decimal. Angle in degrees.
+
+Usage 1:
+```openscad
+for (i = [0:5]) {
+  echo(360 * i / 6, sin(360 * i / 6) * 80, cos(360 * i / 6) * 80);
+  translate([sin(360 * i / 6) * 80, cos(360 * i / 6) * 80, 0])
+    cylinder(h = 200, r = 10);
+}
+```
+
+Usage 2:
+```openscad
+for (i = [0:36]) {
+  translate([i * 10, 0, 0])
+    cylinder(r = 5, h = sin(i * 10) * 50 + 60);
+}
+```
+
+### tan
+Mathematical tangent of an angle in degrees.
+
+Parameters:
+- degrees: Decimal. Angle in degrees.
+
+Usage:
+```openscad
+for (i = [0:5]) {
+  echo(360 * i / 6, tan(360 * i / 6) * 80);
+  translate([tan(360 * i / 6) * 80, 0, 0])
+    cylinder(h = 200, r = 10);
+}
+```
+
+### acos
+Arccosine (inverse cosine), returns degrees.
+
+### asin
+Arcsine (inverse sine), returns degrees.
+
+### atan
+Arctangent (inverse tangent), returns degrees in the range -90 to +90. Note: atan cannot distinguish between y/x and -y/-x. For full 360-degree angles, use atan2.
+
+### atan2
+Two-argument arctangent: atan2(y, x). Returns the full angle between the x-axis and the vector (x, y) in degrees, in the range -180 < angle <= 180.
+
+Usage:
+```openscad
+atan2(5.0, -5.0);  // 135; atan(5.0/-5.0) would give -45
+atan2(y, x);       // angle between (1,0) and (x,y) around the Z-axis
+```
+
+## Other Mathematical Functions
+
+### abs
+Absolute value. Returns the positive value of a signed number.
+
+Usage:
+```openscad
+abs(-5.0);  // 5.0
+abs(0);     // 0.0
+abs(8.0);   // 8.0
+```
+
+### ceil
+Ceiling. Returns the next highest integer (round up).
+
+Usage:
+```openscad
+echo(ceil(4.4), ceil(-4.4));  // ECHO: 5, -4
+```
+
+### concat
+Requires 2015.03 or later. Concatenate values and/or vectors. Vector arguments are flattened by one level; strings are not flattened.
+
+Usage:
+```openscad
+echo(concat("a","b","c","d","e","f"));               // ["a","b","c","d","e","f"]
+echo(concat(["a","b","c"], ["d","e","f"]));          // ["a","b","c","d","e","f"]
+echo(concat(1,2,3,4,5,6));                           // [1,2,3,4,5,6]
+
+// Vector of vectors (one level of nesting is removed)
+echo(concat([[1],[2]], [[3]]));                      // [[1],[2],[3]]
+
+// Add a fourth point to make a square from a triangle path
+polygon(concat([[0,0],[0,5],[5,5]], [[5,0]]));
+
+// Contrast with strings
+echo(concat([1,2,3], [4,5,6]));                      // [1,2,3,4,5,6]
+echo(concat("abc", "def"));                          // ["abc", "def"]
+echo(str("abc","def"));                              // "abcdef"
+```
+
+Notes:
+- All vector arguments lose one level of nesting.
+
+### cross
+Cross product for 3D vectors; for 2D vectors, returns the scalar z component x*v - y*u. Vectors must be both length 2 or both length 3; otherwise returns undef.
+
+Usage:
+```openscad
+echo(cross([2, 3, 4], [5, 6, 7]));     // [-3, 6, -3]
+echo(cross([2, 1, -3], [0, 4, 5]));    // [17, -10, 8]
+echo(cross([2, 1], [0, 4]));           // 8
+echo(cross([1, -3], [4, 5]));          // 17
+echo(cross([2, 1, -3], [4, 5]));       // undef
+echo(cross([2, 3, 4], "5"));           // undef
+
+// Property:
+ // cross(a, b) == -cross(b, a)
+```
+
+### exp
+Base-e exponential: e^x.
+
+Usage:
+```openscad
+echo(exp(1), exp(ln(3) * 4));  // ECHO: 2.71828, 81
+```
+
+### floor
+Floor. Largest integer not greater than x.
+
+Usage:
+```openscad
+echo(floor(4.4), floor(-4.4));  // ECHO: 4, -5
+```
+
+### ln
+Natural logarithm.
+
+### len
+Length function. Returns the number of elements in a vector/array or the length of a string. For non-container scalars, returns undef and emits a warning.
+
+Usage:
+```openscad
+str1 = "abcdef";
+len_str1 = len(str1);                // 6
+echo(str1, len_str1);
+
+a = 6;
+len_a = len(a);                      // undef (warning)
+echo(a, len_a);
+
+array1 = [1,2,3,4,5,6,7,8];
+len_array1 = len(array1);            // 8
+echo(array1, len_array1);
+
+array2 = [[0,0],[0,1],[1,0],[1,1]];
+len_array2 = len(array2);            // 4
+echo(array2, len_array2);
+
+len_array2_2 = len(array2[2]);       // 2
+echo(array2[2], len_array2_2);
+```
+
+Results (illustrative):
+- WARNING: len() parameter could not be converted
+- ECHO: "abcdef", 6
+- ECHO: 6, undef
+- ECHO: [1,2,3,4,5,6,7,8], 8
+- ECHO: [[0,0],[0,1],[1,0],[1,1]], 4
+- ECHO: [1,0], 2
+
+Iterating over a string:
+```openscad
+str2 = "4711";
+for (i = [0:len(str2)-1])
+  echo(str("digit ", i + 1, " : ", str2[i]));
+```
+
+Note:
+- len(x) is useful for modules that accept either a scalar or a vector.
+
+Example:
+```openscad
+module doIt(size) {
+  if (len(size) == undef) {
+    // number (or undef) — use for x,y,z
+    do([size, size, size]);
+  } else {
+    // vector
+    do(size);
+  }
+}
+
+doIt(5);
+doIt([5,5,5]);
+```
+
+### let
+Requires 2015.03 or later. Sequential assignment of variables inside an expression, useful for readability.
+
+Syntax:
+```openscad
+let (var1 = value1, var2 = f(var1), var3 = g(var1, var2)) expression
+```
+
+Usage:
+```openscad
+echo(let(a = 135, s = sin(a), c = cos(a)) [s, c]);  // ECHO: [0.707107, -0.707107]
+```
+
+### log
+Base-10 logarithm. Example: log(1000) = 3.
+
+### lookup
+Look up a value in a table of key-value pairs, with linear interpolation for non-exact keys. Keys outside the table may return an endpoint value depending on version.
+
+Parameters:
+- key: Value to look up
+- table: Vector of [key, value] pairs
+
+Usage:
+```openscad
+function get_cylinder_h(p) =
+  lookup(p, [
+    [-200, 5],
+    [ -50, 20],
+    [ -20, 18],
+    [ +80, 25],
+    [+150,  2]
+  ]);
+
+for (i = [-100:5:+100]) {
+  // echo(i, get_cylinder_h(i));
+  translate([i, 0, -30])
+    cylinder(r1 = 6, r2 = 2, h = get_cylinder_h(i) * 3);
+}
+```
+
+### max
+Maximum of parameters. With a single vector argument, returns the maximum element. Requires 2014.06 for vector form.
+
+Parameters:
+- max(n, n, ...): Two or more numbers
+- max(vector): Single vector of numbers
+
+Usage:
+```openscad
+max(3.0, 5.0);           // 5
+max(8.0, 3.0, 4.0, 5.0); // 8
+max([8, 3, 4, 5]);       // 8
+```
+
+### min
+Minimum of parameters. With a single vector argument, returns the minimum element. Requires 2014.06 for vector form.
+
+Parameters:
+- min(n, n, ...): Two or more numbers
+- min(vector): Single vector of numbers
+
+Usage:
+```openscad
+min(3.0, 5.0);           // 3
+min(8.0, 3.0, 4.0, 5.0); // 3
+min([8, 3, 4, 5]);       // 3
+```
+
+### mod
+Modulo is an operator (%) in OpenSCAD, not a function.
+
+### norm
+Euclidean norm (vector length). Returns numeric magnitude; len() returns element count.
+
+Usage:
+```openscad
+a = [1,2,3,4,5,6];
+b = "abcd";
+c = [];
+d = "";
+e = [[1,2,3,4],[1,2,3],[1,2],[1]];
+
+echo(norm(a));     // 9.53939
+echo(norm(b));     // undef
+echo(norm(c));     // 0
+echo(norm(d));     // undef
+echo(norm(e[0]));  // 5.47723
+echo(norm(e[1]));  // 3.74166
+echo(norm(e[2]));  // 2.23607
+echo(norm(e[3]));  // 1
+```
+
+### pow
+Power function: pow(base, exponent). Since 2021.01, you can also use the operator ^.
+
+Parameters:
+- base: Decimal
+- exponent: Decimal
+
+Usage:
+```openscad
+for (i = [0:5]) {
+  translate([i * 25, 0, 0]) {
+    cylinder(h = pow(2, i) * 5, r = 10);
+    echo(i, pow(2, i));
+  }
+}
+
+echo(pow(10, 2));       // 100
+echo(pow(10, 3));       // 1000
+echo(pow(125, 1/3));    // 5  (cube root)
+```
+
+### rands
+Random number generator. Returns a constant vector of pseudo-random doubles in [min, max). For a single number, index [0]. Optional seed for repeatability.
+
+Parameters:
+- min_value: Minimum value (inclusive)
+- max_value: Maximum value (exclusive)
+- value_count: Number of values
+- seed_value: Optional seed (rounded to integer in versions before late 2015)
+
+Usage:
+```openscad
+// single number
+single_rand = rands(0, 10, 1)[0];
+echo(single_rand);
+
+// vector of 4 numbers with seed
+seed = 42;
+random_vect = rands(5, 15, 4, seed);
+echo("Random Vector: ", random_vect);
+
+// example use
+sphere(r = 5);
+for (i = [0:3]) {
+  rotate(360 * i / 4) {
+    translate([10 + random_vect[i], 0, 0])
+      sphere(r = random_vect[i] / 2);
+  }
+}
+
+// Get a vector of integers between 1 and 10 inclusive by widening the range
+function irands(minimum, maximum, n) =
+  let(floats = rands(minimum, maximum + 1, n))
+    [ for (f = floats) floor(f) ];
+
+echo(irands(1, 10, 5));  // e.g., [9, 6, 2, 4, 1]
+```
+
+### round
+Round to nearest integer, with ties away from zero for positive inputs and toward zero for negative inputs as per behavior shown below.
+
+Usage:
+```openscad
+round(5.4);   // 5
+round(5.5);   // 6
+round(5.6);   // 6
+round(-5.4);  // -5
+round(-5.5);  // -6
+round(-5.6);  // -6
+```
+
+### sign
+Signum function. Returns -1, 0, or +1 depending on the sign of the input.
+
+Parameters:
+- x: Decimal. Value to test.
+
+Usage:
+```openscad
+sign(-5.0);  // -1.0
+sign(0);     // 0.0
+sign(8.0);   // 1.0
+```
+
+### sqrt
+Square root.
+
+Usage:
+```openscad
+translate([sqrt(100), 0, 0])
+  sphere(100);
+```
+
+## Infinities and NaNs
+
+OpenSCAD follows IEEE 754 behavior from the underlying C++ math library:
+- Infinite values: Inf, -Inf
+- Not-a-Number: NaN (e.g., 0/0, sqrt(-1))
+
+Examples (behavior observed in late 2015 tests):
+```
+0/0: nan
+-0/0: nan
+0/-0: nan
+1/0: inf
+1/-0: -inf
+-1/0: -inf
+-1/-0: inf
+
+sin(1/0): nan
+cos(1/0): nan
+tan(1/0): nan
+
+asin(1/0): nan
+acos(1/0): nan
+atan(1/0): 90
+atan(-1/0): -90
+atan2(1/0, -1/0): 135
+
+ln(1/0): inf
+ln(-1/0): nan
+log(1/0): inf
+log(-1/0): nan
+
+ceil(-1/0): -inf
+ceil(1/0): inf
+floor(-1/0): -inf
+floor(1/0): inf
+round(1/0): inf
+round(-1/0): -inf
+
+sign(1/0): 1
+sign(-1/0): -1
+
+sqrt(1/0): inf
+sqrt(-1/0): nan
+
+exp(1/0): inf
+exp(-1/0): 0
+
+max(-1/0, 1/0): inf
+min(-1/0, 1/0): -inf
+
+pow(2, 1/0): inf
+pow(2, -1/0): 0
+```
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual List Comprehensions Each
+
+# OpenSCAD User Manual — List Comprehensions
+
+[Note: Requires version 2015.03]
+
+## Basic Syntax
+
+List comprehensions provide a flexible way to generate lists using the general syntax:
+
+```openscad
+[ list-definition expression ]
+```
+
+Supported elements for constructing the list definition:
+
+- for (i = sequence): Iteration over a range or an existing list.
+- for (init; condition; next): Simple recursive call represented as a C-style for.
+- each: Takes a sequence value as argument, and adds each element to the list being constructed. each x is equivalent to for (i = x) i.
+- if (condition): Selection criteria; when true, the expression is calculated and added to the result list.
+- let (x = value): Local variable assignment.
+
+### Multiple generator expressions
+
+[Note: Requires version 2019.05]
+
+The list comprehension syntax is generalized to allow multiple expressions. This allows constructing lists from multiple sub-lists generated by different list comprehension expressions without concat.
+
+```openscad
+steps = 50;
+
+points = [
+  // first expression generating the points in the positive Y quadrant
+  for (a = [0 : steps]) [ a, 10 * sin(a * 360 / steps) + 10 ],
+
+  // second expression generating the points in the negative Y quadrant
+  for (a = [steps : -1 : 0]) [ a, 10 * cos(a * 360 / steps) - 20 ],
+
+  // additional list of fixed points
+  [ 10, -3 ],
+  [ 3, 0 ],
+  [ 10, 3 ]
+];
+
+polygon(points);
+```
+
+## for
+
+The for element defines the input values for the list generation. The syntax is the same as used by the for iterator.
+
+The sequence to the right of the equals sign can be any list. The for element iterates over all members of the list. The variable on the left of the equals sign takes on the value of each member of the sequence in turn. This value can then be processed in the child of the for element, and each result becomes a member of the final list. If the sequence has more than one dimension, for iterates over the first dimension only. Deeper dimensions can be accessed by nesting for elements.
+
+Common usage patterns:
+
+```openscad
+[ for (i = [start : step : end]) i ]
+```
+
+Examples:
+
+```openscad
+// generate a list with all values defined by a range
+list1 = [ for (i = [0 : 2 : 10]) i ];
+echo(list1); // ECHO: [0, 2, 4, 6, 8, 10]
+
+// extract every second character of a string
+str = "SomeText";
+list2 = [ for (i = [0 : 2 : len(str) - 1]) str[i] ];
+echo(list2); // ECHO: ["S", "m", "T", "x"]
+
+// indexed list access, using function to map input values to output values
+function func(x) = x < 1 ? 0 : x + func(x - 1);
+input = [1, 3, 5, 8];
+output = [for (a = [ 0 : len(input) - 1 ]) func(input[a]) ];
+echo(output); // ECHO: [1, 6, 15, 36]
+```
+
+```openscad
+[ for (i = [a, b, c, ...]) i ]
+```
+
+Examples:
+
+```openscad
+// iterate over an existing list
+friends = ["John", "Mary", "Alice", "Bob"];
+list = [ for (i = friends) len(i)];
+echo(list); // ECHO: [4, 4, 5, 3]
+
+// map input list to output list
+list = [ for (i = [2, 3, 5, 7, 11]) i * i ];
+echo(list); // ECHO: [4, 9, 25, 49, 121]
+
+// calculate Fibonacci numbers
+function func(x) = x < 3 ? 1 : func(x - 1) + func(x - 2);
+input = [7, 10, 12];
+output = [for (a = input) func(a) ];
+echo(output); // ECHO: [13, 55, 144]
+```
+
+```openscad
+[ for (c = "String") c ]
+```
+
+[Note: Requires version 2019.05]
+
+Example:
+
+```openscad
+echo([ for (c = "String") c ]); // ECHO: ["S", "t", "r", "i", "n", "g"]
+```
+
+```openscad
+[ for (a = inita, b = initb, ...; condition; a = nexta, b = nextb, ...) expr ]
+```
+
+Generator for expressing a simple recursive call as a C-style for loop.
+
+[Note: Requires version 2019.05]
+
+Recursive equivalent:
+
+```openscad
+function f(a, b, ...) =
+  condition ? concat([expr], f(nexta, nextb, ...)) : [];
+f(inita, initb, ...);
+```
+
+Examples:
+
+```openscad
+echo( [for (a = 0, b = 1; a < 5; a = a + 1, b = b + 2) [ a, b * b ] ] );
+// ECHO: [[0, 1], [1, 9], [2, 25], [3, 49], [4, 81]]
+
+// Generate fibonacci sequence
+echo([for (a = 0, b = 1; a < 1000; x = a + b, a = b, b = x) a]);
+// ECHO: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987]
+
+// Cumulative sum of values in v
+function cumsum(v) = [for (a = v[0]-v[0], i = 0; i < len(v); a = a+v[i], i = i+1) a+v[i]];
+echo(cumsum([1, 2, 3, 4]));                // ECHO: [1, 3, 6, 10]
+echo(cumsum([[1, 1], [2, 2], [3, 3]]));    // ECHO: [[1, 1], [3, 3], [6, 6]]
+```
+
+## each
+
+[Note: Requires version 2019.05]
+
+each embeds the values of a list given as argument directly, effectively unwrapping the argument list.
+
+```openscad
+// Without using "each", a nested list is generated
+echo([ for (a = [1 : 4]) [a, a * a] ]);
+// ECHO: [[1, 1], [2, 4], [3, 9], [4, 16]]
+
+// Adding "each" unwraps the inner list, producing a flat list as result
+echo([ for (a = [1 : 4]) each [a, a * a] ]);
+// ECHO: [1, 1, 2, 4, 3, 9, 4, 16]
+```
+
+each unwraps ranges and helps to build more general for lists when combined with multiple generator expressions.
+
+```openscad
+A = [-2, each [1:2:5], each [6:-2:0], -1];
+echo(A);                         // ECHO: [-2, 1, 3, 5, 6, 4, 2, 0, -1]
+echo([ for (a = A) 2 * a ]);     // ECHO: [-4, 2, 6, 10, 12, 8, 4, 0, -2]
+```
+
+## if
+
+The if element allows selecting whether the expression should be evaluated and added to the result list. In the simplest case, this allows filtering of a list.
+
+```openscad
+[ for (i = list) if (condition(i)) i ]
+```
+
+When the condition evaluates to true, the expression i is added to the result list.
+
+Example:
+
+```openscad
+list = [ for (a = [ 1 : 8 ]) if (a % 2 == 0) a ];
+echo(list); // ECHO: [2, 4, 6, 8]
+```
+
+Note that the if element cannot be inside an expression; it must be at the top level of the comprehension.
+
+Example:
+
+```openscad
+// from the input list include all positive odd numbers
+// and also all even number divided by 2
+list = [-10:5];
+echo([for(n=list) if(n%2==0 || n>=0) n%2==0 ? n/2 : n ]);
+// ECHO: [-5, -4, -3, -2, -1, 0, 1, 1, 3, 2, 5]
+
+// echo([for(n=list) n%2==0 ? n/2 : if(n>=0) n ]); // this would be a syntax error
+```
+
+## if/else
+
+[Note: Requires version 2019.05]
+
+The if-else construct is equivalent to the conditional expression ?: except that it can be combined with filter if.
+
+```openscad
+[ for (i = list) if (condition(i)) x else y ]
+```
+
+When the condition returns true, x is added to the result list; otherwise y is added.
+
+```openscad
+// even numbers are halved, positive odd numbers are preserved, negative odd numbers are eliminated
+echo([for (a = [-3:5]) if (a % 2 == 0) [a, a/2] else if (a > 0) [a, a] ]);
+// ECHO: [[-2, -1], [0, 0], [1, 1], [2, 1], [3, 3], [4, 2], [5, 5]];
+```
+
+The same filter using the conditional operator is possible but more cryptic:
+
+```openscad
+// even numbers are halved, positive odd numbers are preserved, negative odd numbers are eliminated
+echo([for (a = [-3:5]) if (a % 2 == 0 || (a % 2 != 0 && a > 0))
+       a % 2 == 0 ? [a, a / 2] : [a, a] ]);
+// ECHO: [[-2, -1], [0, 0], [1, 1], [2, 1], [3, 3], [4, 2], [5, 5]];
+```
+
+To bind an else expression to a specific if, use parentheses:
+
+```openscad
+// even numbers are dropped, multiples of 4 are substituted by -1
+echo([for(i=[0:10]) if(i%2==0) (if(i%4==0) -1 ) else i]);
+// ECHO: [-1, 1, 3, -1, 5, 7, -1, 9]
+
+// odd numbers are dropped, multiples of 4 are substituted by -1
+echo([for(i=[0:10]) if(i%2==0) if(i%4==0) -1 else i]);
+// ECHO: [-1, 2, -1, 6, -1, 10]
+```
+
+## let
+
+The let element allows sequential assignment of variables inside a list comprehension definition.
+
+```openscad
+[ for (i = list) let (assignments) a ]
+```
+
+Example:
+
+```openscad
+list = [ for (a = [ 1 : 4 ]) let (b = a*a, c = 2 * b) [ a, b, c ] ];
+echo(list); // ECHO: [[1, 1, 2], [2, 4, 8], [3, 9, 18], [4, 16, 32]]
+```
+
+## Nested loops
+
+There are different ways to define nested loops. Defining multiple loop variables inside one for element and multiple for elements both produce flat result lists. To generate nested result lists, an additional [ ] markup is required.
+
+```openscad
+// nested loop using multiple variables
+flat_result1 = [ for (a = [ 0 : 2 ], b = [ 0 : 2 ]) a == b ? 1 : 0 ];
+echo(flat_result1); // ECHO: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+
+// nested loop using multiple for elements
+flat_result2 = [ for (a = [ 0 : 2 ]) for (b = [0 : 2]) a == b ? 1 : 0 ];
+echo(flat_result2); // ECHO: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+
+// nested loop to generate a bi-dimensional matrix
+identity_matrix = [ for (a = [ 0 : 2 ]) [ for (b = [ 0 : 2 ]) a == b ? 1 : 0 ] ];
+echo(identity_matrix); // ECHO: [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+```
+
+## Advanced Examples
+
+### Generating vertices for a polygon
+
+Using list comprehension, a parametric equation can be calculated at a number of points to approximate many curves, such as the following example for an ellipse (using polygon()):
+
+```openscad
+sma = 20; // semi-minor axis
+smb = 30; // semi-major axis
+
+polygon(
+  [ for (a = [0 : 5 : 359])
+    [ sma * sin(a), smb * cos(a) ] ]
+);
+```
+
+### Flattening a nested vector
+
+List comprehension can be used in a user-defined function to perform tasks on or for vectors. Here is a user-defined function that flattens a nested vector.
+
+```openscad
+// input : nested list
+// output: list with the outer level nesting removed
+function flatten(l) = [ for (a = l) for (b = a) b ] ;
+
+nested_list = [ [ 1, 2, 3 ], [ 4, 5, 6 ] ];
+echo(flatten(nested_list)); // ECHO: [1, 2, 3, 4, 5, 6]
+```
+
+### Sorting a vector
+
+Even a complicated algorithm like Quicksort becomes doable with for(), if(), let() and recursion:
+
+```openscad
+// input : list of numbers
+// output: sorted list of numbers
+function quicksort(arr) =
+  !(len(arr) > 0) ? [] :
+  let(
+    pivot  = arr[floor(len(arr)/2)],
+    lesser = [ for (y = arr) if (y < pivot) y ],
+    equal  = [ for (y = arr) if (y == pivot) y ],
+    greater= [ for (y = arr) if (y > pivot) y ]
+  )
+  concat( quicksort(lesser), equal, quicksort(greater) );
+
+// use seed in rands() to get reproducible results
+unsorted = [for (a = rands(0, 10, 6, 3)) ceil(a)];
+echo(unsorted);             // ECHO: [6, 1, 8, 9, 3, 2]
+echo(quicksort(unsorted));  // ECHO: [1, 2, 3, 6, 8, 9]
+```
+
+### Selecting elements of a vector
+
+select() performs selection and reordering of elements into a new vector.
+
+```openscad
+function select(vector, indices) = [ for (index = indices) vector[index] ];
+
+vector1   = [[0,0],[1,1],[2,2],[3,3],[4,4]];
+selector1 = [4,0,3];
+
+vector2 = select(vector1, selector1);        // [[4, 4], [0, 0], [3, 3]]
+vector3 = select(vector1,[0,2,4,4,2,0]);     // [[0, 0], [2, 2], [4, 4],[4, 4], [2, 2], [0, 0]]
+
+// range also works as indices
+vector4 = select(vector1, [4:-1:0]);         // [[4, 4], [3, 3], [2, 2], [1, 1], [0, 0]]
+```
+
+### Concatenating two vectors
+
+Using indices:
+
+```openscad
+function cat(L1, L2) = [for (i=[0:len(L1)+len(L2)-1]) i < len(L1)? L1[i] : L2[i-len(L1)]] ;
+echo(cat([1,2,3],[4,5])); // [1, 2, 3, 4, 5]
+```
+
+Without using indices:
+
+```openscad
+function cat(L1, L2) = [for(L=[L1, L2], a=L) a];
+echo(cat([1,2,3],[4,5])); // [1, 2, 3, 4, 5]
+```
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Modifier Characters Background Modifier
+
+# OpenSCAD User Manual — Modifier Characters
+
+Modifier characters change the appearance or behavior of child nodes. They are especially useful for debugging to highlight specific objects or to include/exclude them from rendering.
+
+## Advanced concept: Preview vs. Render behavior
+
+OpenSCAD uses different libraries for different operations, which can affect how modifiers appear during preview (F5):
+
+- Traditional transforms (translate, rotate, scale, mirror, multimatrix) are previewed via OpenGL.
+- Some advanced transforms like resize perform a CGAL operation, affecting the underlying object like a CSG operation.
+
+This can lead to non-intuitive highlighting with the "#" and "%" modifiers (e.g., highlighting the pre-resized object, but post-scaled object).
+
+Note: Color changes triggered by modifier characters appear only in Compile (Preview) mode, not in Compile and Render (CGAL) mode.
+
+## Background Modifier (%)
+
+Ignore this subtree during normal rendering and draw it in transparent gray. All transformations are still applied to nodes in this tree.
+
+- In Boolean operations like difference(), using % on the first child can be surprising: the object is drawn in gray but not used as the base of the difference.
+
+Usage:
+```openscad
+% {
+  // ...
+}
+```
+
+Example:
+```openscad
+difference() {
+  cylinder(h = 12, r = 5, center = true, $fn = 100);                      // first object to be subtracted
+  rotate([90, 0, 0]) cylinder(h = 15, r = 1, center = true, $fn = 100);   // second object to be subtracted
+  %rotate([0, 90, 0]) cylinder(h = 15, r = 3, center = true, $fn = 100);
+}
+```
+
+## Debug Modifier (#)
+
+Use this subtree as usual in the rendering process and also draw it unmodified in transparent pink.
+
+Usage:
+```openscad
+# {
+  // ...
+}
+```
+
+Example:
+```openscad
+difference() {
+  // start objects
+  cylinder(h = 12, r = 5, center = true, $fn = 100);                      
+  #rotate([90, 0, 0]) cylinder(h = 15, r = 1, center = true, $fn = 100);  
+  #rotate([0, 90, 0]) cylinder(h = 15, r = 3, center = true, $fn = 100);  
+}
+```
+
+## Root Modifier (!)
+
+Ignore the rest of the design and use this subtree as the design root.
+
+Usage:
+```openscad
+! {
+  // ...
+}
+```
+
+Example:
+```openscad
+difference() {
+  cube(10, center = true);
+  translate([0, 0, 5]) {
+    !rotate([90, 0, 0]) {
+      #cylinder(r = 2, h = 20, center = true, $fn = 40);
+    }
+  }
+}
+```
+
+Note: In the example above, rotate() is executed because it's inside the root-marked subtree, but the surrounding translate() has no effect.
+
+## Disable Modifier (*)
+
+Completely ignore this subtree. Useful for temporarily disabling parts of the design in a structure-aware way.
+
+Usage:
+```openscad
+* {
+  // ...
+}
+```
+
+Example:
+```openscad
+difference() {
+  cube(10, center = true);
+  translate([0, 0, 5]) {
+    rotate([0, 90, 0]) {
+      cylinder(r = 2, h = 20, center = true, $fn = 40);
+    }
+    *rotate([90, 0, 0]) {
+      #cylinder(r = 2, h = 20, center = true, $fn = 40);
+    }
+  }
+}
+```
+
+Note: Unlike traditional comments, the disable modifier respects hierarchy, making it easier to disable large subtrees without hunting for their end.
+
+## Echo statements
+
+Print text and values to the Console during compilation. Useful for debugging. Numeric values are rounded to 5 significant digits. A common pattern is label=value for clarity.
+
+Example:
+```openscad
+my_h = 50;
+my_r = 100;
+
+echo("This is a cylinder with h=", my_h, " and r=", my_r);
+echo(my_h = my_h, my_r = my_r); // labeled shortcut
+
+cylinder(h = my_h, r = my_r);
+```
+
+Console output:
+```
+ECHO: "This is a cylinder with h=", 50, " and r=", 100
+ECHO: my_h = 50, my_r = 100
+```
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Mathematical Operators Logical Operators
+
+# OpenSCAD User Manual — Mathematical and Logical Operators
+
+The following documents arithmetic, relational, logical, conditional, vector, and matrix operations in OpenSCAD. Examples are provided in OpenSCAD code blocks.
+
+## Scalar arithmetic operators
+
+The scalar arithmetic operators take numbers as operands and produce a new number.
+
+| Operator | Description |
+|---|---|
+| + | add |
+| - | subtract |
+| * | multiply |
+| / | divide |
+| % | modulo |
+| ^ | exponent (requires version 2021.01 or newer) |
+| - (prefix) | unary negation |
+
+Notes:
+- Prior to version 2021.01, use the builtin function pow() instead of the ^ exponent operator.
+- The - operator can also be used as a prefix operator to negate a number.
+
+Example:
+
+```openscad
+a = [ for (i = [0:10]) i % 2 ];
+echo(a); // ECHO: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+// A number modulo 2 is zero if even and one if odd.
+```
+
+## Binary arithmetic (bitwise)
+
+[Note: Requires a development snapshot.]
+
+Numbers are converted to 64-bit signed integers for binary arithmetic, and then converted back. OpenSCAD numbers have 53 bits of precision; binary arithmetic exceeding 2^53 will be imprecise.
+
+| Operator | Description |
+|---|---|
+| \| | bitwise OR |
+| & | bitwise AND |
+| << | left shift |
+| >> | right shift (sign preserving) |
+| ~ | unary bitwise NOT |
+
+## Relational operators
+
+Relational operators produce a boolean result from two operands.
+
+| Operator | Description |
+|---|---|
+| < | less than |
+| <= | less or equal |
+| == | equal |
+| != | not equal |
+| >= | greater or equal |
+| > | greater than |
+
+Behavior notes:
+- Numbers: standard numeric comparisons.
+- Strings: compared alphabetically (e.g., "ab" > "aa" > "a").
+- Booleans: true > false. In comparisons between a Boolean and a number, true is treated as 1 and false as 0. Other inequality tests involving Booleans return false.
+- Vectors: equality (==) returns true only if vectors are identical; all inequality comparisons (<, <=, >, >=) involving one or two vectors return false (e.g., [1] < [2] is false).
+- Dissimilar types: test as unequal with == and !=; inequality comparisons (<, <=, >, >=) result in false, except for Boolean–number comparisons as noted above.
+- [1] and 1 are different types, so [1] == 1 is false.
+- undef equals only itself; inequality comparisons involving undef are false.
+- nan does not equal anything (not even itself); all inequality tests with nan produce false.
+
+## Logical operators
+
+All logical operators take Booleans as operands and produce a Boolean. Non-Boolean quantities are converted to Booleans before evaluation.
+
+| Operator | Description |
+|---|---|
+| && | logical AND |
+| \|\| | logical OR |
+| ! | logical unary NOT |
+
+Notes:
+- Non-empty vectors are truthy. Since [false] is true, the expression false || [false] is also true.
+- Logical operators treat vectors differently than relational operators: [1, 1] > [0, 2] is false, but [false, false] && [false, false] is true.
+
+## Conditional operator
+
+The ?: operator conditionally evaluates one of two expressions, like in C-like languages.
+
+Syntax: condition ? expr_if_true : expr_if_false
+
+Example:
+
+```openscad
+a = 1;
+b = 2;
+c = (a == b) ? 4 : 5; // If a equals b, c = 4; otherwise, c = 5.
+```
+
+## Vector–number operators
+
+The vector–number operators take a vector and a number as operands and produce a new vector.
+
+| Operator | Description |
+|---|---|
+| number * vector | multiply all vector elements by number |
+| vector / number | divide all vector elements by number |
+
+Example:
+
+```openscad
+L = [1, [2, [3, "a"]]];
+echo(5 * L); // ECHO: [5, [10, [15, undef]]]
+```
+
+## Vector operators
+
+The vector operators take vectors as operands and produce a new vector.
+
+| Operator | Description |
+|---|---|
+| + | add element-wise |
+| - | subtract element-wise |
+| - (prefix) | element-wise unary negation |
+
+Notes:
+- Using + or - with vector operands of different sizes produces a result vector sized to the smaller operand.
+
+Example:
+
+```openscad
+L1 = [1, [2, [3, "a"]]];
+L2 = [1, [2, 3]];
+
+echo(L1 + L1); // ECHO: [2, [4, [6, undef]]]
+echo(L1 + L2); // ECHO: [2, [4, undef]]
+```
+
+## Vector dot-product operator
+
+If both operands of multiplication are simple vectors (numbers only), the result is a number according to the dot product:
+
+c = u * v = sum over i of (u_i * v_i)
+
+If the operand sizes don’t match, the result is undef.
+
+## Matrix multiplication
+
+If one or both operands of multiplication are matrices, the result follows linear algebra rules.
+
+- Matrix–matrix (A is n×m, B is m×p):
+  - C = A * B is n×p with elements C_ij = sum over k=0..m-1 of (A_ik * B_kj).
+  - B * A results in undef unless n = p.
+
+- Matrix–vector (A is n×m, v is size m):
+  - u = A * v is a vector of size n with elements u_i = sum over k=0..m-1 of (A_ik * v_k).
+  - This corresponds to a matrix times a column vector.
+
+- Vector–matrix (v is size n, A is n×m):
+  - u = v * A is a vector of size m with elements u_j = sum over k=0..n-1 of (v_k * A_kj).
+  - This corresponds to a row vector times a matrix.
+
+Matrix multiplication is not commutative: A*B ≠ B*A, and A*v ≠ v*A.
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Other Language Features $Fa
+
+# OpenSCAD User Manual: Other Language Features
+
+## Special variables
+
+Special variables provide an alternate means of passing arguments to modules and functions. All variables starting with a `$` are special variables. Modules and functions see all outside variables in addition to those passed as arguments or defined internally.
+
+- Special variable names are `$` followed by simple characters and underscores `[a-zA-Z0-9_]`. High-ASCII or Unicode characters are not allowed.
+- Regular variables are assigned at compile time (static for all calls).
+- Special variables pass along their value from within the scope from which the module or function is called, so they can differ for each call.
+
+Example showing differences between regular and special variables and their scoping:
+
+```openscad
+regular = "regular global";
+$special = "special global";
+
+module show()
+    echo(" in show ", regular," ", $special );
+
+echo (" outside ", regular," ", $special );
+// ECHO: " outside ", "regular global", " ", "special global"
+
+for ( regular = [0:1] ){
+    echo("in regular loop ", regular," ", $special );
+    show();
+}
+// ECHO: "in regular loop ", 0, " ", "special global"
+// ECHO: " in show ", "regular global", " ", "special global"
+// ECHO: "in regular loop ", 1, " ", "special global"
+// ECHO: " in show ", "regular global", " ", "special global"
+
+for ( $special = [5:6] ){
+    echo("in special loop ", regular," ", $special );
+    show();
+}
+// ECHO: "in special loop ", "regular global", " ", 5
+// ECHO: " in show ", "regular global", " ", 5
+// ECHO: "in special loop ", "regular global", " ", 6
+// ECHO: " in show ", "regular global", " ", 6
+
+show();
+// ECHO: " in show ", "regular global", " ", "special global"
+```
+
+Several special variables are predefined by OpenSCAD.
+
+### Circle resolution: $fa, $fs, and $fn
+
+These special variables control the number of facets used to generate arcs:
+
+- `$fa`: minimum angle per fragment (defaults to 12). A full circle uses at most `360 / $fa` fragments. Minimum allowed is `0.01` (lower values warn).
+- `$fs`: minimum size per fragment (defaults to 2). Governs small circles so they use fewer fragments than `$fa` would imply. Minimum allowed is `0.01` (lower values warn).
+- `$fn`: explicit number of fragments (defaults to 0). If greater than 0, it overrides `$fa` and `$fs`. Higher values increase CPU and memory.
+
+Guidance:
+- Keep `$fn` small during design; increase for the final render.
+- `$fn > 128` is generally not recommended unless necessary; `< 50` is advisable for performance.
+- Use different values for preview and render:
+  
+```openscad
+$fn = $preview ? 32 : 64;
+```
+
+Tip: To get axis-aligned integer bounding boxes for circles/cylinders/spheres, choose `$fn` divisible by 4.
+
+When `$fa` and `$fs` determine the fragment count for a circle, OpenSCAD never uses fewer than 5 fragments.
+
+C code used to determine number of fragments:
+
+```c
+int get_fragments_from_r(double r, double fn, double fs, double fa) {
+    if (r < GRID_FINE) return 3;
+    if (fn > 0.0) return (int)(fn >= 3 ? fn : 3);
+    return (int)ceil(fmax(fmin(360.0 / fa, r*2*M_PI / fs), 5));
+}
+```
+
+OpenSCAD expression to inspect the computation (set r to your radius):
+
+```openscad
+echo(
+    n = ($fn > 0 ? ($fn >= 3 ? $fn : 3) : ceil(max(min(360/$fa, r*2*PI/$fs), 5))),
+    a_based = 360/$fa,
+    s_based = r*2*PI/$fs
+);
+```
+
+Notes:
+- Spheres are sliced by the fragment count of a circle with the sphere’s radius. The pole typically forms a pentagon.
+- Cylinders use the greater of the two radii to determine fragment count.
+- `$fa`, `$fs`, `$fn` affect built primitives and DXF arcs/circles; they do not affect STL imports.
+
+Examples:
+
+```openscad
+// High-resolution sphere by resetting special variable
+$fs = 0.01;
+sphere(2);
+```
+
+```openscad
+// Passing the special variable as a parameter
+sphere(2, $fs = 0.01);
+```
+
+```openscad
+// Scaling the special variable
+sphere(2, $fs = $fs * 0.01);
+```
+
+## Animation: $t
+
+The `$t` variable is a time parameter useful for animation. Typically use `$t * 360` for full cycles.
+
+- Start animation via View → Animate, setting FPS and Steps.
+- `$t` runs from 0 to `(1 - 1/Steps)` and never reaches 1 to avoid frame duplication “hitching.”
+- No variable distinguishes “first frame” (`$t=0`) from “not animating,” so use `$t=0` as the rest position.
+
+### Simple harmonic motion
+
+```openscad
+translate([0, 0, 10*sin($t*360)]) sphere(2);
+```
+
+Oscillates a sphere between -10 and +10 on the Z-axis.
+
+### Rotation
+
+```openscad
+rotate([0, 0, $t*360]) square(5);
+```
+
+Rotate square around a corner on Z.
+
+Rotate about center:
+
+```openscad
+rotate([0, 0, $t*360]) square(5, center=true);
+```
+
+### Part-rotation
+
+All animated parts cycle together across the same `$t` span; different apparent speeds can be achieved by scaling angles, enabling meshing gear effects.
+
+```openscad
+rotate([0, 0, $t*360/17]) gear(teeth=17);
+```
+
+```openscad
+rotate([0, 0, -$t*360/31]) gear(teeth=31);
+```
+
+### Circular orbit
+
+```openscad
+rotate([0, 0, $t*360]) translate([10, 0]) square(5, center=true);
+```
+
+### Circular orbit without rotation
+
+```openscad
+rotate([0, 0, $t*360])
+translate([9, 0])
+rotate([0, 0, -$t*360])
+square(5, center=true);
+```
+
+### Elliptical orbit
+
+```openscad
+translate([10*sin($t*360), 20*cos($t*360)])
+square(2, center=true);
+```
+
+Note: Using translate alone does not rotate the object.
+
+### Elliptical motion
+
+```openscad
+e = 10;
+rotate([0, 0, $t*360])
+translate([e, 0])
+rotate([0, 0, -$t*720])
+square([2*e, 2], center=true);
+```
+
+Export frames as PNG and convert to GIF:
+
+```
+convert -delay 10 -loop 0 *.png myimage.gif
+```
+
+## Viewport: $vpr, $vpt, $vpf, $vpd
+
+Contain the viewport state at render time. During animation, they update per frame. Moving the viewport alone doesn’t update the variables.
+
+- `$vpr`: rotation
+- `$vpt`: translation (not affected by rotate/zoom)
+- `$vpf`: field of view (requires 2021.01)
+- `$vpd`: camera distance (requires 2015.03)
+
+Example: size varies with view angle (active animation loop required; it does not need to use `$t`):
+
+```openscad
+cube([10, 10, $vpr[0] / 10]);
+```
+
+All four variables are writable at top-level in the main file to affect the viewport (requires 2015.03).
+
+Example: simple 360° Z-rotation in animation mode:
+
+```openscad
+$vpr = [0, 0, $t * 360];
+```
+
+The Paste Viewport Rotation/Translation command copies the current viewport values (not the variable values).
+
+## Execution mode: $preview
+
+[Note: Requires 2019.05]
+
+- `$preview = true` in OpenCSG preview (F5).
+- `$preview = false` in render (F6).
 
-<div class="vector-sticky-header-context-bar">
+Use it to reduce detail for faster previews:
 
-<div id="vector-sticky-header-toc" class="vector-dropdown mw-portlet mw-portlet-sticky-header-toc vector-sticky-header-toc vector-button-flush-left">
+```openscad
+$fn = $preview ? 12 : 72;
+sphere(r = 1);
+```
 
-<span class="vector-icon mw-ui-icon-listBullet mw-ui-icon-wikimedia-listBullet"></span>
-<span class="vector-dropdown-label-text">Toggle the table of
-contents</span>
+The render module does not affect `$preview`:
 
-<div class="vector-dropdown-content">
+```openscad
+render() {
+    $fn = $preview ? 12 : 72;
+    sphere(r = 1);
+}
+```
 
-<div id="vector-sticky-header-toc-unpinned-container" class="vector-unpinned-container">
+Command-line behavior: `$preview = true` only when generating PNG with OpenCSG; it’s false for STL, DXF, SVG (CGAL), CSG, and ECHO. Override on the command line with `-D`.
+
+## Echo module
+
+The `echo()` module prints to the Console (compilation window). Handy for debugging. Numeric values are rounded to 5 significant digits.
+
+Usage examples:
+
+```openscad
+my_h = 50;
+my_r = 100;
 
-</div>
+echo("This is a cylinder with h=", my_h, " and r=", my_r);
+echo(my_h = my_h, my_r = my_r); // shortcut
+
+cylinder(h = my_h, r = my_r);
+
+// Console:
+// ECHO: "This is a cylinder with h=", 50, " and r=", 100
+// ECHO: my_h = 50, my_r = 100
+```
+
+### Rounding examples
+
+```openscad
+a = 1.0;
+b = 1.000002;
+
+echo(a);
+echo(b);
+
+if (a == b) {
+    echo("a==b");
+} else if (a > b) {
+    echo("a>b");
+} else if (a < b) {
+    echo("a<b");
+} else {
+    echo("???");
+}
 
-</div>
+// Console:
+// ECHO: 1
+// ECHO: 1
+// ECHO: "a<b"
+```
 
-</div>
+### Small and large numbers
 
-<div class="vector-sticky-header-context-bar-primary" aria-hidden="true">
+```openscad
+c = 1000002;
+d = 0.000002;
+echo(c); // 1e+06
+echo(d); // 2e-06
+```
 
-<span class="mw-page-title-main">OpenSCAD User Manual/Print
-version</span>
+### HTML
 
-</div>
+HTML output in the console is not officially supported; behavior depends on version.
 
-</div>
+## Echo function
 
-</div>
+[Note: Requires 2019.05]
 
-<div class="vector-sticky-header-end" aria-hidden="true">
+`echo()` can be used in expression context to print values while evaluating, including within recursive functions. Output occurs before evaluation.
+
+```openscad
+a = 3;
+b = 5;
+
+// echo() prints values before evaluating the expression
+r1 = echo(a, b) a * b;       // ECHO: 3, 5
+
+// using let, it's easy to output the result
+r2 = let(r = 2 * a * b) echo(r) r; // ECHO: 30
+
+// show results
+echo(r1, r2);                // ECHO: 15, 30
+```
+
+Example printing both inputs and result of recursive sum:
+
+```openscad
+v = [4, 7, 9, 12];
+
+function result(x) = echo(result = x) x;
+
+function sum(x, i = 0) =
+    echo(str("x[", i, "]=", x[i]))
+    result(len(x) > i ? x[i] + sum(x, i + 1) : 0);
+
+echo("sum(v) = ", sum(v));
+
+// ECHO: "x[0]=4"
+// ECHO: "x[1]=7"
+// ECHO: "x[2]=9"
+// ECHO: "x[3]=12"
+// ECHO: "x[4]=undef"
+// ECHO: result = 0
+// ECHO: result = 12
+// ECHO: result = 21
+// ECHO: result = 28
+// ECHO: result = 32
+// ECHO: "sum(v) = ", 32
+```
+
+## render
+
+Forces mesh generation even in preview mode (useful when boolean operations are slow or to avoid preview artifacts). Often used with `convexity`.
+
+```openscad
+render(convexity = 2)
+difference() {
+    cube([20, 20, 150], center = true);
+    translate([-10, -10, 0])      cylinder(h = 80, r = 10, center = true);
+    translate([-10, -10, +40])    sphere(r = 10);
+    translate([-10, -10, -40])    sphere(r = 10);
+}
+```
 
-<div class="vector-sticky-header-icons">
+## surface
+
+Reads heightmap data from text or image files.
 
-[<span class="vector-icon mw-ui-icon-speechBubbles mw-ui-icon-wikimedia-speechBubbles"></span>
-<span></span>](#)
-[<span class="vector-icon mw-ui-icon-article mw-ui-icon-wikimedia-article"></span>
-<span></span>](#)
-[<span class="vector-icon mw-ui-icon-wikimedia-history mw-ui-icon-wikimedia-wikimedia-history"></span>
-<span></span>](#)
-[<span class="vector-icon mw-ui-icon-wikimedia-star mw-ui-icon-wikimedia-wikimedia-star"></span>
-<span></span>](#)
-[<span class="vector-icon mw-ui-icon-wikimedia-bookmarkOutline mw-ui-icon-wikimedia-wikimedia-bookmarkOutline"></span>
-<span></span>](#)
-[<span class="vector-icon mw-ui-icon-wikimedia-edit mw-ui-icon-wikimedia-wikimedia-edit"></span>
-<span></span>](#)
-[<span class="vector-icon mw-ui-icon-wikimedia-wikiText mw-ui-icon-wikimedia-wikimedia-wikiText"></span>
-<span></span>](#)
-[<span class="vector-icon mw-ui-icon-wikimedia-editLock mw-ui-icon-wikimedia-wikimedia-editLock"></span>
-<span></span>](#)
+Parameters:
+- `file` (string): Path to heightmap data.
+- `center` (bool): Center on X/Y if true; else placed in positive quadrant. Default: false.
+- `invert` (bool): Invert image color → height mapping. No effect for text data. Default: false. The resulting geometry is positioned with its top at z = 0, with a thin “footprint” layer (1 unit thick) added just below.
+- `convexity` (int): Maximum number of front/back faces a ray might penetrate (for correct OpenCSG preview only; no effect on final render). [Requires 2015.03]
+
+### Text file format
 
-</div>
+Text-based heightmaps are matrices of numbers (heights). Rows map to Y, columns to X, with unit spacing. Numbers are separated by spaces or tabs. Empty lines and lines beginning with `#` are ignored.
+
+### Images
+
+[Requires 2015.03]
+
+- Currently only PNG is supported.
+- Alpha channel is ignored.
+- Height computed from sRGB linear luminance: `Y = 0.2126R + 0.7152G + 0.0722B`.
+- Heights are scaled to range 0–100.
+- A 1-unit thick “footprint” layer is added below the heightmap.
+
+### Examples
+
+Example 1 (text heightmap):
 
-<div class="vector-sticky-header-buttons">
+```openscad
+// surface.scad
+surface(file = "surface.dat", center = true, convexity = 5);
+%translate([0,0,5]) cube([10,10,10], center = true);
+```
 
-<span class="vector-icon mw-ui-icon-wikimedia-language mw-ui-icon-wikimedia-wikimedia-language"></span>
-<span>3 languages</span>
+surface.dat:
 
-[<span class="vector-icon mw-ui-icon-speechBubbleAdd-progressive mw-ui-icon-wikimedia-speechBubbleAdd-progressive"></span>
-<span>Add topic</span>](#)
+```
+#surface.dat
+10 9 8 7 6 5 5 5 5 5
+9 8 7 6 6 4 3 2 1 0
+8 7 6 6 4 3 2 1 0 0
+7 6 6 4 3 2 1 0 0 0
+6 6 4 3 2 1 1 0 0 0
+6 6 3 2 1 1 1 0 0 0
+6 6 2 1 1 1 1 0 0 0
+6 6 1 0 0 0 0 0 0 0
+3 1 0 0 0 0 0 0 0 0
+3 0 0 0 0 0 0 0 0 0
+```
 
-</div>
+Example 2 (generated data + variations):
 
-<div class="vector-sticky-header-icon-end">
+```
+# example010.dat generated using Octave/Matlab:
+d = (sin(1:0.2:10)' * cos(1:0.2:10)) * 10;
+save("-ascii", "example010.dat", "d");
+```
 
-<div class="vector-user-links">
+```openscad
+// original surface
+surface(file = "example010.dat", center = true, convexity = 5);
+
+// rotated surface
+translate([70, 0, 0])
+rotate(45, [0, 0, 1])
+surface(file = "example010.dat", center = true, convexity = 5);
 
-</div>
+// intersection
+translate([35, 60, 0])
+intersection() {
+    surface(file = "example010.dat", center = true, convexity = 5);
+    rotate(45, [0, 0, 1])
+    surface(file = "example010.dat", center = true, convexity = 5);
+}
+```
 
-</div>
+Example 3 (PNG heightmap) [Requires 2015.03]:
 
-</div>
+```openscad
+// Example 3a
+scale([1, 1, 0.1]) surface(file = "smiley.png", center = true);
 
-</div>
+// Example 3b (invert)
+scale([1, 1, 0.1]) surface(file = "smiley.png", center = true, invert = true);
+```
 
-</div>
+Example 4 (PNG heightmap) [Requires 2015.03]:
 
-<div id="p-dock-bottom" class="mw-portlet mw-portlet-dock-bottom emptyPortlet">
+```openscad
+surface(file = "BRGY-Grey.png", center = true, invert = false);
+```
 
-</div>
+## search
+
+The `search()` function finds occurrences of values or lists in a vector, string, or list-of-lists.
+
+### Usage
+
+```
+search(match_value, string_or_vector [, num_returns_per_match [, index_col_num ] ]);
+```
+
+### Arguments
+
+- `match_value`:
+  - Single string: searches per-character in the second argument (string or list-of-lists). Does not search substrings.
+  - Single number.
+  - List of values: searches for each item in the list independently.
+  - To search for the whole string/list as a single item, wrap in another list, e.g. `["abc"]` or `[[6,7,8]]`.
+  - If boolean, returns `undef`.
+
+- `string_or_vector`:
+  - The string or list to search.
+  - If `match_value` is a string, this should be a string (search per character) or a list-of-lists. For list-of-lists, only one index of each sublist is searched (see `index_col_num`).
+  - If a character fails to match (with list-of-lists and `num_returns_per_match == 1`), a warning is printed and that result is excluded.
+
+- `num_returns_per_match` (default 1):
+  - If `> 1`, returns up to that many indices per match (list of lists).
+  - If `0`, returns all matches per item (list of lists).
+  - If `1`, returns first match per item (vector).
+
+- `index_col_num` (default 0):
+  - For list-of-lists, specifies which index of each sublist to search.
+
+### Search usage examples
+
+See example023.scad for a renderable example.
+
+#### Index values returned as list
+
+| # | Code                         | Result   |
+|---|------------------------------|----------|
+| 1 | `search("a","abcdabcd");`    | `[0]`    |
+| 2 | `search("e","abcdabcd");`    | `[]`     |
+| 3 | `search("a","abcdabcd",0);`  | `[[0,4]]`|
+
+Example 4 (list-of-lists):
+
+```openscad
+data = [
+    ["a",1],["b",2],["c",3],["d",4],
+    ["a",5],["b",6],["c",7],["d",8],["e",9]
+];
+search("a", data, num_returns_per_match=0);  // -> [[0,4]]
+```
+
+#### Search on different column; return index values
+
+```openscad
+data = [
+    ["a",1],["b",2],["c",3],["d",4],
+    ["a",5],["b",6],["c",7],["d",8],["e",3]
+];
+
+echo(search(3, data)); // default searches index 0 -> []
+echo(search(3, data, num_returns_per_match=0, index_col_num=1)); // -> [2, 8]
+
+// Console:
+// ECHO: []
+// ECHO: [2, 8]
+```
+
+#### Search on list of values
+
+Return all matches per search element (`num_returns_per_match = 0`):
+
+```openscad
+data = [
+    ["a",1],["b",2],["c",3],["d",4],
+    ["a",5],["b",6],["c",7],["d",8],["e",9]
+];
+
+search("abc", data, num_returns_per_match=0);
+// Returns: [[0,4],[1,5],[2,6]]
+```
+
+Return first match per element (`num_returns_per_match = 1`):
+
+```openscad
+data = [
+    ["a",1],["b",2],["c",3],["d",4],
+    ["a",5],["b",6],["c",7],["d",8],["e",9]
+];
+
+search("abc", data, num_returns_per_match=1);
+// Returns: [0,1,2]
+```
+
+Return first two matches per element:
+
+```openscad
+data = [
+    ["a",1],["b",2],["c",3],["d",4],
+    ["a",5],["b",6],["c",7],["d",8],["e",9]
+];
+
+search("abce", data, num_returns_per_match=2);
+// Returns: [[0,4],[1,5],[2,6],[8]]
+```
+
+#### Search on list of strings
+
+```openscad
+lTable2 = [
+    ["cat",1],["b",2],["c",3],["dog",4],["a",5],["b",6],["c",7],["d",8],
+    ["e",9],["apple",10],["a",11]
+];
+lSearch2 = ["b","zzz","a","c","apple","dog"];
+l2 = search(lSearch2, lTable2);
+echo(str("Default list string search (",lSearch2,"): ", l2));
+
+// Console:
+// ECHO: "Default list string search (["b", "zzz", "a", "c", "apple", "dog"]): [1, [], 4, 2, 9, 3]"
+```
+
+#### Getting the right results
+
+```openscad
+// work out which vectors get the results
+v = [["O",2],["p",3],["e",9],["n",4],["S",5],["C",6],["A",7],["D",8]];
+
+// echo(v[0]);                 // -> ["O",2]
+echo(v[1]);                    // -> ["p",3]
+echo(v[1][0], v[1][1]);        // -> "p", 3
+
+echo(search("p", v));          // find "p" -> [1]
+echo(search("p", v)[0]);       // -> 1
+
+echo(search(9, v, 0, 1));      // find 9 in column 1 -> [2]
+echo(v[search(9, v, 0, 1)[0]]);    // -> ["e",9]
+echo(v[search(9, v, 0, 1)[0]][0]); // -> "e"
+echo(v[search(9, v, 0, 1)[0]][1]); // -> 9
+
+echo(v[search("p", v, 1, 0)[0]][1]); // -> 3
+echo(v[search("p", v, 1, 0)[0]][0]); // -> "p"
+echo(v[search("d", v, 1, 0)[0]][0]); // "d" not found -> undef
+echo(v[search("D", v, 1, 0)[0]][1]); // -> 8
+```
+
+## OpenSCAD version
+
+- `version()` returns a vector `[year, month, day]`, e.g. `[2011, 9, 23]`.
+- `version_num()` returns a numeric form, e.g. `20110923`.
+
+## parent_module(n) and $parent_modules
+
+- `$parent_modules` contains the number of modules in the instantiation stack.
+- `parent_module(i)` returns the name of the module `i` levels above the current one in the instantiation stack (based on where modules are instantiated).
+
+Example (useful for BOMs or diagnostics):
+
+```openscad
+module top() { children(); }
+module middle() { children(); }
+
+top()
+    middle()
+        echo(parent_module(0)); // prints "middle"
+
+top()
+    middle()
+        echo(parent_module(1)); // prints "top"
+```
+
+## assert
+
+[Note: Requires 2019.05]
+
+Assert evaluates a logical expression. If false, preview/render stops and an error is reported with the expression and optional message.
+
+Usage:
+
+```openscad
+assert(condition);
+assert(condition, message);
+```
+
+Parameters:
+- `condition`: expression to evaluate.
+- `message`: optional string to output when the assertion fails.
+
+### Example
+
+```openscad
+// assert_example1.scad
+cube();
+assert(false);
+sphere();
+
+// ERROR: Assertion 'false' failed in file assert_example1.scad, line 2
+```
+
+### Checking parameters
+
+```openscad
+module row(cnt = 3){
+    // Count has to be a positive integer greater 0
+    assert(cnt > 0);
+    for (i = [1 : cnt]) {
+        translate([i * 2, 0, 0]) sphere();
+    }
+}
+
+row(0);
+// ERROR: Assertion '(cnt > 0)' failed in file assert_example2.scad, line 3
+```
+
+### Adding message
+
+```openscad
+module row(cnt = 3){
+    assert(cnt > 0, "Count has to be a positive integer greater 0");
+    for (i = [1 : cnt]) {
+        translate([i * 2, 0, 0]) sphere();
+    }
+}
+
+row(0);
+// ERROR: Assertion '(cnt > 0)': "Count has to be a positive integer greater 0" failed in file assert_example3.scad, line 2
+```
+
+### Using assertions in functions
+
+`assert` returns its children; in a function, chain checks and then compute:
+
+```openscad
+function f(a, b) =
+    assert(a < 0, "wrong a")       // assert input
+    assert(b > 0, "wrong b")       // assert input
+    let (c = a + b)                // derive a new value
+    assert(c != 0, "wrong c")      // assert derived value
+    a * b;                         // calculate
+```
+
+---
+
+# En.Wikibooks.Org Wiki Openscad User Manual Type Test Functions Is Bool
+
+# OpenSCAD User Manual — Type Test Functions
+
+## is_undef
+
+Note: Requires version 2019.05
+
+- Accepts one parameter. Returns true if the argument is undef, otherwise false.
+- When checking a variable like is_undef(a), the variable lookup is silent and does not produce warnings about unknown variables.
+
+Example (causes warnings if not using is_undef):
+```openscad
+if (a == undef) {
+  // code goes here
+}
+
+b = (a == undef) ? true : false;
+```
+
+Using is_undef with special variables:
+```openscad
+exploded = is_undef($exploded) ? 0 : $exploded; // 1 for exploded view
+```
+
+### Legacy support
+
+For older OpenSCAD versions, is_undef can be emulated (will cause warnings):
+```openscad
+function is_undef(a) = (undef == a);
+```
+
+## is_list
+
+Note: Requires version 2019.05
+
+```openscad
+echo("returning true");
+echo(is_list([]));
+echo(is_list([1]));
+echo(is_list([1,2]));
+echo(is_list([true]));
+echo(is_list([1,2,[5,6],"test"]));
+
+echo("--------");
+
+echo("returning false");
+echo(is_list(1));
+echo(is_list(1/0));
+echo(is_list(((1/0)/(1/0))));
+echo(is_list("test"));
+echo(is_list(true));
+echo(is_list(false));
+
+echo("--------");
+
+echo("causing warnings:");
+echo(is_list());
+echo(is_list(1,2));
+```
+
+## is_num
+
+Note: Requires version 2019.05
+
+```openscad
+echo("a number is a number:");
+echo(is_num(0.1));
+echo(is_num(1));
+echo(is_num(10));
+
+echo("inf is a number:");
+echo(is_num(+1/0)); // +inf
+echo(is_num(-1/0)); // -inf
+
+echo("nan is not a number:");
+echo(is_num(0/0));        // nan
+echo(is_num((1/0)/(1/0))); // nan
+
+echo("resulting in false:");
+echo(is_num([]));
+echo(is_num([1]));
+echo(is_num("test"));
+echo(is_num(false));
+echo(is_num(undef));
+```
+
+## is_bool
+
+Note: Requires version 2019.05
+
+```openscad
+echo("resulting in true:");
+echo(is_bool(true));
+echo(is_bool(false));
+
+echo("resulting in false:");
+echo(is_bool([]));
+echo(is_bool([1]));
+echo(is_bool("test"));
+echo(is_bool(0.1));
+echo(is_bool(1));
+echo(is_bool(10));
+echo(is_bool(0/0));           // nan
+echo(is_bool((1/0)/(1/0)));   // nan
+echo(is_bool(1/0));           // inf
+echo(is_bool(-1/0));          // -inf
+echo(is_bool(undef));
+```
+
+## is_string
+
+Note: Requires version 2019.05
+
+```openscad
+echo("resulting in true:");
+echo(is_string(""));
+echo(is_string("test"));
+
+echo("resulting in false:");
+echo(is_string(0.1));
+echo(is_string(1));
+echo(is_string(10));
+echo(is_string([]));
+echo(is_string([1]));
+echo(is_string(false));
+echo(is_string(0/0));           // nan
+echo(is_string((1/0)/(1/0)));   // nan
+echo(is_string(1/0));           // inf
+echo(is_string(-1/0));          // -inf
+echo(is_string(undef));
+```
+
+## is_function
+
+Note: Requires version 2021.01
+
+- Works only for expressions. Can be applied to function literals or variables containing functions.
+- Does not work with built-in functions or normal function definitions.
+
+```openscad
+echo(is_function(function(x) x*x)); // ECHO: true
+
+func = function(x) x+x;
+echo(is_function(func)); // ECHO: true
+
+function f(x) = x;
+echo(is_function(f)); // WARNING: Ignoring unknown variable 'f' / ECHO: false
+```
+
+## is_object
+
+Note: Requires version Development snapshot
+
+Returns true if the argument is an object, and false otherwise.
+
+---
+
