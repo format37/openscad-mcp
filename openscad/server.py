@@ -9,7 +9,6 @@ import threading
 import uuid
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
 
 import sentry_sdk
 import uvicorn
@@ -19,24 +18,25 @@ from starlette.responses import JSONResponse
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 
-from mcp.server.fastmcp import Context, FastMCP
+from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp import Image as MCPImage
 
 from mcp_image_utils import to_mcp_image
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),  # This goes to Docker logs
-    ]
-)
+# # Configure logging
+# logging.basicConfig(
+#     level=logging.INFO,
+#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+#     handlers=[
+#         logging.StreamHandler(),  # This goes to Docker logs
+#     ]
+# )
 logger = logging.getLogger(__name__)
 
 # Initialize Sentry if DSN is provided
 sentry_dsn = os.getenv("SENTRY_DSN")
 if sentry_dsn:
+    logger.info(f"Initializing Sentry with DSN: {sentry_dsn[:20]}... (truncated for security)")
     sentry_sdk.init(
         dsn=sentry_dsn,
         # Enable logs to be sent to Sentry
@@ -98,13 +98,6 @@ if PUBLIC_ASSET_BASE_URL:
 elif PUBLIC_BASE_URL:
     PUBLIC_ASSET_BASE_URL = f"{PUBLIC_BASE_URL}{ASSETS_ROUTE}"
 
-PUBLIC_LINK_TOKEN = os.getenv("MCP_PUBLIC_LINK_TOKEN")
-ALLOW_URL_TOKENS = os.getenv("MCP_ALLOW_URL_TOKENS", "").lower() in {"1", "true", "yes"}
-if PUBLIC_LINK_TOKEN and not ALLOW_URL_TOKENS:
-    logger.warning(
-        "MCP_PUBLIC_LINK_TOKEN is set but MCP_ALLOW_URL_TOKENS is disabled; omitting link token from URLs."
-    )
-    PUBLIC_LINK_TOKEN = None
 
 
 # Preview sizing (keep inline responses <~1MB)
@@ -119,7 +112,6 @@ PREVIEW_JPEG_QUALITY = _env_int("MCP_PREVIEW_JPEG_QUALITY", 85)
 mcp = FastMCP(_safe_name, streamable_http_path=STREAM_PATH, json_response=True)
 
 # Add custom error handling for stream disconnections
-import anyio
 original_logger = logging.getLogger("mcp.server.streamable_http")
 
 class StreamErrorFilter(logging.Filter):
@@ -145,7 +137,6 @@ _render_semaphore = threading.Semaphore(_max_concurrency)
 def render_scad_script(
     scad_code: str,
     view: str = "3d",
-    ctx: Context | None = None,
 ) -> list[Any]:
     """Render an OpenSCAD script and return a preview image with download link.
 
@@ -265,13 +256,9 @@ def render_scad_script(
                 preview_content = preview_block.to_image_content()
 
                 asset_relative_path = f"{render_uid}/{png_name}"
-                asset_http_path = f"{ASSETS_ROUTE}/{asset_relative_path}"
                 public_url = None
                 if PUBLIC_ASSET_BASE_URL:
                     public_url = f"{PUBLIC_ASSET_BASE_URL}/{asset_relative_path}"
-                    if PUBLIC_LINK_TOKEN:
-                        sep = "&" if "?" in public_url else "?"
-                        public_url = f"{public_url}{sep}token={quote(PUBLIC_LINK_TOKEN)}"
 
                 if public_url:
                     info_lines = [f"Preview URL: {public_url}"]
@@ -302,7 +289,6 @@ def render_scad_script(
 @mcp.tool()
 def generate_stl(
     scad_code: str,
-    ctx: Context | None = None,
 ) -> list[Any]:
     """Generate an STL file from OpenSCAD code and provide download link.
 
@@ -327,7 +313,6 @@ def generate_stl(
 
             # Use provided scad_code directly
             scad_content = scad_code
-            source_name = _sanitize_filename(output_filename)
 
             # Create temporary files
             with tempfile.NamedTemporaryFile(
@@ -385,13 +370,9 @@ def generate_stl(
 
                 # Generate public URL for STL file
                 stl_asset_relative_path = f"{stl_uid}/{stl_filename}"
-                stl_asset_http_path = f"{STL_ASSETS_ROUTE}/{stl_asset_relative_path}"
                 stl_public_url = None
                 if PUBLIC_BASE_URL:
                     stl_public_url = f"{PUBLIC_BASE_URL}{STL_ASSETS_ROUTE}/{stl_asset_relative_path}"
-                    if PUBLIC_LINK_TOKEN:
-                        sep = "&" if "?" in stl_public_url else "?"
-                        stl_public_url = f"{stl_public_url}{sep}token={quote(PUBLIC_LINK_TOKEN)}"
 
                 if stl_public_url:
                     info_lines = [f"STL URL: {stl_public_url}"]
