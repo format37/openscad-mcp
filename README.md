@@ -4,7 +4,19 @@ Openscad MCP server, that has the following features:
 * stl generation from openscad code
 * openscad documentation resource
 
-## Installation
+### Client side installation
+Available in Claude web, Claude mobile, Chat GPT Web, and any other mcp client
+```
+https://rtlm.info/openscad/8TikTAffQT3Db65Q7xbofbUjapGjKepTI3sikOeLWClfXW5GXO/
+```
+*The provided url is defined for demonstration and would be removed eventually.*
+
+## Server installation
+
+### Requirements
+* donaim name
+* linux machine with ext ip
+* sufficien firewall ports configuration
 
 ### 1. Reverse-proxy
 Install [this](https://github.com/format37/reverse-proxy) or use your own.
@@ -28,9 +40,6 @@ MCP_TOKENS=YOUR_TOKEN
 MCP_REQUIRE_AUTH=true
 MCP_ALLOW_URL_TOKENS=true
 ```
-
-# Define the Caddyfile
-Need to define domain name in the first line. Subtomain is also acceptable.
 
 ### 4. Compose
 ```bash
@@ -56,11 +65,3 @@ The token is defined temporary for demo and may be unavailable later. Make ur ow
   }
 }
 ```
-
-### 6. Claude web, Claude mobile, Chat GPT Web
-```
-https://rtlm.info/openscad/8TikTAffQT3Db65Q7xbofbUjapGjKepTI3sikOeLWClfXW5GXO/
-```
-
-### 7. Notes
-The provided url is defined for demonstration and would be removed eventually.

@@ -290,11 +290,11 @@ def render_scad_script(
 def generate_stl(
     scad_code: str,
 ) -> list[Any]:
-    """Generate an STL file from OpenSCAD code and provide download link.
+    """Generate an STL file from OpenSCAD code and provide download links.
 
-    Takes OpenSCAD code and generates a downloadable STL file for 3D printing or CAD import.
-    Returns an HTTPS download URL. IMPORTANT: Always provide the STL URL to users so they
-    can download the generated 3D model file for 3D printing or CAD software.
+    Takes OpenSCAD code and generates downloadable STL and SCAD files for 3D printing or CAD import.
+    Returns HTTPS download URLs for both files. IMPORTANT: Always provide both STL and SCAD URLs to users so they
+    can download the generated 3D model file for 3D printing or CAD software and the source code.
     """
 
     try:
@@ -353,13 +353,20 @@ def generate_stl(
                         "OpenSCAD STL generation succeeded but no output file was created"
                     )
 
-                # Always persist STL files
+                # Always persist STL and SCAD files
                 uid_stl_dir.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(temp_stl_path, permanent_stl_path)
+
+                # Also save the SCAD file alongside the STL
+                scad_filename = f"{safe_output_name}.scad"
+                permanent_scad_path = uid_stl_dir / scad_filename
+                shutil.copy2(temp_scad_path, permanent_scad_path)
+
                 logger.info(
-                    "Persisted STL UID=%s file at %s",
+                    "Persisted STL UID=%s files at %s and %s",
                     stl_uid,
                     permanent_stl_path,
+                    permanent_scad_path,
                 )
 
                 # Generate resource URI
@@ -368,19 +375,23 @@ def generate_stl(
                 # Get file size for info
                 stl_size = temp_stl_path.stat().st_size
 
-                # Generate public URL for STL file
+                # Generate public URLs for both STL and SCAD files
                 stl_asset_relative_path = f"{stl_uid}/{stl_filename}"
+                scad_asset_relative_path = f"{stl_uid}/{scad_filename}"
+
                 stl_public_url = None
+                scad_public_url = None
                 if PUBLIC_BASE_URL:
                     stl_public_url = f"{PUBLIC_BASE_URL}{STL_ASSETS_ROUTE}/{stl_asset_relative_path}"
+                    scad_public_url = f"{PUBLIC_BASE_URL}{STL_ASSETS_ROUTE}/{scad_asset_relative_path}"
 
-                if stl_public_url:
-                    info_lines = [f"{stl_public_url}"]
+                if stl_public_url and scad_public_url:
+                    info_lines = [f"STL: {stl_public_url}", f"SCAD: {scad_public_url}"]
                 else:
-                    info_lines = ["Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL links."]
+                    info_lines = ["Configure MCP_PUBLIC_BASE_URL to expose HTTPS STL and SCAD links."]
 
                 # Log successful STL generation
-                logger.info(f"generate_stl successful: {stl_filename} generated, stl_uid={stl_uid}, size={stl_size} bytes, url={stl_public_url or 'not_configured'}")
+                logger.info(f"generate_stl successful: {stl_filename} and {scad_filename} generated, stl_uid={stl_uid}, size={stl_size} bytes, stl_url={stl_public_url or 'not_configured'}, scad_url={scad_public_url or 'not_configured'}")
 
                 # return [stl_resource_uri, "\n".join(info_lines)]
                 return ["\n".join(info_lines)]
