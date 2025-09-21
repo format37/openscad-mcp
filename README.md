@@ -3,6 +3,10 @@ Openscad MCP server, that has the following features:
 * openscad code rendering to png
 * stl generation from openscad code
 * openscad documentation resource
+## Demo Video
+Watch the OpenSCAD MCP in action:
+
+[![OpenSCAD MCP Demo](https://img.youtube.com/vi/_wX1f8O_n8M/0.jpg)](https://youtu.be/_wX1f8O_n8M)
 
 ### Client side installation
 Available in Claude web, Claude mobile, Chat GPT Web, and any other mcp client
