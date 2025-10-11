@@ -11,7 +11,7 @@ Watch the OpenSCAD MCP in action:
 ### Client side installation
 Available in Claude web, Claude mobile, Chat GPT Web, and any other mcp client
 ```
-https://rtlm.info/openscad/8TikTAffQT3Db65Q7xbofbUjapGjKepTI3sikOeLWClfXW5GXO/
+https://scriptlab.duckdns.org/openscad/8TikTAffQT3Db65Q7xbofbUjapGjKepTI3sikOeLWClfXW5GXO/
 ```
 *The provided url is defined for demonstration and would be removed eventually.*
 
@@ -44,6 +44,7 @@ MCP_TOKENS=YOUR_TOKEN
 MCP_REQUIRE_AUTH=true
 MCP_ALLOW_URL_TOKENS=true
 ```
+Check that docker-compose.yml configured accordingly to your dns name
 
 ### 4. Compose
 ```bash
@@ -55,7 +56,7 @@ MCP_ALLOW_URL_TOKENS=true
 - Each render is saved under `./data/scad/<uid>/` and `./data/render/<uid>/` with filenames derived from the provided `filename` plus the view (e.g., `script_3d.png`). You can pass a custom `uid` if you need predictable locations.
 
 ### 5. Claude desktop config
-The token is defined temporary for demo and may be unavailable later. Make ur own server)
+The token is defined temporary for demo and may be unavailable later. So u can deploy ur own server
 ```
 {
   "mcpServers": {
