@@ -1,5 +1,6 @@
 import contextlib
 import contextvars
+import datetime
 import logging
 import os
 import re
@@ -15,7 +16,7 @@ import uvicorn
 from starlette.applications import Starlette
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
-from starlette.routing import Mount
+from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
 from mcp.server.fastmcp import FastMCP
@@ -477,8 +478,81 @@ async def lifespan(_: Starlette):
     async with mcp.session_manager.run():
         yield
 
+async def health_check(request):
+    """Health endpoint for monitoring and load balancer checks."""
+    try:
+        # Check OpenSCAD availability
+        openscad_available = True
+        openscad_version = None
+        try:
+            result = subprocess.run(
+                ["openscad", "--version"], 
+                capture_output=True, 
+                text=True, 
+                timeout=5
+            )
+            if result.returncode == 0:
+                # Extract version from output
+                version_line = result.stderr.strip() or result.stdout.strip()
+                openscad_version = version_line.split('\n')[0] if version_line else "unknown"
+            else:
+                openscad_available = False
+        except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
+            openscad_available = False
+
+        # Check directory accessibility
+        directories_ok = all(
+            directory.exists() and directory.is_dir() 
+            for directory in [DATA_DIR, SCAD_DIR, RENDER_DIR, STL_DIR]
+        )
+
+        # Check semaphore availability
+        semaphore_available = _render_semaphore._value > 0
+
+        # Determine overall status
+        healthy = openscad_available and directories_ok
+        status = "healthy" if healthy else "unhealthy"
+
+        health_data = {
+            "status": status,
+            "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+            "service": _safe_name,
+            "version": "1.0.0",  # You can make this configurable
+            "checks": {
+                "openscad": {
+                    "available": openscad_available,
+                    "version": openscad_version
+                },
+                "directories": {
+                    "accessible": directories_ok,
+                    "data_dir": str(DATA_DIR),
+                    "scad_dir": str(SCAD_DIR), 
+                    "render_dir": str(RENDER_DIR),
+                    "stl_dir": str(STL_DIR)
+                },
+                "concurrency": {
+                    "available_slots": _render_semaphore._value,
+                    "max_concurrent": _max_concurrency
+                }
+            }
+        }
+
+        status_code = 200 if healthy else 503
+        return JSONResponse(health_data, status_code=status_code)
+
+    except Exception as e:
+        logger.error(f"Health check error: {e}")
+        return JSONResponse({
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+        }, status_code=503)
+
+
 app = Starlette(
     routes=[
+        Route("/health", health_check, methods=["GET"]),
+        Route(f"{BASE_PATH}/health", health_check, methods=["GET"]),
         Mount(
             ASSETS_ROUTE,
             app=StaticFiles(directory=ASSETS_DIR, check_dir=False),
@@ -542,8 +616,10 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
         if not path.startswith(BASE_PATH):
             return await call_next(request)
 
-        # Allow public access to asset routes (they use UUID-based security)
-        if path.startswith(ASSETS_ROUTE) or path.startswith(STL_ASSETS_ROUTE):
+        # Allow public access to health endpoints, asset routes (they use UUID-based security)
+        if (path in ["/health", f"{BASE_PATH}/health"] or 
+            path.startswith(ASSETS_ROUTE) or 
+            path.startswith(STL_ASSETS_ROUTE)):
             return await call_next(request)
 
         def accept(token_value: str, source: str):
