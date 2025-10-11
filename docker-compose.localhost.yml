@@ -1,0 +1,34 @@
+services:
+  mcp-openscad:
+    container_name: mcp-openscad
+    runtime: runc
+    build: openscad
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./data.csv:/app/data.csv:ro
+    environment:
+      - PORT=8004
+      - TZ=UTC
+      - MCP_TOKENS=${MCP_TOKENS}
+      - MCP_REQUIRE_AUTH=${MCP_REQUIRE_AUTH}
+      - MCP_ALLOW_URL_TOKENS=${MCP_ALLOW_URL_TOKENS}
+      - MCP_PUBLIC_BASE_URL=${MCP_PUBLIC_BASE_URL}
+      - MCP_PUBLIC_LINK_TOKEN=${MCP_PUBLIC_LINK_TOKEN}
+      - MCP_PUBLIC_ASSET_BASE_URL=${MCP_PUBLIC_ASSET_BASE_URL}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - RENDER_MAX_CONCURRENCY=1
+    expose:
+      - "8004"
+    restart: unless-stopped
+    networks:
+      - default
+      - mcp-shared
+
+networks:
+  mcp-shared:
+    external: true
